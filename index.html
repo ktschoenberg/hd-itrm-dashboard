@@ -190,11 +190,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .gauge-stat-label{font-size:10px;color:var(--g500);margin-top:1px}
 
 /* Heat Map */
-.hm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:2px}
-.hm-cell{border-radius:6px;padding:10px 10px 8px;cursor:default;transition:opacity .1s}
+.hm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:2px}
+.hm-cell{border-radius:5px;padding:7px 8px 6px;cursor:default;transition:opacity .1s}
 .hm-cell:hover{opacity:.85}
-.hm-name{font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;text-transform:uppercase;letter-spacing:.03em}
-.hm-pct{font-size:18px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.hm-name{font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;text-transform:uppercase;letter-spacing:.03em}
+.hm-pct{font-size:15px;font-weight:800;letter-spacing:-.03em;line-height:1}
 .hm-flag{font-size:9px;font-weight:600;margin-top:2px}
 
 /* Spend Breakdown (Chart 7) */
@@ -1047,7 +1047,7 @@ function toTitleCase(s) {
 }
 
 // ── DETAIL PANE ───────────────────────────────────────────
-let _vpSorted = [], _bubbleData = [];
+let _vpSorted = [], _bubbleData = [], _hmPortfolios = [];
 
 function _dpColor(c) {
   return c === 'green' ? 'var(--green600)' : c === 'yellow' ? 'var(--yellow700)' : 'var(--red600)';
@@ -1109,13 +1109,13 @@ function openDp(type, data) {
   } else if (type === 'portfolio') {
     const p = data;
     const burn = burnPct(p.actual, p.forecast);
-    const sps  = SP.filter(s => s.portfolio === p.name).sort((a,b) => b.forecast - a.forecast);
+    const sps  = SP.filter(s => s.portfolio === p.name && !s.name.includes('Hard Cap')).sort((a,b) => b.forecast - a.forecast);
     eyebrow.textContent = 'Portfolio';
     title.textContent   = p.name;
     body.innerHTML = `
-      <div class="dp-context"><div class="dp-context-row"><strong>VP</strong> · ${toTitleCase(p.vp)}</div></div>
+      <div class="dp-context"><div class="dp-context-row"><strong>VP</strong> · ${toTitleCase(p.vp)}</div><div class="dp-context-row" style="margin-top:3px;font-size:10.5px;color:var(--g500)">Labor only · excludes Hard Cap</div></div>
       <div class="dp-kpi-row">
-        ${_dpKpi('FY Forecast','$'+fmtM(p.forecast),'')}
+        ${_dpKpi('Labor Forecast','$'+fmtM(p.forecast),'')}
         ${_dpKpi('YTD Actual','$'+fmtM(p.actual),'var(--hd)')}
         ${_dpKpi('Burn Rate',burn.toFixed(1)+'%',_dpColor(burnColor(burn)))}
       </div>
@@ -1385,7 +1385,8 @@ function closeDp() {
   document.getElementById('dp').classList.remove('open');
 }
 function openDpPortfolio(name) {
-  const p = PORTFOLIOS.find(x => x.name === name); if (p) openDp('portfolio', p);
+  const p = (_hmPortfolios.length ? _hmPortfolios : PORTFOLIOS).find(x => x.name === name);
+  if (p) openDp('portfolio', p);
 }
 function openDpSP(id) {
   const s = SP.find(x => x.id === id); if (s) openDp('sp', s);
@@ -1595,6 +1596,7 @@ function buildOverview() {
     forecast: (laborSPMap[p.name] || {forecast:p.forecast}).forecast,
     actual:   (laborSPMap[p.name] || {actual:p.actual}).actual,
   }));
+  _hmPortfolios = hmPortfolios;
   hmEl.innerHTML = hmPortfolios.map(p => {
     const pct = burnPct(p.actual, p.forecast);
     const s = hmStyle(pct, p.actual);
