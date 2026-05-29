@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HD Network Ops · ITRM Financial Dashboard FY2026</title>
+<title>HD Infrastructure Technology · ITRM Financial Dashboard FY2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-/* ─── Tokens ─── */
 :root {
   --g950:#0C111D; --g900:#101828; --g800:#1D2939; --g700:#344054;
   --g600:#475467; --g500:#667085; --g400:#98A2B3; --g300:#D0D5DD;
@@ -30,7 +29,6 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);
   display:flex;flex-direction:column;height:100vh;overflow:hidden;
   font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
-/* ── TOPBAR ── */
 .topbar{background:var(--white);border-bottom:1px solid var(--g200);height:56px;
   display:flex;align-items:center;padding:0 24px;flex-shrink:0;box-shadow:var(--sh-xs);z-index:10}
 .tb-mark{width:30px;height:30px;background:var(--hd);border-radius:var(--r6);
@@ -47,7 +45,6 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);
 .live-dot{width:6px;height:6px;background:var(--green500);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ── LAYOUT ── */
 .body-wrap{display:flex;flex:1;overflow:hidden}
 .sidebar{width:220px;flex-shrink:0;background:var(--g900);display:flex;flex-direction:column}
 .s-nav{padding:10px 8px;flex:1}
@@ -61,7 +58,6 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);
 .s-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.7);line-height:1.7}
 .s-footer strong{color:#fff;display:block;font-size:11.5px;margin-bottom:1px}
 
-/* ── MAIN ── */
 .main{flex:1;overflow-y:auto;padding:22px 28px 56px}
 .section{display:none}.section.active{display:block}
 .page-hd{margin-bottom:18px;display:flex;align-items:flex-end;justify-content:space-between}
@@ -69,1157 +65,878 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);
 .page-sub{font-size:12.5px;color:var(--g500);margin-top:2px}
 .page-meta{font-size:11.5px;color:var(--g400)}
 
-/* ── ALERT ── */
 .alert{display:flex;align-items:center;gap:10px;background:var(--red50);border:1px solid var(--red100);
   border-left:3px solid var(--red600);border-radius:var(--r8);padding:10px 16px;
-  font-size:12.5px;color:var(--red700);margin-bottom:16px}
+  font-size:12.5px;color:var(--red700);margin-bottom:12px}
 .alert svg{flex-shrink:0;width:15px;height:15px}
 .alert strong{font-weight:700}
 .alert-note{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--red600);white-space:nowrap}
 .alert-warn{background:var(--yellow50);border-color:var(--yellow100);border-left-color:var(--yellow700);color:var(--yellow700)}
 .alert-ok{background:var(--green50);border-color:var(--green100);border-left-color:var(--green500);color:var(--green700)}
-.alert-ok .alert-note{color:var(--green700)}
+.alert-warn .alert-note{color:var(--yellow700)}
 
-/* ── KPI ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
-.kpi-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
-.kpi{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:16px 18px;box-shadow:var(--sh-xs)}
-.kpi.accent{border-left:3px solid var(--hd)}
-.kpi.alert-red{border-left:3px solid var(--red600)}
-.kpi.alert-green{border-left:3px solid var(--green500)}
-.kpi-label{font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
-.kpi-val{font-size:26px;font-weight:800;color:var(--g900);letter-spacing:-.04em;line-height:1;margin-bottom:4px}
-.kpi.accent .kpi-val{color:var(--hd)}
-.kpi-sub{font-size:11.5px;color:var(--g400)}
-.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;
-  padding:1.5px 7px;border-radius:var(--rfull);margin-top:5px}
-.delta-up{background:var(--red50);color:var(--red700)}
-.delta-dn{background:var(--green50);color:var(--green700)}
-.delta-neu{background:var(--g150);color:var(--g600)}
-.delta-warn{background:var(--yellow50);color:var(--yellow700)}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:16px 20px;box-shadow:var(--sh-xs)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.kpi-val{font-size:24px;font-weight:800;color:var(--g900);letter-spacing:-.03em;line-height:1}
+.kpi-val.hd{color:var(--hd)}
+.kpi-val.green{color:var(--green600)}
+.kpi-val.red{color:var(--red600)}
+.kpi-val.yellow{color:var(--yellow700)}
+.kpi-sub{font-size:11.5px;color:var(--g400);margin-top:5px}
+.kpi-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;
+  padding:2px 7px;border-radius:var(--rfull);margin-top:6px}
+.kpi-badge.behind{background:var(--red50);color:var(--red700);border:1px solid var(--red100)}
+.kpi-badge.ahead{background:var(--green50);color:var(--green700);border:1px solid var(--green100)}
+.kpi-badge.on{background:var(--yellow50);color:var(--yellow700);border:1px solid var(--yellow100)}
 
-/* ── CARDS ── */
-.card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);box-shadow:var(--sh-xs)}
-.card-body{padding:18px 20px}
-.card-title{font-size:13.5px;font-weight:700;color:var(--g900)}
-.card-sub{font-size:12px;color:var(--g500);margin-top:1px}
-.mb14{margin-bottom:14px}.mb16{margin-bottom:16px}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:18px 20px;box-shadow:var(--sh-xs)}
+.chart-card.full{grid-column:1/-1}
+.cc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cc-title{font-size:13px;font-weight:700;color:var(--g900)}
+.cc-sub{font-size:11.5px;color:var(--g500)}
+.cc-chart{position:relative}
 
-/* ── GRIDS ── */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
-.grid-5-3{display:grid;grid-template-columns:5fr 3fr;gap:14px;margin-bottom:16px}
-.grid-3-2{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:16px}
-canvas{display:block;width:100%!important}
-
-/* ── PROGRESS BAR ── */
-.pbar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.pbar-row:last-child{margin-bottom:0}
-.pbar-label{font-size:12px;color:var(--g600);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pbar-track{flex:1;background:var(--g150);border-radius:var(--rfull);height:6px;position:relative}
-.pbar-fill{border-radius:var(--rfull);height:6px;transition:width .3s}
-.pbar-val{font-size:11.5px;font-weight:600;color:var(--g700);width:60px;text-align:right;flex-shrink:0;font-family:monospace}
-
-/* ── TABLE ── */
-.table-wrap{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);overflow:hidden;box-shadow:var(--sh-xs)}
-.table-header{padding:14px 18px;border-bottom:1px solid var(--g200);background:var(--white);
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-table{width:100%;border-collapse:collapse}
-thead th{text-align:left;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;
-  letter-spacing:.05em;padding:9px 14px;background:var(--g100);border-bottom:1px solid var(--g200);white-space:nowrap}
+.tbl-wrap{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);box-shadow:var(--sh-xs);overflow:hidden;margin-bottom:20px}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--g200)}
+.tbl-title{font-size:13px;font-weight:700;color:var(--g900)}
+.tbl-ct{font-size:11.5px;color:var(--g400);margin-left:8px}
+.tbl-filter{display:flex;align-items:center;gap:8px}
+.search-box{display:flex;align-items:center;gap:6px;background:var(--g100);border:1px solid var(--g200);
+  border-radius:var(--r6);padding:5px 10px;font-size:12.5px;color:var(--g600)}
+.search-box input{border:none;background:none;outline:none;font-size:12.5px;color:var(--g900);font-family:var(--font);width:180px}
+.search-box svg{color:var(--g400);flex-shrink:0}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead th{background:var(--g100);padding:9px 14px;text-align:left;font-size:11px;font-weight:700;
+  color:var(--g500);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;
+  border-bottom:1px solid var(--g200)}
 thead th.r{text-align:right}
-tbody td{padding:10px 14px;font-size:13px;color:var(--g700);border-bottom:1px solid var(--g150);vertical-align:middle}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:var(--g100)}
-td.r{text-align:right}
-td.mono{font-family:'SF Mono','Fira Code',monospace;font-size:12px}
-td.r.mono{text-align:right;font-family:'SF Mono','Fira Code',monospace;font-size:12px}
-.td-name{font-weight:600;color:var(--g900);font-size:13px}
-.td-muted{color:var(--g500);font-size:12px}
-tfoot td{padding:10px 14px;background:var(--g100);border-top:2px solid var(--g200);
-  font-family:'SF Mono','Fira Code',monospace;font-weight:700;color:var(--g700);font-size:12.5px}
-tfoot td:first-child{font-family:var(--font);color:var(--g500);font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
-tfoot td.r{text-align:right}
-tfoot td.grand{color:var(--hd);font-size:14px}
-.burn-bar{height:4px;border-radius:2px;margin-top:4px}
+tbody tr{border-bottom:1px solid var(--g200);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--g100)}
+td{padding:9px 14px;vertical-align:middle}
+td.r{text-align:right;font-variant-numeric:tabular-nums}
+td.mono{font-size:11px;color:var(--g500);font-family:monospace}
+.td-name{font-weight:600;color:var(--g900);max-width:280px}
+.td-sub{font-size:11px;color:var(--g500);margin-top:1px}
+.badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;
+  padding:2px 7px;border-radius:var(--rfull);white-space:nowrap}
+.badge-green{background:var(--green50);color:var(--green700);border:1px solid var(--green100)}
+.badge-red{background:var(--red50);color:var(--red700);border:1px solid var(--red100)}
+.badge-yellow{background:var(--yellow50);color:var(--yellow700);border:1px solid var(--yellow100)}
+.badge-gray{background:var(--g100);color:var(--g600);border:1px solid var(--g200)}
+.badge-hd{background:var(--hd-50);color:var(--hd-dark);border:1px solid rgba(249,99,2,.2)}
 
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--rfull);font-size:11px;font-weight:600;white-space:nowrap}
-.b-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.b-red{background:var(--red50);color:var(--red700)}.b-red .b-dot{background:var(--red600)}
-.b-green{background:var(--green50);color:var(--green700)}.b-green .b-dot{background:var(--green500)}
-.b-neu{background:var(--g150);color:var(--g700)}.b-neu .b-dot{background:var(--g400)}
-.b-hd{background:var(--hd-50);color:var(--hd-dark)}.b-hd .b-dot{background:var(--hd)}
-.b-warn{background:var(--yellow50);color:var(--yellow700)}.b-warn .b-dot{background:var(--yellow700)}
-.type-labor{background:#EFF8FF;color:#026AA2}
-.type-hc{background:var(--g150);color:var(--g700)}
+.burn-bar{width:80px;height:6px;background:var(--g200);border-radius:3px;display:inline-block;vertical-align:middle;position:relative;overflow:hidden}
+.burn-fill{height:100%;border-radius:3px;transition:width .3s}
+.burn-fill.green{background:var(--green500)}
+.burn-fill.yellow{background:#F79009}
+.burn-fill.red{background:var(--red600)}
 
-/* ── SEGMENT ── */
-.seg-ctrl{display:flex;gap:3px;background:var(--g150);border-radius:8px;padding:3px}
-.seg-btn{padding:4px 11px;border:none;border-radius:6px;font-size:11.5px;font-weight:500;cursor:pointer;background:transparent;color:var(--g500);transition:all .15s;white-space:nowrap;font-family:var(--font)}
-.seg-btn.active{background:var(--white);color:var(--g800);box-shadow:var(--sh-xs);font-weight:600}
+.vp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.vp-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:16px 18px;box-shadow:var(--sh-xs)}
+.vp-name{font-size:13px;font-weight:700;color:var(--g900);margin-bottom:2px}
+.vp-portfolio{font-size:11px;color:var(--g500);margin-bottom:10px}
+.vp-stat-row{display:flex;gap:16px;margin-bottom:8px}
+.vp-stat{flex:1}
+.vp-stat-label{font-size:10.5px;color:var(--g500);margin-bottom:2px}
+.vp-stat-val{font-size:16px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
+.vp-stat-val.hd{color:var(--hd)}
+.vp-burn-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.vp-burn-label{font-size:11px;color:var(--g500);white-space:nowrap}
+.vp-burn-bar{flex:1;height:5px;background:var(--g200);border-radius:3px;overflow:hidden}
+.vp-burn-fill{height:100%;border-radius:3px}
+.vp-burn-fill.green{background:var(--green500)}
+.vp-burn-fill.yellow{background:#F79009}
+.vp-burn-fill.red{background:var(--red600)}
+.vp-burn-pct{font-size:11px;font-weight:700;white-space:nowrap}
 
-/* ── FILTER BAR ── */
-.filter-bar{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);
-  padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;box-shadow:var(--sh-xs)}
-.filter-label{font-size:12px;font-weight:500;color:var(--g500)}
-.filter-select{font-size:12px;font-family:var(--font);color:var(--g700);border:1px solid var(--g200);
-  border-radius:var(--r6);padding:5px 10px;background:var(--g100);cursor:pointer;outline:none}
-.filter-select:focus{border-color:var(--hd)}
-
-/* ── INSIGHT CHIP ── */
-.insight-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-.insight{background:var(--white);border:1px solid var(--g200);border-radius:var(--r8);
-  padding:10px 14px;flex:1;min-width:200px;box-shadow:var(--sh-xs)}
-.insight-label{font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.insight-val{font-size:18px;font-weight:800;letter-spacing:-.03em;line-height:1}
-.insight-sub{font-size:11.5px;color:var(--g500);margin-top:2px}
-
-/* ── MISC ── */
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
-.divider{height:1px;background:var(--g200);margin:14px 0}
-.em-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:6px}
-.period-label{font-size:10px;color:var(--g400);font-weight:500}
-.current-period{font-size:10px;color:var(--hd);font-weight:700}
+.filter-tabs{display:flex;gap:4px;margin-bottom:16px}
+.ftab{padding:6px 14px;border-radius:var(--r6);font-size:12px;font-weight:600;cursor:pointer;
+  border:1px solid var(--g200);background:var(--white);color:var(--g600);transition:all .12s}
+.ftab.active{background:var(--g900);color:#fff;border-color:var(--g900)}
+.ftab:hover:not(.active){background:var(--g100)}
 </style>
 </head>
 <body>
 
 <header class="topbar">
   <div class="tb-mark">HD</div>
-  <span class="tb-name">Network &amp; Unified Comms</span>
+  <span class="tb-name">Infrastructure Technology</span>
   <span class="tb-sep">|</span>
-  <span class="tb-sub">ITRM Financial Dashboard · FY2026</span>
+  <span class="tb-sub">ITRM Financial Dashboard</span>
   <div class="tb-right">
-    <span class="tb-pill">P4 May · Period 4 of 13</span>
     <span class="tb-pill">FY 2026</span>
-    <span class="live-pill"><span class="live-dot"></span>Live</span>
+    <span class="tb-pill">Full IT Org</span>
+    <div class="live-pill"><div class="live-dot"></div>P4 May · Live</div>
   </div>
 </header>
 
 <div class="body-wrap">
-  <aside class="sidebar">
-    <nav class="s-nav">
-      <button class="s-item active" data-section="overview" onclick="switchTab('overview')">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+  <nav class="sidebar">
+    <div class="s-nav">
+      <button class="s-item active" onclick="switchTab('overview')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         Overview
       </button>
-      <button class="s-item" data-section="labor" onclick="switchTab('labor')">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        Labor
+      <button class="s-item" onclick="switchTab('portfolios')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        By Portfolio
       </button>
-      <button class="s-item" data-section="hardcap" onclick="switchTab('hardcap')">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-        Hard Cap
+      <button class="s-item" onclick="switchTab('vps')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        By VP
       </button>
-      <button class="s-item" data-section="projects" onclick="switchTab('projects')">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-        All Projects
+      <button class="s-item" onclick="switchTab('subproducts')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Sub-Products
       </button>
-    </nav>
-    <div class="s-footer">
-      <strong>Source: ITRM Reports</strong>
-      Project Financials · Allocation<br>
-      Monthly Financials · Resource Data
-      <div style="margin-top:6px;color:rgba(255,255,255,.5);font-size:10.5px">18 projects · 4 Eng. Managers</div>
-      <div style="margin-top:2px;color:rgba(255,255,255,.5);font-size:10.5px">Data as of P4 May 2026</div>
     </div>
-  </aside>
+    <div class="s-footer">
+      <strong>HD IT — Full Org</strong>
+      $1.549B Portfolio · 16 VPs<br>
+      31 Portfolios · 223 Sub-Products<br>
+      Updated P4 May 2026
+    </div>
+  </nav>
 
   <main class="main">
 
-    <!-- ═══════════════════ OVERVIEW ═══════════════════ -->
-    <div id="sec-overview" class="section">
+    <!-- OVERVIEW -->
+    <section class="section active" id="s-overview">
       <div class="page-hd">
         <div>
-          <div class="page-title">Executive Overview</div>
-          <div class="page-sub">FY2026 ITRM Portfolio · Network &amp; Unified Communications</div>
+          <div class="page-title">Financial Overview</div>
+          <div class="page-sub">FY2026 full IT organization · All portfolios and departments</div>
         </div>
-        <div class="page-meta">P4 May 2026 · 30.8% of fiscal year elapsed</div>
+        <div class="page-meta">As of P4 May 2026</div>
       </div>
 
-      <div class="alert">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        <span><strong>Budget Risk — Action Required:</strong> UC Refresh Store Hard Cap (PR000938) forecast of <strong>$40.9M</strong> exceeds approved budget of <strong>$38.0M</strong> by <strong>$2.89M (7.6%).</strong> GIBNER portfolio is the only EM over budget. All other EMs are favorable.</span>
-        <span class="alert-note">−$2.89M over budget</span>
-      </div>
+      <div id="alert-zone"></div>
 
       <div class="kpi-grid">
-        <div class="kpi accent">
-          <div class="kpi-label">Total Forecast Cost</div>
-          <div class="kpi-val">$99.2M</div>
-          <div class="kpi-sub">18 projects · Labor + Hard Cap</div>
-          <div class="kpi-delta delta-neu">vs Budget $101.6M</div>
+        <div class="kpi">
+          <div class="kpi-label">FY26 Forecast</div>
+          <div class="kpi-val hd">$1.549B</div>
+          <div class="kpi-sub">Full IT organization</div>
         </div>
         <div class="kpi">
           <div class="kpi-label">YTD Actual Spend</div>
-          <div class="kpi-val">$30.0M</div>
-          <div class="kpi-sub">Through P4 May (30.2% burn rate)</div>
-          <div class="kpi-delta delta-neu">Year 30.8% elapsed · On track</div>
+          <div class="kpi-val">$385.4M</div>
+          <div class="kpi-sub">P1–P4 (Feb–May)</div>
         </div>
-        <div class="kpi alert-green">
-          <div class="kpi-label">Portfolio Budget Variance</div>
-          <div class="kpi-val" style="color:var(--green600)">+$2.43M</div>
-          <div class="kpi-sub">Budget exceeds forecast — favorable overall</div>
-          <div class="kpi-delta delta-dn">↓ Favorable · Under budget</div>
+        <div class="kpi">
+          <div class="kpi-label">Burn Rate</div>
+          <div class="kpi-val yellow" id="kpi-burn">24.9%</div>
+          <div class="kpi-badge behind" id="kpi-burn-badge">−8.4 pts vs pace</div>
         </div>
-        <div class="kpi alert-red">
-          <div class="kpi-label">At-Risk Budget Items</div>
-          <div class="kpi-val" style="color:var(--red600)">1</div>
-          <div class="kpi-sub">PR000938 UC Refresh Store over budget</div>
-          <div class="kpi-delta delta-up">↑ −$2.89M unfavorable</div>
+        <div class="kpi">
+          <div class="kpi-label">Portfolios</div>
+          <div class="kpi-val">31</div>
+          <div class="kpi-sub">Across 16 VPs</div>
         </div>
-      </div>
-
-      <div class="grid-5-3">
-        <div class="card">
-          <div class="card-body">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-              <div>
-                <div class="card-title">Forecast vs Budget by Engineering Manager</div>
-                <div class="card-sub">Orange = Forecast · Light = Budget · Sorted by forecast total</div>
-              </div>
-            </div>
-            <div style="position:relative;height:210px"><canvas id="emChart"></canvas></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <div class="card-title">Portfolio Composition</div>
-            <div style="position:relative;height:150px;margin-top:12px"><canvas id="compChart"></canvas></div>
-            <div id="compLegend" style="margin-top:14px;display:flex;flex-direction:column;gap:7px"></div>
-          </div>
+        <div class="kpi">
+          <div class="kpi-label">Sub-Products</div>
+          <div class="kpi-val">223</div>
+          <div class="kpi-sub">Active work streams</div>
         </div>
       </div>
 
-      <!-- Monthly Burn Chart -->
-      <div class="card mb16">
-        <div class="card-body">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="chart-row">
+        <div class="chart-card full">
+          <div class="cc-hd">
             <div>
-              <div class="card-title">Monthly Spend — Forecast vs Actual</div>
-              <div class="card-sub">P1 Feb – P12 Jan · Combined Labor + Hard Cap · P4 May in progress</div>
-            </div>
-            <div style="display:flex;gap:14px;font-size:11.5px;color:var(--g500)">
-              <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--hd);border-radius:2px;display:inline-block"></span>Actual</span>
-              <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:3px;background:var(--g400);display:inline-block"></span>Forecast</span>
+              <div class="cc-title">Portfolio Spend Breakdown</div>
+              <div class="cc-sub">FY forecast vs YTD actual by portfolio · Top 15 by forecast</div>
             </div>
           </div>
-          <div style="position:relative;height:210px"><canvas id="monthlyChart"></canvas></div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--g400);padding:0 2px">
-            <span>← FY26 Start</span>
-            <span style="color:var(--hd);font-weight:600">▲ Current: P4 May</span>
-            <span>FY26 End →</span>
+          <div class="cc-chart" style="height:280px">
+            <canvas id="ch-portfolio"></canvas>
           </div>
         </div>
       </div>
 
-      <!-- EM Summary Cards -->
-      <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.05em">Engineering Manager Portfolios</div>
-      <div class="grid-2" id="emSummaryCards"></div>
-    </div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">Monthly Spend (P1–P4)</div>
+              <div class="cc-sub">Act+Fcst by period across all portfolios</div>
+            </div>
+          </div>
+          <div class="cc-chart" style="height:200px">
+            <canvas id="ch-monthly"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">Burn Rate by VP</div>
+              <div class="cc-sub">YTD actual / FY forecast · Year is 33.3% elapsed</div>
+            </div>
+          </div>
+          <div class="cc-chart" style="height:200px">
+            <canvas id="ch-vp-burn"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- ═══════════════════ LABOR ═══════════════════ -->
-    <div id="sec-labor" class="section">
+    <!-- PORTFOLIOS -->
+    <section class="section" id="s-portfolios">
       <div class="page-hd">
         <div>
-          <div class="page-title">Labor Budget Analysis</div>
-          <div class="page-sub">THD, T&amp;M, SOW, and Ranch Labor across 11 projects</div>
-        </div>
-        <div class="page-meta">FY2026 · Labor Forecast $23.9M · Budget $23.6M</div>
-      </div>
-
-      <div class="alert alert-warn">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span>Labor burn rate is <strong>24.5%</strong> vs 30.8% of year elapsed — labor is running slightly behind planned pace. Monitor resource fill rate and project velocity to ensure full-year forecast is achievable.</span>
-        <span class="alert-note">−6.3 pts vs year pace</span>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi accent">
-          <div class="kpi-label">Labor Forecast</div>
-          <div class="kpi-val">$23.9M</div>
-          <div class="kpi-sub">11 labor projects across 4 EMs</div>
-          <div class="kpi-delta delta-up">↑ +$317K over labor budget</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">YTD Labor Actual</div>
-          <div class="kpi-val">$5.85M</div>
-          <div class="kpi-sub">24.5% of forecast spent</div>
-          <div class="kpi-delta delta-warn">⚠ Behind 30.8% year pace</div>
-        </div>
-        <div class="kpi alert-red">
-          <div class="kpi-label">Labor Budget Variance</div>
-          <div class="kpi-val" style="color:var(--red600)">−$318K</div>
-          <div class="kpi-sub">Forecast slightly exceeds labor budget</div>
-          <div class="kpi-delta delta-up">↑ Unfavorable · 3 projects over</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Remaining to Spend</div>
-          <div class="kpi-val">$18.0M</div>
-          <div class="kpi-sub">Through P12 Jan 2027</div>
-          <div class="kpi-delta delta-neu">9 periods remaining</div>
+          <div class="page-title">By Portfolio</div>
+          <div class="page-sub">All 31 portfolios · FY26 forecast, actuals, and burn rate</div>
         </div>
       </div>
-
-      <div class="grid-5-3">
-        <div class="table-wrap">
-          <div class="table-header">
-            <div>
-              <div class="card-title">Labor Projects — Full Detail</div>
-              <div class="card-sub">Forecast vs Actual vs Budget · variance column: green = favorable, red = over budget</div>
-            </div>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Project ID</th>
-                <th>Sub-Product</th>
-                <th>Eng. Manager</th>
-                <th class="r">Forecast</th>
-                <th class="r">Actual YTD</th>
-                <th class="r">Burn %</th>
-                <th class="r">Budget</th>
-                <th class="r">Variance</th>
-              </tr>
-            </thead>
-            <tbody id="laborTableBody"></tbody>
-            <tfoot id="laborTableFoot"></tfoot>
-          </table>
-        </div>
-        <div>
-          <div class="card mb14">
-            <div class="card-body">
-              <div class="card-title" style="margin-bottom:14px">Labor by Engineering Manager</div>
-              <div id="laborEmBars"></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <div class="card-title" style="margin-bottom:4px">Burn Rate Context</div>
-              <div class="card-sub" style="margin-bottom:14px">Actual vs Forecast per project</div>
-              <div id="laborBurnBars"></div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <div><span class="tbl-title">All Portfolios</span><span class="tbl-ct" id="port-ct">31 portfolios</span></div>
+          <div class="tbl-filter">
+            <div class="search-box">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="port-search" placeholder="Search portfolios…" oninput="filterPortfolios()">
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- ═══════════════════ HARDCAP ═══════════════════ -->
-    <div id="sec-hardcap" class="section">
-      <div class="page-hd">
-        <div>
-          <div class="page-title">Hard Cap Budget Analysis</div>
-          <div class="page-sub">Equipment, infrastructure, and technology hardware purchases across 7 projects</div>
-        </div>
-        <div class="page-meta">FY2026 · Hard Cap Forecast $75.3M · Budget $78.1M</div>
-      </div>
-
-      <div class="alert">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        <span><strong>PR000938 — UC Refresh Store (GIBNER):</strong> Forecast of <strong>$40.89M</strong> exceeds approved budget of <strong>$38.0M</strong>. The $2.89M overage requires a budget amendment or scope reduction before year-end. All other HC projects are at or under budget.</span>
-        <span class="alert-note">−$2.89M / −7.6%</span>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi accent">
-          <div class="kpi-label">Hard Cap Forecast</div>
-          <div class="kpi-val">$75.3M</div>
-          <div class="kpi-sub">7 projects · Equipment &amp; licenses</div>
-          <div class="kpi-delta delta-dn">↓ $2.75M under HC budget</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">YTD HC Actual</div>
-          <div class="kpi-val">$24.1M</div>
-          <div class="kpi-sub">32.0% of HC forecast spent</div>
-          <div class="kpi-delta delta-dn">↓ Slightly ahead of year pace</div>
-        </div>
-        <div class="kpi alert-green">
-          <div class="kpi-label">HC Budget Variance</div>
-          <div class="kpi-val" style="color:var(--green600)">+$2.74M</div>
-          <div class="kpi-sub">Exc. PR000938 overage — net favorable</div>
-          <div class="kpi-delta delta-dn">↓ $5.63M favorable ex-UC Refresh</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Remaining HC Spend</div>
-          <div class="kpi-val">$51.2M</div>
-          <div class="kpi-sub">Per forecast through Jan 2027</div>
-          <div class="kpi-delta delta-neu">68.0% of HC forecast remaining</div>
-        </div>
-      </div>
-
-      <div class="grid-5-3">
-        <div class="table-wrap">
-          <div class="table-header">
-            <div>
-              <div class="card-title">Hard Cap Projects — Full Detail</div>
-              <div class="card-sub">Negative variance = forecast exceeds budget (action required)</div>
-            </div>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Project ID</th>
-                <th>Sub-Product / Description</th>
-                <th>Eng. Manager</th>
-                <th class="r">Forecast</th>
-                <th class="r">Actual YTD</th>
-                <th class="r">Burn %</th>
-                <th class="r">Budget</th>
-                <th class="r">Variance</th>
-              </tr>
-            </thead>
-            <tbody id="hcTableBody"></tbody>
-            <tfoot id="hcTableFoot"></tfoot>
-          </table>
-        </div>
-        <div>
-          <div class="card mb14">
-            <div class="card-body">
-              <div class="card-title" style="margin-bottom:14px">HC Forecast by Project</div>
-              <div style="position:relative;height:180px"><canvas id="hcPieChart"></canvas></div>
-              <div id="hcPieLegend" style="margin-top:10px;display:flex;flex-direction:column;gap:5px"></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <div class="card-title" style="margin-bottom:4px">Spend Velocity</div>
-              <div class="card-sub" style="margin-bottom:14px">Actual as % of forecast · 30.8% = on pace</div>
-              <div id="hcVelocityBars"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══════════════════ ALL PROJECTS ═══════════════════ -->
-    <div id="sec-projects" class="section">
-      <div class="page-hd">
-        <div>
-          <div class="page-title">All Projects</div>
-          <div class="page-sub">18 projects · Full financial detail · Filter by type or engineering manager</div>
-        </div>
-        <div class="page-meta">FY2026 Portfolio Total: $99.2M forecast</div>
-      </div>
-
-      <div class="filter-bar">
-        <span class="filter-label">Type:</span>
-        <div class="seg-ctrl">
-          <button class="seg-btn active" id="filt-all" onclick="filterProjects('all')">All (18)</button>
-          <button class="seg-btn" id="filt-labor" onclick="filterProjects('labor')">Labor (11)</button>
-          <button class="seg-btn" id="filt-hc" onclick="filterProjects('hc')">Hard Cap (7)</button>
-        </div>
-        <span class="filter-label" style="margin-left:8px">EM:</span>
-        <select class="filter-select" id="emFilter" onchange="filterProjects(document.getElementById('filt-all').classList.contains('active')?'all':document.getElementById('filt-labor').classList.contains('active')?'labor':'hc')">
-          <option value="all">All Managers</option>
-          <option value="gibner">GIBNER, Jason</option>
-          <option value="glenn">GLENN, Matt</option>
-          <option value="janus">JANUS, Alexander</option>
-          <option value="higginbotham">Higginbotham, Matt</option>
-        </select>
-        <div style="margin-left:auto;font-size:12px;color:var(--g400)">
-          Variance: <span style="color:var(--green600);font-weight:600">Green = Under budget</span> · <span style="color:var(--red600);font-weight:600">Red = Over budget</span>
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <div class="table-header">
-          <div>
-            <div class="card-title" id="allProjectsTitle">All 18 Projects — FY2026</div>
-            <div class="card-sub">Sorted by forecast cost descending · Budget-to-Forecast variance shown</div>
-          </div>
-        </div>
-        <table>
+        <div style="overflow-x:auto">
+        <table id="port-table">
           <thead>
             <tr>
-              <th>Project ID</th>
-              <th>Sub-Product</th>
-              <th>Type</th>
-              <th>Eng. Manager</th>
-              <th class="r">Forecast Cost</th>
-              <th class="r">Actual YTD</th>
+              <th>Portfolio</th>
+              <th>VP</th>
+              <th class="r">FY Forecast</th>
+              <th class="r">YTD Actual</th>
               <th class="r">Burn %</th>
-              <th class="r">Planned Cost</th>
-              <th class="r">Budget Cost</th>
-              <th class="r">Variance (Bdgt−Fcst)</th>
-              <th class="r">Status</th>
+              <th>Burn Bar</th>
+              <th class="r">Managers</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody id="allProjectsBody"></tbody>
-          <tfoot id="allProjectsFoot"></tfoot>
+          <tbody id="port-tbody"></tbody>
         </table>
+        </div>
       </div>
+    </section>
 
-      <!-- Sub-product rollup -->
-      <div class="table-wrap" style="margin-top:14px">
-        <div class="table-header">
-          <div>
-            <div class="card-title">Sub-Product Rollup</div>
-            <div class="card-sub">Aggregated by program area · includes all project types</div>
+    <!-- VPs -->
+    <section class="section" id="s-vps">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">By VP</div>
+          <div class="page-sub">16 Vice Presidents · FY26 portfolio totals</div>
+        </div>
+      </div>
+      <div class="vp-grid" id="vp-grid"></div>
+    </section>
+
+    <!-- SUB-PRODUCTS -->
+    <section class="section" id="s-subproducts">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Sub-Products</div>
+          <div class="page-sub">All 223 active sub-products across the full IT organization</div>
+        </div>
+      </div>
+      <div class="filter-tabs" id="sp-portfolio-filters">
+        <button class="ftab active" onclick="filterSP(this,'')">All</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <div><span class="tbl-title">Sub-Products</span><span class="tbl-ct" id="sp-ct">223 items</span></div>
+          <div class="tbl-filter">
+            <div class="search-box">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="sp-search" placeholder="Search name, VP, manager…" oninput="renderSP()">
+            </div>
           </div>
         </div>
-        <table>
+        <div style="overflow-x:auto">
+        <table id="sp-table">
           <thead>
             <tr>
               <th>Sub-Product</th>
-              <th>Eng. Manager</th>
-              <th class="r">Forecast</th>
-              <th class="r">Actual YTD</th>
+              <th>Portfolio</th>
+              <th>VP</th>
+              <th>Manager</th>
+              <th class="r">FY Forecast</th>
+              <th class="r">YTD Actual</th>
               <th class="r">Burn %</th>
-              <th class="r">Budget</th>
-              <th class="r">Variance</th>
-              <th class="r">Projects</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody id="subprodBody"></tbody>
-          <tfoot id="subprodFoot"></tfoot>
+          <tbody id="sp-tbody"></tbody>
         </table>
+        </div>
       </div>
-    </div>
+    </section>
 
   </main>
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════
-//  DATA — sourced from ITRM Report exports (FY2026)
-// ════════════════════════════════════════════════════════
-
-const PROJECTS = [
-  // ── Higginbotham, Matt ─────────────────────────────
-  { id:'PR001509', type:'Labor',    em:'Higginbotham, Matt', em_id:'higginbotham',
-    subProduct:'DC Network Services Enhancement',
-    name:'FY26 - Data Center Network Services Enhancements (Labor) (IT-09365)',
-    forecast:1161574.80, actual:267728.00,  planned:1161574.80, budget:1227750.20,  variance:66175.40 },
-  { id:'PR000406', type:'Hard Cap', em:'Higginbotham, Matt', em_id:'higginbotham',
-    subProduct:'DC Network Services Enhancement',
-    name:'Data Center Network Services Enhancements (Hard Cap) (IT-09365)',
-    forecast:1200000.00, actual:1163161.64, planned:1200000.00, budget:1200000.00,  variance:0.00 },
-  { id:'PR001510', type:'Labor',    em:'Higginbotham, Matt', em_id:'higginbotham',
-    subProduct:'DC Network Services Operations',
-    name:'FY26 - Data Center Network Services Operations (IT-09376)',
-    forecast:1550610.40, actual:390953.60,  planned:1550610.40, budget:1547009.36,  variance:-3601.04 },
-  { id:'PR001511', type:'Labor',    em:'Higginbotham, Matt', em_id:'higginbotham',
-    subProduct:'DC Network Services Refresh',
-    name:'FY26 - Data Center Network Services Refresh (Labor) (IT-09366)',
-    forecast:1217664.50, actual:299613.60,  planned:1217664.50, budget:1267431.88,  variance:49767.38 },
-  { id:'PR000407', type:'Hard Cap', em:'Higginbotham, Matt', em_id:'higginbotham',
-    subProduct:'DC Network Services Refresh',
-    name:'Data Center Network Services Refresh (Hard Cap) (IT-09366)',
-    forecast:4660000.34, actual:3350847.11, planned:4660000.00, budget:4660000.00,  variance:-0.34 },
-  // ── GLENN, Matt ────────────────────────────────────
-  { id:'PR000413', type:'Hard Cap', em:'GLENN, Matt', em_id:'glenn',
-    subProduct:'Distributed Network Enhancements',
-    name:'Distributed Network Enhancements (Hard Cap) (IT-09562)',
-    forecast:5259265.36, actual:-66733.11,  planned:5328124.75, budget:5476239.75,  variance:216974.39 },
-  { id:'PR001513', type:'Labor',    em:'GLENN, Matt', em_id:'glenn',
-    subProduct:'Distributed Network Enhancements',
-    name:'FY26 - Distributed Network Enhancements (Labor) (IT-09562)',
-    forecast:3235026.75, actual:801456.50,  planned:3227613.25, budget:3157505.19,  variance:-77521.56 },
-  { id:'PR000414', type:'Hard Cap', em:'GLENN, Matt', em_id:'glenn',
-    subProduct:'Distributed Network Non-Store',
-    name:'Distributed Network Refresh: Non-Store (Hard Cap) (IT-08369)',
-    forecast:22200000.00, actual:9372902.29, planned:22200000.00, budget:24348000.00, variance:2148000.00 },
-  { id:'PR001514', type:'Labor',    em:'GLENN, Matt', em_id:'glenn',
-    subProduct:'Distributed Network Operations',
-    name:'FY26 - Distributed Network Operations (IT-09377)',
-    forecast:2295639.08, actual:572155.97,  planned:2295639.08, budget:2254867.13,  variance:-40771.95 },
-  { id:'PR001515', type:'Labor',    em:'GLENN, Matt', em_id:'glenn',
-    subProduct:'Distributed Network Refresh',
-    name:'FY26 - Distributed Network Refresh (Labor) (IT-79368)',
-    forecast:837893.47,  actual:209976.00,  planned:835461.74,  budget:826484.27,   variance:-11409.20 },
-  // ── JANUS, Alexander ──────────────────────────────
-  { id:'PR001536', type:'Labor',    em:'JANUS, Alexander', em_id:'janus',
-    subProduct:'Network Automation &amp; Traffic Mgmt',
-    name:'FY26 - Network Automation and Traffic Management - TLM (Labor)',
-    forecast:928280.62,  actual:231450.21,  planned:927448.73,  budget:964690.92,   variance:36410.30 },
-  { id:'PR001507', type:'Labor',    em:'JANUS, Alexander', em_id:'janus',
-    subProduct:'Network Automation &amp; Traffic Mgmt',
-    name:'FY26 - Network Automation and Traffic Management (Labor)',
-    forecast:8523388.11, actual:2069554.25, planned:8526388.91, budget:8294705.65,  variance:-228682.46 },
-  { id:'PR001205', type:'Hard Cap', em:'JANUS, Alexander', em_id:'janus',
-    subProduct:'Network Automation &amp; Traffic Mgmt',
-    name:'Network Automation and Traffic Management (Hard Cap) (IT-09590)',
-    forecast:725791.88,  actual:692205.38,  planned:756925.37,  budget:1700000.00,  variance:974208.12 },
-  // ── GIBNER, Jason ──────────────────────────────────
-  { id:'PR001526', type:'Labor',    em:'GIBNER, Jason', em_id:'gibner',
-    subProduct:'Unified Communications Enhancements',
-    name:'FY26 - Unified Communications Enhancements (Labor) (IT-09370)',
-    forecast:1072272.40, actual:269200.00,  planned:1072272.40, budget:1059595.28,  variance:-12677.12 },
-  { id:'PR001527', type:'Labor',    em:'GIBNER, Jason', em_id:'gibner',
-    subProduct:'Unified Communications Operations',
-    name:'FY26 - Unified Communications Operations (IT-09390)',
-    forecast:2066573.13, actual:473790.44,  planned:2068936.69, budget:1976296.35,  variance:-90276.78 },
-  { id:'PR001528', type:'Labor',    em:'GIBNER, Jason', em_id:'gibner',
-    subProduct:'Unified Communications Refresh',
-    name:'FY26 - Unified Communications Refresh (Labor) (IT-09371)',
-    forecast:985091.19,  actual:261498.72,  planned:985756.47,  budget:980123.32,   variance:-4967.87 },
-  { id:'PR000938', type:'Hard Cap', em:'GIBNER, Jason', em_id:'gibner',
-    subProduct:'Unified Communications Refresh',
-    name:'Unified Communications Refresh - Store (Hard Cap)',
-    forecast:40894798.25, actual:9539212.25, planned:40894799.25, budget:38000000.00, variance:-2894798.25 },
-  { id:'PR001705', type:'Hard Cap', em:'GIBNER, Jason', em_id:'gibner',
-    subProduct:'Unified Communications Refresh Non-Store',
-    name:'Unified Communications Refresh - Non-Store (Hard Cap)',
-    forecast:400000.00,  actual:69038.17,   planned:400000.00,  budget:2700000.00,  variance:2300000.00 },
+<script>
+const SP = [
+  {id:'SP00055',name:'Supply Chain & Centralized Platforms',vp:'GRIDER, DANIEL',mgr:'TOMLINSON, CRAIG',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:45763868,actual:32693667},
+  {id:'SP00232',name:'Unified Communications Refresh',vp:'GRIDER, DANIEL',mgr:'Schoenberg, Kristy',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:41879890,actual:9800711},
+  {id:'SP00138',name:'KTLO Identity & Access Management',vp:'LANZILOTTA, CHRIS',mgr:'MUNROE, CAROL',portfolio:'Cybersecurity',dept:'Identity and Access Management',forecast:31382022,actual:7042473},
+  {id:'SP00199',name:'Unallocated - Other',vp:'BROWN, ANGIE',mgr:'Jones, Michelle',portfolio:'CIO',dept:'IT Executive',forecast:28561861,actual:0},
+  {id:'SP00217',name:'Technology Support Center Operations',vp:'GRIDER, DANIEL',mgr:'CHAVEZ, STORMY',portfolio:'Infrastructure & Operations',dept:'IT Support Desk',forecast:28134044,actual:7000280},
+  {id:'SP00093',name:'Distributed Network Non-Store (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'GROVES, ANNETTE',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:22200000,actual:9372902},
+  {id:'SP00311',name:'Store Laser Printers (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'Nelson, Megan',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:18624849,actual:0},
+  {id:'SP00151',name:'KTLO Network Sec Ops',vp:'LANZILOTTA, CHRIS',mgr:'BOWERS, ERIN',portfolio:'Cybersecurity',dept:'Security Operations',forecast:18369926,actual:2312343},
+  {id:'SP00181',name:'KTLO Sec Ops',vp:'LANZILOTTA, CHRIS',mgr:'MUNROE, CAROL',portfolio:'Cybersecurity',dept:'Security Operations',forecast:17234803,actual:3779356},
+  {id:'SP00244',name:'Data Warehouse Platforms',vp:'MOSES, SAMUEL',mgr:'IVEY, MELANIE',portfolio:'Data Warehousing & Machine Learning',dept:'Data WH ML',forecast:15349290,actual:2801659},
+  {id:'SP00296',name:'Mobile POS (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'WEST, STACY',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:15258166,actual:0},
+  {id:'SP00130',name:'Finance',vp:'HART, MAURA',mgr:'Dornfeld, Lauren',portfolio:'Finance',dept:'IT Financial Systems',forecast:15064321,actual:3620441},
+  {id:'SP00137',name:'Human Resources',vp:'MOSES, SAMUEL',mgr:'Lawlor, Tim',portfolio:'Human Resources',dept:'IT HR Systems',forecast:13900690,actual:3423791},
+  {id:'SP00109',name:'Portfolio Variance',vp:'BROWN, ANGIE',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'IT Executive',forecast:13870355,actual:3629230},
+  {id:'SP00099',name:'End User Computing',vp:'GRIDER, DANIEL',mgr:'ORDONEZ, VERA',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:13274828,actual:3347282},
+  {id:'SP00248',name:'Core AI',vp:'BLACK, CHRIS',mgr:'NEARY, SAL',portfolio:'Core AI',dept:'Enterprise Architecture',forecast:12866256,actual:513680},
+  {id:'SP00129',name:'One Finance',vp:'HART, MAURA',mgr:'Hernandez, Aileen',portfolio:'Finance',dept:'IT Financial Systems',forecast:12566807,actual:3538625},
+  {id:'SP00229',name:'KTLO Threat Exposure Mgmt',vp:'LANZILOTTA, CHRIS',mgr:'MUNROE, CAROL',portfolio:'Cybersecurity',dept:'Security Operations',forecast:12152295,actual:2893933},
+  {id:'SP00160',name:'Payment',vp:'MOSES, SAMUEL',mgr:'MONFORT, SHANNON',portfolio:'Payment',dept:'IT - Payments',forecast:12047938,actual:3224640},
+  {id:'SP00216',name:'KTLO Tech Risk & Compliance',vp:'LANZILOTTA, CHRIS',mgr:'BOWERS, ERIN',portfolio:'Cybersecurity',dept:'Tech Risk - Compliance - Srvc Resiliency',forecast:11848947,actual:2909950},
+  {id:'SP00176',name:'Lead Management',vp:'MOSES, SAMUEL',mgr:'Quarterman, Shaun',portfolio:'Services',dept:'Services - IT',forecast:11577542,actual:3194505},
+  {id:'SP00094',name:'Distribution HDW',vp:'SMITH, CHRISTOPHER',mgr:'Wilkerson, Bria',portfolio:'Supply Chain',dept:'IT Supply Chain - Logistics',forecast:10391551,actual:2414766},
+  {id:'SP00225',name:'Corporate Laptop Refresh (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:10196519,actual:265646},
+  {id:'SP00175',name:'Job Management',vp:'MOSES, SAMUEL',mgr:'Quarterman, Shaun',portfolio:'Services',dept:'Services - IT',forecast:9714541,actual:1989669},
+  {id:'SP00297',name:'Energy Management Refresh (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'Nelson, Megan',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:9117321,actual:1568446},
+  {id:'SP00091',name:'Distributed Network Enhancements',vp:'GRIDER, DANIEL',mgr:'GROVES, ANNETTE',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:8494293,actual:734724},
+  {id:'SP00102',name:'Enterprise Machine Learning',vp:'MOSES, SAMUEL',mgr:'IVEY, MELANIE',portfolio:'Data Warehousing & Machine Learning',dept:'Data WH ML',forecast:8287710,actual:1724364},
+  {id:'SP00204',name:'Distribution Center (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'NATHAN, LAURA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:8272916,actual:1305001},
+  {id:'SP00182',name:'KTLO Service Resiliency Management',vp:'LANZILOTTA, CHRIS',mgr:'BOWERS, ERIN',portfolio:'Cybersecurity',dept:'Tech Risk - Compliance - Srvc Resiliency',forecast:7985323,actual:1832891},
+  {id:'SP00144',name:'Large Systems Operations',vp:'GRIDER, DANIEL',mgr:'Howell, Erica',portfolio:'Infrastructure & Operations',dept:'IT Enterprise Systems and Storage',forecast:7938608,actual:4989531},
+  {id:'SP00180',name:'KTLO SSE',vp:'LANZILOTTA, CHRIS',mgr:'MUNROE, CAROL',portfolio:'Cybersecurity',dept:'Secure Solutions Enablement',forecast:7603535,actual:1942363},
+  {id:'SP00096',name:'E2E Integration Testing Services',vp:'GREGORIO, ANTHONY',mgr:'PREISS, BETSY',portfolio:'Reliability Engineering',dept:'E2E Testing',forecast:7515268,actual:1778851},
+  {id:'SP00215',name:'UPS (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'BEYNUM, RHONDA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:7492845,actual:2218454},
+  {id:'SP00227',name:'Technology Deployment Center',vp:'GRIDER, DANIEL',mgr:'FISHER, DONNA',portfolio:'Infrastructure & Operations',dept:'TDC',forecast:7339713,actual:1758271},
+  {id:'SP00201',name:'Store Scanner & Docking (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'WEST, STACY',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:7125000,actual:0},
+  {id:'SP00079',name:'Data Center Facility Services Refresh',vp:'GRIDER, DANIEL',mgr:'DANAUSKYTE, JUSTINA',portfolio:'Infrastructure & Operations',dept:'IT OCC and Data Center Facilities',forecast:6887163,actual:1464453},
+  {id:'SP00162',name:'Price Management',vp:'HART, MAURA',mgr:'CASSOTTA, DANIELLE',portfolio:'Merchandising',dept:'IT Merchandising Core',forecast:6831608,actual:1592538},
+  {id:'SP00084',name:'KTLO Data Protection',vp:'LANZILOTTA, CHRIS',mgr:'MUNROE, CAROL',portfolio:'Cybersecurity',dept:'Security Operations',forecast:6373622,actual:1334231},
+  {id:'SP00081',name:'Data Center Network Services Refresh',vp:'GRIDER, DANIEL',mgr:'McDougal, Shannon',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:5877665,actual:3650461},
+  {id:'SP00155',name:'Online Reliability Engineering',vp:'GREGORIO, ANTHONY',mgr:'Wicker, Paul',portfolio:'Reliability Engineering',dept:'Reliability Engineering',forecast:5827827,actual:1436036},
+  {id:'SP00088',name:'Delivery Selling',vp:'SMITH, CHRISTOPHER',mgr:'Thomas, Jas',portfolio:'Supply Chain',dept:'IT Supply Chain - Deliv-Sourcing-Trans',forecast:5789035,actual:670060},
+  {id:'SP00052',name:'Cloud Enablement',vp:'GREGORIO, ANTHONY',mgr:'BIALY, KATE',portfolio:'Developer Experience',dept:'Cloud Enablement',forecast:5662611,actual:2909557},
+  {id:'SP00011',name:'Assisted Selling',vp:'AKRAM, MUZAMMIL',mgr:'HUTCHESON, AMI',portfolio:'Store Systems',dept:'IT - Store Selling Systems',forecast:5375846,actual:1373356},
+  {id:'SP00186',name:'Store Application Platform',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:4774947,actual:734756},
+  {id:'SP00007',name:'Network Automation and Traffic Management',vp:'GRIDER, DANIEL',mgr:'STEVENSON, KYLA',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:4772529,actual:1769100},
+  {id:'SP00141',name:'Infrastructure Integration',vp:'GRIDER, DANIEL',mgr:'ORDONEZ, VERA',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:4668773,actual:1172251},
+  {id:'SP00194',name:'Supplier Management',vp:'HART, MAURA',mgr:'Rego, Zena',portfolio:'Merchandising',dept:'IT Merchandising Master Data',forecast:4439157,actual:1065961},
+  {id:'SP00243',name:'Enterprise Analytics',vp:'MOSES, SAMUEL',mgr:'IVEY, MELANIE',portfolio:'Finance',dept:'Data WH ML',forecast:4438317,actual:599496},
+  {id:'SP00196',name:'Supply Chain Analytics',vp:'MOSES, SAMUEL',mgr:'IVEY, MELANIE',portfolio:'Supply Chain',dept:'Data WH ML',forecast:4437783,actual:922459},
+  {id:'SP00245',name:'Enterprise Product Mgmt',vp:'POST, SARAH',mgr:'USHER, DEAN',portfolio:'Product CoE',dept:'Enterprise Product Management',forecast:4331868,actual:1228565},
+  {id:'SP00101',name:'Enterprise Architecture Enablement',vp:'BLACK, CHRIS',mgr:'JACKSON, AMANDA',portfolio:'Enterprise Architecture',dept:'Enterprise Architecture',forecast:4323359,actual:471210},
+  {id:'SP00191',name:'KTLO Strategic Planning',vp:'LANZILOTTA, CHRIS',mgr:'MUNROE, CAROL',portfolio:'Cybersecurity',dept:'Cyber Strategic Planning - Arch - Legal',forecast:4099172,actual:815149},
+  {id:'SP00161',name:'Portfolio Services',vp:'GRIDER, DANIEL',mgr:'DANAUSKYTE, JUSTINA',portfolio:'Infrastructure & Operations',dept:'IT Enterprise Systems and Storage',forecast:4084339,actual:1022960},
+  {id:'SP00211',name:'IP Cameras (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'Nelson, Megan',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:4024360,actual:80600},
+  {id:'SP00226',name:'Workbench',vp:'GRIDER, DANIEL',mgr:'FISHER, DONNA',portfolio:'Infrastructure & Operations',dept:'TDC',forecast:3962950,actual:950317},
+  {id:'SP00066',name:'Customer Analytics',vp:'MOSES, SAMUEL',mgr:'EBNER, MELISSA',portfolio:'Online',dept:'Data WH ML',forecast:3942963,actual:897394},
+  {id:'SP00224',name:'Corporate PCs (1001)',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:3740000,actual:1186398},
+  {id:'SP00178',name:'Reliability Engineering',vp:'GREGORIO, ANTHONY',mgr:'Wicker, Paul',portfolio:'Reliability Engineering',dept:'Reliability Engineering',forecast:3682321,actual:520310},
+  {id:'SP00072',name:'Customer Experience Programs',vp:'Kruck, Josh',mgr:'Battle, LENNETTA',portfolio:'Customer Experience',dept:'IT Customer Exp',forecast:3581911,actual:919748},
+  {id:'SP00064',name:'Crown Bolt',vp:'SMITH, CHRISTOPHER',mgr:'Wilkerson, Bria',portfolio:'Supply Chain',dept:'IT Supply Chain Crown Bolt',forecast:3272042,actual:406544},
+  {id:'SP00146',name:'Marketing Technology',vp:'Ramaswamy, Arun',mgr:'MEKONNEN, SELAMAWIT',portfolio:'Marketing',dept:'Marketing Technology',forecast:3214989,actual:325771},
+  {id:'SP00183',name:'Sourcing',vp:'SMITH, CHRISTOPHER',mgr:'Thomas, Jas',portfolio:'Supply Chain',dept:'IT Supply Chain - Deliv-Sourcing-Trans',forecast:2574857,actual:414876},
+  {id:'SP00067',name:'Customer Checkout - Stores',vp:'AKRAM, MUZAMMIL',mgr:'Zdon, Joe',portfolio:'Store Systems',dept:'IT - Store Selling Systems',forecast:2426025,actual:426537},
+  {id:'SP00302',name:'Inventory Planning and Replenishment',vp:'COUNTRYMAN, DENISE',mgr:'BALAKRISHNAN, BALAJI',portfolio:'Inventory Planning & Replenishment',dept:'IPR',forecast:2386241,actual:573073},
+  {id:'SP00082',name:'Data Center Network Services Enhancement',vp:'GRIDER, DANIEL',mgr:'McDougal, Shannon',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:2361575,actual:1430890},
+  {id:'SP00092',name:'Distributed Network Operations',vp:'GRIDER, DANIEL',mgr:'GROVES, ANNETTE',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:2295639,actual:572156},
+  {id:'SP00234',name:'Unified Tasking',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:2277556,actual:468444},
+  {id:'SP00189',name:'Store Inventory Management',vp:'AKRAM, MUZAMMIL',mgr:'HUTCHESON, AMI',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:2105152,actual:586797},
+  {id:'SP00231',name:'Unified Communications Operations',vp:'GRIDER, DANIEL',mgr:'AGEE, JOSEPH',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:2066573,actual:473790},
+  {id:'SP00008',name:'Appliances - Vendor Funded',vp:'Kruck, Josh',mgr:'Battle, LENNETTA',portfolio:'Online',dept:'Online Experiences',forecast:2035051,actual:485096},
+  {id:'SP00206',name:'Field Deployment Labor',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:2003528,actual:460400},
+  {id:'SP00265',name:'EUX Director Leadership',vp:'LOPEZ, CARLOS',mgr:'PREISS, BETSY',portfolio:'Executive and Admin',dept:'UX Administrative',forecast:1908593,actual:464014},
+  {id:'SP00134',name:'Global Sourcing',vp:'SMITH, CHRISTOPHER',mgr:'Thomas, Jas',portfolio:'Supply Chain',dept:'IT Supply Chain Arch Global Sourcing',forecast:1899754,actual:531785},
+  {id:'SP00166',name:'Product Data Management - Item',vp:'HART, MAURA',mgr:'Rego, Zena',portfolio:'Merchandising',dept:'IT Merchandising Master Data',forecast:1841388,actual:371809},
+  {id:'SP00247',name:'OAM',vp:'Ramaswamy, Arun',mgr:'MEKONNEN, SELAMAWIT',portfolio:'Orange Apron Media',dept:'Orange Apron Media',forecast:1807467,actual:322413},
+  {id:'SP00095',name:'Distribution WMS (Labor)',vp:'SMITH, CHRISTOPHER',mgr:'Wilkerson, Bria',portfolio:'Supply Chain',dept:'IT Supply Chain - Logistics',forecast:1798083,actual:450038},
+  {id:'SP00242',name:'Legal',vp:'LANZILOTTA, CHRIS',mgr:'MUNROE, CAROL',portfolio:'Legal',dept:'Legal',forecast:1716352,actual:315353},
+  {id:'SP00140',name:'In-Store Environment',vp:'HART, MAURA',mgr:'McKee, Lori',portfolio:'Merchandising',dept:'IT Store Merchandising',forecast:1700368,actual:501348},
+  {id:'SP00143',name:'Enterprise Content Management',vp:'MOSES, SAMUEL',mgr:'Lawlor, Tim',portfolio:'ECM & Low Code Platforms',dept:'IT HR Systems',forecast:1584158,actual:394298},
+  {id:'SP00080',name:'Data Center Network Services Operations',vp:'GRIDER, DANIEL',mgr:'Schoenberg, Kristy',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:1550610,actual:390954},
+  {id:'SP00200',name:'Technology Operations',vp:'GRIDER, DANIEL',mgr:'DANAUSKYTE, JUSTINA',portfolio:'Infrastructure & Operations',dept:'IT OCC and Data Center Facilities',forecast:1488573,actual:350137},
+  {id:'SP00313',name:'Early Career Product Management',vp:'POST, SARAH',mgr:'USHER, DEAN',portfolio:'Product CoE',dept:'Enterprise Product Management',forecast:1458156,actual:0},
+  {id:'SP00218',name:'Site Enhancements Services (Labor)',vp:'GRIDER, DANIEL',mgr:'Tran, Vincent',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:1453402,actual:422845},
+  {id:'SP00069',name:'Customer Communication',vp:'SMITH, CHRISTOPHER',mgr:'Thomas, Jas',portfolio:'Delivery Experience',dept:'Delivery Experience',forecast:1415097,actual:372602},
+  {id:'SP00321',name:'WorldPay - Vendor Funded',vp:'MOSES, SAMUEL',mgr:'RICHARDSON, CHARLOTTE',portfolio:'Payment',dept:'IT - Payments',forecast:1367377,actual:185464},
+  {id:'SP00142',name:'Infrastructure Integration (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'Adebowale, Doyin',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:1335901,actual:285248},
+  {id:'SP00190',name:'Store Performance Analytics',vp:'MOSES, SAMUEL',mgr:'IVEY, MELANIE',portfolio:'Store Systems',dept:'Data WH ML',forecast:1313002,actual:141005},
+  {id:'SP00107',name:'Sign on bonuses',vp:'BROWN, ANGIE',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'IT Executive',forecast:1289000,actual:164000},
+  {id:'SP00046',name:'CDN Store Selling Applications',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:1233697,actual:1233697},
+  {id:'SP00246',name:'Enterprise UX',vp:'LOPEZ, CARLOS',mgr:'USHER, DEAN',portfolio:'Enterprise UX',dept:'IT User Experience',forecast:1160051,actual:291067},
+  {id:'SP00061',name:'Customer Solutions',vp:'Kruck, Josh',mgr:'Battle, LENNETTA',portfolio:'Customer Solutions',dept:'IT Customer Solutions',forecast:1136907,actual:384322},
+  {id:'SP00028',name:'CDN Cart Commons - Lead Management',vp:'DiRisio, Victor',mgr:'Sahay, Gunjan',portfolio:'Canada',dept:'CAN IT Corp',forecast:1127640,actual:1127640},
+  {id:'SP00193',name:'Supplier Analytics',vp:'MOSES, SAMUEL',mgr:'EBNER, MELISSA',portfolio:'Merchandising',dept:'Data WH ML',forecast:1110305,actual:163257},
+  {id:'SP00233',name:'Unified Communications Enhancements',vp:'GRIDER, DANIEL',mgr:'Schoenberg, Kristy',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:1072272,actual:269200},
+  {id:'SP00097',name:'Edge Platform',vp:'GRIDER, DANIEL',mgr:'ORDONEZ, VERA',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:1056363,actual:308782},
+  {id:'SP00219',name:'Corporate PCs (1226)',vp:'GRIDER, DANIEL',mgr:'FISHER, DONNA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:1024923,actual:0},
+  {id:'SP00076',name:'Customer Rental Management',vp:'AKRAM, MUZAMMIL',mgr:'HUTCHESON, AMI',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:1024866,actual:471113},
+  {id:'SP00238',name:'Customer Order Management',vp:'COUNTRYMAN, DENISE',mgr:'BALAKRISHNAN, BALAJI',portfolio:'Customer Order Management',dept:'Customer Order Management',forecast:1023376,actual:235237},
+  {id:'SP00100',name:'Enterprise Architecture Development',vp:'BLACK, CHRIS',mgr:'JACKSON, AMANDA',portfolio:'Enterprise Architecture',dept:'Enterprise Architecture',forecast:1002795,actual:201596},
+  {id:'SP00167',name:'Product Data Management - SKU',vp:'HART, MAURA',mgr:'Rego, Zena',portfolio:'Merchandising',dept:'IT Merchandising Master Data',forecast:999678,actual:229655},
+  {id:'SP00316',name:'Online Experience',vp:'Kruck, Josh',mgr:'COSTA, KAREN',portfolio:'Online',dept:'Online Experiences',forecast:974662,actual:200527},
+  {id:'SP00164',name:'Pro Planned Purchase',vp:'COUNTRYMAN, DENISE',mgr:'Hess, DJ',portfolio:'Pro',dept:'Pro Planned Purchase',forecast:968580,actual:199570},
+  {id:'SP00087',name:'Delivery Fulfillment',vp:'SMITH, CHRISTOPHER',mgr:'Thomas, Jas',portfolio:'Supply Chain',dept:'IT Supply Chain - Deliv-Sourcing-Trans',forecast:959631,actual:193037},
+  {id:'SP00179',name:'Reverse Logistics (Returns)',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:949621,actual:242247},
+  {id:'SP00230',name:'Transportation',vp:'SMITH, CHRISTOPHER',mgr:'Thomas, Jas',portfolio:'Supply Chain',dept:'IT Supply Chain - Deliv-Sourcing-Trans',forecast:942544,actual:206060},
+  {id:'SP00089',name:'Developer Tools',vp:'GREGORIO, ANTHONY',mgr:'PREISS, BETSY',portfolio:'Developer Experience',dept:'Developer Tools',forecast:942302,actual:0},
+  {id:'SP00148',name:'Monitoring Refresh',vp:'GREGORIO, ANTHONY',mgr:'SHERLOCK, BRIAN',portfolio:'Reliability Engineering',dept:'Reliability Engineering',forecast:932966,actual:63560},
+  {id:'SP00235',name:'Supply Chain Compliance',vp:'MOSES, SAMUEL',mgr:'EBNER, MELISSA',portfolio:'Merchandising',dept:'Data WH ML',forecast:924809,actual:202695},
+  {id:'SP00291',name:'Delivery Experience Director Leadership',vp:'SMITH, CHRISTOPHER',mgr:'Gaillet, Maddy',portfolio:'Executive and Admin',dept:'Supply Chain Administrative',forecast:923949,actual:221512},
+  {id:'SP00292',name:'OAM Analytics',vp:'MOSES, SAMUEL',mgr:'IVEY, MELANIE',portfolio:'Orange Apron Media',dept:'Data WH ML',forecast:919790,actual:255232},
+  {id:'SP00159',name:'Payment - Vendor Funded',vp:'MOSES, SAMUEL',mgr:'MONFORT, SHANNON',portfolio:'Payment',dept:'IT - Payments',forecast:916954,actual:201756},
+  {id:'SP00177',name:'Low Code Platforms',vp:'MOSES, SAMUEL',mgr:'Betabdishoo, Rafik',portfolio:'ECM & Low Code Platforms',dept:'IT HR Systems',forecast:899068,actual:95618},
+  {id:'SP00268',name:'Reliability Eng Director Leadership',vp:'GREGORIO, ANTHONY',mgr:'HARDING, PATRICIA',portfolio:'Executive and Admin',dept:'Reliability Engineering Administrative',forecast:884330,actual:216650},
+  {id:'SP00090',name:'Distributed Network Refresh (Labor)',vp:'GRIDER, DANIEL',mgr:'GROVES, ANNETTE',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:837894,actual:209976},
+  {id:'SP00320',name:'Common Booking',vp:'AKRAM, MUZAMMIL',mgr:'Haigler, Ashley',portfolio:'Store Systems',dept:'IT - Store Selling Systems',forecast:836034,actual:129797},
+  {id:'SP00145',name:'Marketing Analytics',vp:'MOSES, SAMUEL',mgr:'EBNER, MELISSA',portfolio:'Marketing',dept:'Data WH ML',forecast:818528,actual:197885},
+  {id:'SP00063',name:'Corporate Communications & External Affa',vp:'MOSES, SAMUEL',mgr:'Betabdishoo, Rafik',portfolio:'Human Resources',dept:'IT HR Systems',forecast:777292,actual:162952},
+  {id:'SP00018',name:'RTS Chargeback MET - CDN',vp:'DiRisio, Victor',mgr:'Mandloi, Swapnil',portfolio:'Canada',dept:'CAN IT Corp',forecast:771570,actual:771570},
+  {id:'SP00174',name:'Outside Sales and Service Analytics',vp:'MOSES, SAMUEL',mgr:'IVEY, MELANIE',portfolio:'Services',dept:'Data WH ML',forecast:765348,actual:186566},
+  {id:'SP00322',name:'Technology Strategy & Fin Op',vp:'BROWN, ANGIE',mgr:'Gaillet, Maddy',portfolio:'Executive and Admin',dept:'IT Executive',forecast:762569,actual:155676},
+  {id:'SP00223',name:'Corporate PCs (1075)',vp:'GRIDER, DANIEL',mgr:'FISHER, DONNA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:760000,actual:177625},
+  {id:'SP00025',name:'CDN Store & Desktop Support',vp:'DiRisio, Victor',mgr:'CHOWDHURY, ISRAT',portfolio:'Canada',dept:'CAN IT Corp',forecast:753238,actual:753238},
+  {id:'SP00038',name:'CDN Supply Chain Experience',vp:'DiRisio, Victor',mgr:'Batra, Shivam',portfolio:'Canada',dept:'CAN IT Corp',forecast:728938,actual:728938},
+  {id:'SP00147',name:'Merchandising Execution',vp:'HART, MAURA',mgr:'McKee, Lori',portfolio:'Merchandising',dept:'IT Store Merchandising',forecast:686598,actual:168359},
+  {id:'SP00014',name:'Bulk Data Transfer Platforms Product',vp:'HART, MAURA',mgr:'McKee, Lori',portfolio:'Merchandising',dept:'IT Merchandising Master Data',forecast:664406,actual:166968},
+  {id:'SP00260',name:'Infrastructure Director Leadership',vp:'GRIDER, DANIEL',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Infrastructure Administrative',forecast:660268,actual:163486},
+  {id:'SP00035',name:'CDN Merch Commons & Pricing',vp:'DiRisio, Victor',mgr:'VADDEY, GANGA',portfolio:'Canada',dept:'CAN IT Corp',forecast:652721,actual:652721},
+  {id:'SP00070',name:'Customer Data Privacy and Governance',vp:'Kruck, Josh',mgr:'ADIRI, YAFFA',portfolio:'Customer',dept:'Customer Technology',forecast:642191,actual:156828},
+  {id:'SP00278',name:'Finance Director Leadership',vp:'HART, MAURA',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Merch Administrative',forecast:624401,actual:111894},
+  {id:'SP00252',name:'Supply Chain Director Leadership',vp:'SMITH, CHRISTOPHER',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Supply Chain Administrative',forecast:607518,actual:142045},
+  {id:'SP00133',name:'Fulfillment WMS (Labor)',vp:'SMITH, CHRISTOPHER',mgr:'Wilkerson, Bria',portfolio:'Supply Chain',dept:'IT Supply Chain - Logistics',forecast:600366,actual:121915},
+  {id:'SP00033',name:'CDN Merch Technology Applications',vp:'DiRisio, Victor',mgr:'RAO, RAGHAVENDRA',portfolio:'Canada',dept:'CAN IT Corp',forecast:566985,actual:566985},
+  {id:'SP00324',name:'PayPal - Vendor Funded',vp:'MOSES, SAMUEL',mgr:'MONFORT, SHANNON',portfolio:'Payment',dept:'IT - Payments',forecast:531537,actual:0},
+  {id:'SP00077',name:'Customer Returns Experience',vp:'AKRAM, MUZAMMIL',mgr:'CARTER, Lexi',portfolio:'Store Systems',dept:'IT - Store Selling Systems',forecast:520510,actual:121526},
+  {id:'SP00108',name:'Executive Management',vp:'BROWN, ANGIE',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'IT Executive',forecast:512726,actual:118062},
+  {id:'SP00062',name:'Content Management Platforms',vp:'GRIDER, DANIEL',mgr:'ORDONEZ, VERA',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:481884,actual:42106},
+  {id:'SP00266',name:'Enterprise Prod Mgmt Dir Leadership',vp:'POST, SARAH',mgr:'HACKETT, JONNA',portfolio:'Executive and Admin',dept:'Product Administrative',forecast:461974,actual:110756},
+  {id:'SP00030',name:'CDN IPR Systems',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:459146,actual:459146},
+  {id:'SP00318',name:'Online Platforms',vp:'Kruck, Josh',mgr:'COSTA, KAREN',portfolio:'Online',dept:'Online Platforms',forecast:443676,actual:160262},
+  {id:'SP00259',name:'Merchandising Director Leadership',vp:'HART, MAURA',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Merch Administrative',forecast:441684,actual:110059},
+  {id:'SP00058',name:'Config Product Selling Tools- Paint',vp:'HART, MAURA',mgr:'Mullins, Sarah',portfolio:'Merchandising',dept:'IT Store Merchandising',forecast:438639,actual:91118},
+  {id:'SP00269',name:'Customer Director Leadership',vp:'Kruck, Josh',mgr:'HARDING, PATRICIA',portfolio:'Executive and Admin',dept:'Customer Administrative',forecast:438367,actual:101781},
+  {id:'SP00257',name:'Online Director Leadership',vp:'Kruck, Josh',mgr:'COSTA, KAREN',portfolio:'Executive and Admin',dept:'Online Administrative',forecast:431906,actual:105866},
+  {id:'SP00010',name:'Asset Protection',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:430183,actual:99162},
+  {id:'SP00256',name:'Cybersecurity Director Leadership',vp:'LANZILOTTA, CHRIS',mgr:'BOWERS, ERIN',portfolio:'Executive and Admin',dept:'Security Administrative',forecast:429317,actual:105118},
+  {id:'SP00261',name:'IPR Director Leadership',vp:'COUNTRYMAN, DENISE',mgr:'BALAKRISHNAN, BALAJI',portfolio:'Executive and Admin',dept:'Services Administrative',forecast:414387,actual:99423},
+  {id:'SP00255',name:'Services Director Leadership',vp:'MOSES, SAMUEL',mgr:'WILKINSON, HELEN',portfolio:'Executive and Admin',dept:'Corporate Services Administrative',forecast:411304,actual:101769},
+  {id:'SP00031',name:'CDN Mobile App',vp:'DiRisio, Victor',mgr:'Kumar, Hitesh',portfolio:'Canada',dept:'CAN IT Corp',forecast:410558,actual:410558},
+  {id:'SP00040',name:'CDN Systems Growth & Renewal',vp:'DiRisio, Victor',mgr:'PERSAUD, CHETRAM',portfolio:'Canada',dept:'CAN IT Corp',forecast:402505,actual:402505},
+  {id:'SP00315',name:'Unified Communications Refresh - Non-Store',vp:'GRIDER, DANIEL',mgr:'AGEE, JOSEPH',portfolio:'Infrastructure & Operations',dept:'IT Network and Unified Communications',forecast:400000,actual:69038},
+  {id:'SP00042',name:'CDN Homedepot.ca &SRE',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:385694,actual:385694},
+  {id:'SP00048',name:'CDN S/4 Related Enhancements',vp:'DiRisio, Victor',mgr:'SUNKARA, RAMA',portfolio:'Canada',dept:'CAN IT Corp',forecast:377641,actual:377641},
+  {id:'SP00012',name:'Associate Order Fulfillment',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:367531,actual:170011},
+  {id:'SP00039',name:'CDN Order Experience',vp:'DiRisio, Victor',mgr:'GOGINENI, RAMA TEJA',portfolio:'Canada',dept:'CAN IT Corp',forecast:362197,actual:362197},
+  {id:'SP00034',name:'CDN Analytics Warehouse',vp:'DiRisio, Victor',mgr:'THIYAGARATNAM, GERALD',portfolio:'Canada',dept:'CAN IT Corp',forecast:361950,actual:361950},
+  {id:'SP00075',name:'Customer Record',vp:'Kruck, Josh',mgr:'Battle, LENNETTA',portfolio:'Customer',dept:'Customer Technology',forecast:360194,actual:108375},
+  {id:'SP00158',name:'Path to Pro Network',vp:'Ramaswamy, Arun',mgr:'MEKONNEN, SELAMAWIT',portfolio:'Marketing',dept:'Marketing Technology',forecast:353437,actual:66896},
+  {id:'SP00053',name:'Compact Power',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:351035,actual:63728},
+  {id:'SP00037',name:'CDN Customer and Contact Center',vp:'DiRisio, Victor',mgr:'Agrawal, Ishet',portfolio:'Canada',dept:'CAN IT Corp',forecast:349656,actual:349656},
+  {id:'SP00047',name:'CDN Store Applications - Backend Ops',vp:'DiRisio, Victor',mgr:'Lee, Simon',portfolio:'Canada',dept:'CAN IT Corp',forecast:342334,actual:342334},
+  {id:'SP00043',name:'CDN Search Common',vp:'DiRisio, Victor',mgr:'Shirazi, Amir',portfolio:'Canada',dept:'CAN IT Corp',forecast:335381,actual:335381},
+  {id:'SP00290',name:'OAM Director Leadership',vp:'Ramaswamy, Arun',mgr:'Gaillet, Maddy',portfolio:'Executive and Admin',dept:'OAM Administrative',forecast:321095,actual:78414},
+  {id:'SP00254',name:'Payment Director Leadership',vp:'MOSES, SAMUEL',mgr:'WILKINSON, HELEN',portfolio:'Executive and Admin',dept:'Corporate Services Administrative',forecast:318857,actual:78094},
+  {id:'SP00051',name:'CDN PIP',vp:'DiRisio, Victor',mgr:'SUNDARANANDA, SHIYAMALAN',portfolio:'Canada',dept:'CAN IT Corp',forecast:316399,actual:316399},
+  {id:'SP00019',name:'RTS Chargeback ICR - CDN',vp:'DiRisio, Victor',mgr:'Lee, Simon',portfolio:'Canada',dept:'CAN IT Corp',forecast:303167,actual:303167},
+  {id:'SP00250',name:'Upstream Distribution (Hardcap)',vp:'SMITH, CHRISTOPHER',mgr:'Wilkerson, Bria',portfolio:'Supply Chain',dept:'IT Supply Chain - Logistics',forecast:300000,actual:0},
+  {id:'SP00249',name:'Downstream Distribution (Hardcap)',vp:'SMITH, CHRISTOPHER',mgr:'Wilkerson, Bria',portfolio:'Supply Chain',dept:'IT Supply Chain - Logistics',forecast:275000,actual:0},
+  {id:'SP00237',name:'SEO',vp:'Ramaswamy, Arun',mgr:'MEKONNEN, SELAMAWIT',portfolio:'Online',dept:'Marketing Technology',forecast:272733,actual:15783},
+  {id:'SP00060',name:'Config Product Selling Tools- Kitchen',vp:'HART, MAURA',mgr:'McKee, Lori',portfolio:'Merchandising',dept:'IT Store Merchandising',forecast:270241,actual:70392},
+  {id:'SP00021',name:'RTS Chargeback Store Ops - CDN',vp:'DiRisio, Victor',mgr:'Shirazi, Amir',portfolio:'Canada',dept:'CAN IT Corp',forecast:267902,actual:267902},
+  {id:'SP00027',name:'CDN Clean Core Initiatives',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:264550,actual:264550},
+  {id:'SP00059',name:'Store Merch Utils',vp:'HART, MAURA',mgr:'Mullins, Sarah',portfolio:'Merchandising',dept:'IT Store Merchandising',forecast:262671,actual:88295},
+  {id:'SP00022',name:'RTS Expense Employees - CDN',vp:'DiRisio, Victor',mgr:'BHANDARI, RISHI',portfolio:'Canada',dept:'CAN IT Corp',forecast:248357,actual:248357},
+  {id:'SP00272',name:'CDN CRM Services',vp:'DiRisio, Victor',mgr:'SAMUEL, SIBIL',portfolio:'Canada',dept:'CAN IT Corp',forecast:227535,actual:227535},
+  {id:'SP00270',name:'Store Systems Director Leadership',vp:'AKRAM, MUZAMMIL',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Store Systems Administrative',forecast:221904,actual:53611},
+  {id:'SP00267',name:'Enterprise Architecture Director Leaders',vp:'BLACK, CHRIS',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Enterprise Architecture Administrative',forecast:221082,actual:54162},
+  {id:'SP00319',name:'Marketing Director Leadership',vp:'Ramaswamy, Arun',mgr:'HARDING, PATRICIA',portfolio:'Executive and Admin',dept:'Marketing Administrative - IT',forecast:215953,actual:52933},
+  {id:'SP00157',name:'IT EDX Program Team',vp:'Walk, Demetrus',mgr:'Thomas, Jas',portfolio:'Delivery Experience',dept:'PM - Delivery Experience',forecast:204960,actual:49802},
+  {id:'SP00017',name:'CDN RTS Chargeback Retail Media',vp:'DiRisio, Victor',mgr:'SAMUEL, SIBIL',portfolio:'Canada',dept:'CAN IT Corp',forecast:203843,actual:203843},
+  {id:'SP00293',name:'Enterprise Escalation Management',vp:'GREGORIO, ANTHONY',mgr:'Wicker, Paul',portfolio:'Reliability Engineering',dept:'Enterprise Escalation Management',forecast:197043,actual:47751},
+  {id:'SP00049',name:'CDN Hardware & Network',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:194192,actual:204221},
+  {id:'SP00263',name:'Pro Director Leadership',vp:'COUNTRYMAN, DENISE',mgr:'BALAKRISHNAN, BALAJI',portfolio:'Executive and Admin',dept:'Services Administrative',forecast:193723,actual:19502},
+  {id:'SP00258',name:'Customer Solutions Director Leadership',vp:'Kruck, Josh',mgr:'SHAH, RAJJU',portfolio:'Executive and Admin',dept:'Customer Administrative',forecast:192290,actual:46586},
+  {id:'SP00169',name:'Product Safety',vp:'SMITH, CHRISTOPHER',mgr:'Thomas, Jas',portfolio:'Supply Chain',dept:'IT Supply Chain Arch Global Sourcing',forecast:190466,actual:44480},
+  {id:'SP00253',name:'Data Warehouse Director Leadership',vp:'MOSES, SAMUEL',mgr:'WILKINSON, HELEN',portfolio:'Executive and Admin',dept:'Corporate Services Administrative',forecast:184712,actual:28213},
+  {id:'SP00020',name:'RTS Chargeback Marketing & Advertising -',vp:'DiRisio, Victor',mgr:'SUTHARMAN, SHANNON',portfolio:'Canada',dept:'CAN IT Corp',forecast:165389,actual:165389},
+  {id:'SP00202',name:'HDTV Refresh',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:159765,actual:159765},
+  {id:'SP00185',name:'Computer Vision (Hard Cap)',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:150000,actual:0},
+  {id:'SP00023',name:'CDN Store MTB and NC',vp:'DiRisio, Victor',mgr:'Fauteux, Alanna',portfolio:'Canada',dept:'CAN IT Corp',forecast:140168,actual:140168},
+  {id:'SP00128',name:'Facilities Management & Safety',vp:'AKRAM, MUZAMMIL',mgr:'Krull, Jeff',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:126236,actual:6898},
+  {id:'SP00264',name:'CX Director Leadership',vp:'Kruck, Josh',mgr:'SHAH, RAJJU',portfolio:'Executive and Admin',dept:'Customer Administrative',forecast:119306,actual:29130},
+  {id:'SP00078',name:'KTLO Cyber Arch / Innovation',vp:'LANZILOTTA, CHRIS',mgr:'BOWERS, ERIN',portfolio:'Cybersecurity',dept:'Cyber Strategic Planning - Arch - Legal',forecast:108025,actual:0},
+  {id:'SP00045',name:'CDN Store MET Suite Apps',vp:'DiRisio, Victor',mgr:'Lee, Simon',portfolio:'Canada',dept:'CAN IT Corp',forecast:96334,actual:96334},
+  {id:'SP00187',name:'Store Associate Workbench',vp:'AKRAM, MUZAMMIL',mgr:'HUTCHESON, AMI',portfolio:'Store Systems',dept:'IT - Store Operations',forecast:88458,actual:21665},
+  {id:'SP00036',name:'CDN Finance Technology',vp:'DiRisio, Victor',mgr:'VADDEY, GANGA',portfolio:'Canada',dept:'CAN IT Corp',forecast:83888,actual:83888},
+  {id:'SP00032',name:'CDN Cloud Operations',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:72275,actual:72275},
+  {id:'SP00149',name:'Monitoring Operations',vp:'GREGORIO, ANTHONY',mgr:'SHERLOCK, BRIAN',portfolio:'Reliability Engineering',dept:'Reliability Engineering',forecast:60819,actual:15205},
+  {id:'SP00262',name:'COM Director Leadership',vp:'COUNTRYMAN, DENISE',mgr:'BALAKRISHNAN, BALAJI',portfolio:'Executive and Admin',dept:'Services Administrative',forecast:59737,actual:6567},
+  {id:'SP00026',name:'CDN Leadership',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:55412,actual:55412},
+  {id:'SP00277',name:'HR & CCEA Director Leadership',vp:'MOSES, SAMUEL',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Corporate Services Administrative',forecast:47882,actual:47882},
+  {id:'SP00172',name:'IT Training',vp:'GREGORIO, ANTHONY',mgr:'GOODWIN, CHRISTI',portfolio:'Developer Experience',dept:'IT Training',forecast:44335,actual:33740},
+  {id:'SP00057',name:'Millwork - Vendor Funded',vp:'HART, MAURA',mgr:'McKee, Lori',portfolio:'Merchandising',dept:'IT Store Merchandising',forecast:41080,actual:9935},
+  {id:'SP00303',name:'Core AI Director Leadership',vp:'BLACK, CHRIS',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'Enterprise Architecture Administrative',forecast:24026,actual:24026},
+  {id:'SP00212',name:'Device Engineering',vp:'GRIDER, DANIEL',mgr:'EBERHARDT, BRIAN',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:20599,actual:18063},
+  {id:'SP00220',name:'Corporate PCs (1225)',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:20035,actual:22090},
+  {id:'SP00314',name:'UPS Refresh (DC Hard Cap)',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:14700,actual:0},
+  {id:'SP00044',name:'CDN Store Apps SRE and DevOps',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:14346,actual:14346},
+  {id:'SP00221',name:'Corporate PCs (1201)',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:7500,actual:0},
+  {id:'SP00213',name:'TVSS Device Infrastructure (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'BEYNUM, RHONDA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:0,actual:0},
+  {id:'SP00203',name:'Store PC/POS Client (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'Taitt, Donovan',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:0,actual:0},
+  {id:'SP00184',name:'Space Management',vp:'HART, MAURA',mgr:'McKee, Lori',portfolio:'Merchandising',dept:'IT Merchandising Master Data',forecast:0,actual:0},
+  {id:'SP00300',name:'Pin Pad Refresh (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:0,actual:0},
+  {id:'SP00150',name:'Monitoring Enhancements',vp:'GREGORIO, ANTHONY',mgr:'SHERLOCK, BRIAN',portfolio:'Reliability Engineering',dept:'Reliability Engineering',forecast:0,actual:0},
+  {id:'SP00323',name:'Hard Cap - Corporate UPS',vp:'GRIDER, DANIEL',mgr:'NATHAN, LAURA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:0,actual:0},
+  {id:'SP00222',name:'Corporate PCs (1400)',vp:'GRIDER, DANIEL',mgr:'FISHER, DONNA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:0,actual:0},
+  {id:'SP00016',name:'CDN Technology Capitalization',vp:'DiRisio, Victor',mgr:'FASCIO, MARIA',portfolio:'Canada',dept:'CAN IT Corp',forecast:0,actual:0},
+  {id:'SP00024',name:'CDN TCS Support',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:0,actual:0},
+  {id:'SP00029',name:'CDN Payments',vp:'DiRisio, Victor',mgr:'BAJWA, AMMY',portfolio:'Canada',dept:'CAN IT Corp',forecast:0,actual:0},
+  {id:'SP00013',name:'Assortment Management',vp:'HART, MAURA',mgr:'McKee, Lori',portfolio:'Merchandising',dept:'IT Merchandising Master Data',forecast:0,actual:0},
+  {id:'SP00281',name:'OU Standardization - Infr (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'Adebowale, Doyin',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:-43234,actual:-43234},
+  {id:'SP00210',name:'Analog Camera Refresh (Hard Cap)',vp:'GRIDER, DANIEL',mgr:'MCGAHEE, MONICA',portfolio:'Infrastructure & Operations',dept:'IT Field Operations Team',forecast:-564255,actual:-564255},
+  {id:'SP00205',name:'Technology Field Captains Operations',vp:'GRIDER, DANIEL',mgr:'MEIER, FRANCK',portfolio:'Infrastructure & Operations',dept:'Field Captain Operations',forecast:-681391,actual:16528},
+  {id:'SP00105',name:'Contractor Rebates',vp:'BROWN, ANGIE',mgr:'Jones, Michelle',portfolio:'Executive and Admin',dept:'IT Executive',forecast:-1893360,actual:-741360}
 ];
 
-const EM_COLORS = {
-  gibner:       '#344054',
-  glenn:        '#667085',
-  janus:        '#F96302',
-  higginbotham: '#98A2B3',
-};
+const PORTFOLIOS = [
+  {name:'Infrastructure & Operations',vp:'GRIDER, DANIEL',forecast:409909357,actual:115516343,managers:27},
+  {name:'Cybersecurity',vp:'LANZILOTTA, CHRIS',forecast:158239572,actual:34826945,managers:3},
+  {name:'Supply Chain',vp:'SMITH, CHRISTOPHER',forecast:120476950,actual:27225206,managers:5},
+  {name:'Online',vp:'Kruck, Josh',forecast:102722115,actual:26094263,managers:5},
+  {name:'Store Systems',vp:'AKRAM, MUZAMMIL',forecast:95439299,actual:21731139,managers:9},
+  {name:'Finance',vp:'MOSES, SAMUEL',forecast:75663911,actual:18092780,managers:8},
+  {name:'Executive and Admin',vp:'COUNTRYMAN, DENISE',forecast:67246618,actual:16425798,managers:14},
+  {name:'Merchandising',vp:'HART, MAURA',forecast:53083661,actual:12957094,managers:8},
+  {name:'CIO',vp:'BROWN, ANGIE',forecast:41766402,actual:0,managers:2},
+  {name:'Human Resources',vp:'MOSES, SAMUEL',forecast:34467887,actual:8414643,managers:4},
+  {name:'Reliability Engineering',vp:'GREGORIO, ANTHONY',forecast:34161788,actual:7685533,managers:7},
+  {name:'Pro',vp:'COUNTRYMAN, DENISE',forecast:33306429,actual:7909947,managers:2},
+  {name:'Data Warehousing & Machine Learning',vp:'MOSES, SAMUEL',forecast:31241190,actual:6075536,managers:2},
+  {name:'Developer Experience',vp:'GREGORIO, ANTHONY',forecast:30279063,actual:7720876,managers:7},
+  {name:'Services',vp:'MOSES, SAMUEL',forecast:28585932,actual:6632864,managers:4},
+  {name:'Customer Order Management',vp:'COUNTRYMAN, DENISE',forecast:26780493,actual:6540189,managers:2},
+  {name:'Payment',vp:'MOSES, SAMUEL',forecast:25737943,actual:6702018,managers:2},
+  {name:'Inventory Planning & Replenishment',vp:'COUNTRYMAN, DENISE',forecast:24810278,actual:5926084,managers:2},
+  {name:'Orange Apron Media',vp:'Ramaswamy, Arun',forecast:23367700,actual:6093268,managers:4},
+  {name:'Marketing',vp:'MOSES, SAMUEL',forecast:22115672,actual:4763711,managers:4},
+  {name:'Core AI',vp:'BLACK, CHRIS',forecast:20208931,actual:2216269,managers:2},
+  {name:'Canada',vp:'DiRisio, Victor',forecast:19574015,actual:19584044,managers:26},
+  {name:'Delivery Experience',vp:'SMITH, CHRISTOPHER',forecast:13228387,actual:3093530,managers:2},
+  {name:'Customer Solutions',vp:'Kruck, Josh',forecast:12061047,actual:3104256,managers:2},
+  {name:'Product CoE',vp:'POST, SARAH',forecast:10450156,actual:2380722,managers:1},
+  {name:'Enterprise Architecture',vp:'BLACK, CHRIS',forecast:9776161,actual:1765459,managers:2},
+  {name:'Customer',vp:'Kruck, Josh',forecast:8331662,actual:2085770,managers:2},
+  {name:'Customer Experience',vp:'Kruck, Josh',forecast:7605687,actual:1881692,managers:2},
+  {name:'Enterprise UX',vp:'LOPEZ, CARLOS',forecast:4450027,actual:1033245,managers:1},
+  {name:'ECM & Low Code Platforms',vp:'MOSES, SAMUEL',forecast:2689158,actual:558568,managers:3},
+  {name:'Legal',vp:'LANZILOTTA, CHRIS',forecast:1798512,actual:335222,managers:2},
+];
 
-const EM_NAMES = {
-  gibner:'GIBNER, Jason', glenn:'GLENN, Matt',
-  janus:'JANUS, Alexander', higginbotham:'Higginbotham, Matt'
-};
+const VPS = [
+  {name:'GRIDER, DANIEL',forecast:414075288,actual:116505824,portfolios:2},
+  {name:'LANZILOTTA, CHRIS',forecast:163894510,actual:36100800,portfolios:3},
+  {name:'MOSES, SAMUEL',forecast:152085811,actual:34466214,portfolios:13},
+  {name:'Kruck, Josh',forecast:130131742,actual:33086047,portfolios:5},
+  {name:'SMITH, CHRISTOPHER',forecast:127339429,actual:29002420,portfolios:3},
+  {name:'HART, MAURA',forecast:122868860,actual:30234827,portfolios:3},
+  {name:'AKRAM, MUZAMMIL',forecast:95386806,actual:21918980,portfolios:2},
+  {name:'COUNTRYMAN, DENISE',forecast:89364883,actual:21500451,portfolios:4},
+  {name:'BROWN, ANGIE',forecast:67571609,actual:6498840,portfolios:2},
+  {name:'GREGORIO, ANTHONY',forecast:65755265,actual:15728351,portfolios:3},
+  {name:'Ramaswamy, Arun',forecast:45287378,actual:10688844,portfolios:4},
+  {name:'BLACK, CHRIS',forecast:34186568,actual:4985911,portfolios:3},
+  {name:'DiRisio, Victor',forecast:19574015,actual:19584044,portfolios:1},
+  {name:'POST, SARAH',forecast:10912130,actual:2491478,portfolios:2},
+  {name:'LOPEZ, CARLOS',forecast:6358620,actual:1497259,portfolios:2},
+  {name:'Walk, Demetrus',forecast:4783089,actual:1082724,portfolios:1},
+];
 
-// Monthly totals P1-P12 (all types) from ITRM Investment Allocation report totals row
 const MONTHLY = [
-  { period:'P1', month:'Feb', forecast:1880091.18,  actual:1880091.18,  complete:true  },
-  { period:'P2', month:'Mar', forecast:13073903.95, actual:13073903.95, complete:true  },
-  { period:'P3', month:'Apr', forecast:11256549.52, actual:11256549.52, complete:true  },
-  { period:'P4', month:'May', forecast:4496559.26,  actual:3757466.37,  complete:false, current:true },
-  { period:'P5', month:'Jun', forecast:9219165.09,  actual:null,        complete:false },
-  { period:'P6', month:'Jul', forecast:7172794.05,  actual:null,        complete:false },
-  { period:'P7', month:'Aug', forecast:9283055.68,  actual:null,        complete:false },
-  { period:'P8', month:'Sep', forecast:6841816.68,  actual:null,        complete:false },
-  { period:'P9', month:'Oct', forecast:7454567.02,  actual:null,        complete:false },
-  { period:'P10', month:'Nov', forecast:7282721.59,  actual:null,        complete:false },
-  { period:'P11', month:'Dec', forecast:6557531.68,  actual:null,        complete:false },
-  { period:'P12', month:'Jan', forecast:14695114.59, actual:null,        complete:false },
+  {period:'P1',month:'Feb',af:94408912},
+  {period:'P2',month:'Mar',af:112291738},
+  {period:'P3',month:'Apr',af:159879172},
+  {period:'P4',month:'May',af:121303721,current:true},
+  {period:'P5',month:'Jun',af:145500000,fcst:true},
+  {period:'P6',month:'Jul',af:145500000,fcst:true},
+  {period:'P7',month:'Aug',af:145500000,fcst:true},
+  {period:'P8',month:'Sep',af:145500000,fcst:true},
+  {period:'P9',month:'Oct',af:145500000,fcst:true},
+  {period:'P10',month:'Nov',af:145500000,fcst:true},
+  {period:'P11',month:'Dec',af:145500000,fcst:true},
+  {period:'P12',month:'Jan',af:145500000,fcst:true},
 ];
 
-// ════════════════════════════════════════════════════════
-//  HELPERS
-// ════════════════════════════════════════════════════════
+
+const YR_ELAPSED = 33.3;
+const TOTAL_FORECAST = 1549576003;
+const TOTAL_ACTUAL = 385373014;
 
 function fmtM(v, dp=1) {
   if (v === null || v === undefined) return '—';
   const abs = Math.abs(v);
-  const sign = v < 0 ? '-' : '';
-  if (abs >= 1e6) return sign + '$' + (abs/1e6).toFixed(dp) + 'M';
-  if (abs >= 1e3) return sign + '$' + (abs/1e3).toFixed(dp) + 'K';
-  return sign + '$' + abs.toFixed(0);
-}
-function fmtPct(a, b) { return b === 0 ? '—' : (a/b*100).toFixed(1) + '%'; }
-function burnPct(actual, forecast) { return forecast > 0 ? (actual/forecast*100).toFixed(1) : 0; }
-
-function varBadge(v) {
-  if (v > 500) return `<span class="badge b-green"><span class="b-dot"></span>${fmtM(v)} fav</span>`;
-  if (v < -500) return `<span class="badge b-red"><span class="b-dot"></span>${fmtM(Math.abs(v))} over</span>`;
-  return `<span class="badge b-neu"><span class="b-dot"></span>${fmtM(v)}</span>`;
+  if (abs >= 1e9) return (v/1e9).toFixed(dp) + 'B';
+  if (abs >= 1e6) return (v/1e6).toFixed(dp) + 'M';
+  if (abs >= 1e3) return (v/1e3).toFixed(dp) + 'K';
+  return v.toFixed(dp);
 }
 
-function varCellStyle(v) {
-  if (v > 500)  return 'style="color:var(--green600);font-weight:700"';
-  if (v < -500) return 'style="color:var(--red600);font-weight:700"';
-  return 'style="color:var(--g500)"';
+function burnPct(actual, forecast) {
+  if (!forecast || forecast <= 0) return 0;
+  return (actual / forecast) * 100;
+}
+
+function burnColor(pct) {
+  if (pct > YR_ELAPSED + 5) return 'red';
+  if (pct > YR_ELAPSED - 3) return 'yellow';
+  return 'green';
 }
 
 function burnBadge(pct) {
-  const n = parseFloat(pct);
-  if (n > 50)  return `<span class="badge b-warn">${pct}%</span>`;
-  if (n > 35)  return `<span class="badge b-hd">${pct}%</span>`;
-  return `<span class="badge b-neu">${pct}%</span>`;
+  const delta = pct - YR_ELAPSED;
+  if (pct <= 0) return '<span class="badge badge-gray">No actuals</span>';
+  if (pct > YR_ELAPSED + 5) return `<span class="badge badge-red">+${delta.toFixed(1)}% over pace</span>`;
+  if (delta >= -3) return `<span class="badge badge-yellow">On pace</span>`;
+  return `<span class="badge badge-green">${delta.toFixed(1)}% under pace</span>`;
 }
 
-function statusBadge(p) {
-  if (p.type === 'Hard Cap' && p.id === 'PR000406' && p.actual/p.forecast > 0.9) return '<span class="badge b-green">Fully Spent</span>';
-  if (p.id === 'PR001205' && p.actual/p.forecast > 0.9) return '<span class="badge b-green">Fully Spent</span>';
-  if (p.variance < -500000) return '<span class="badge b-red"><span class="b-dot"></span>Over Budget</span>';
-  if (p.variance < 0) return '<span class="badge b-warn">Watch</span>';
-  return '<span class="badge b-neu">On Track</span>';
+function burnBar(pct, color) {
+  const w = Math.min(pct, 100);
+  return `<div class="burn-bar"><div class="burn-fill ${color}" style="width:${w}%"></div></div>`;
 }
 
-// ════════════════════════════════════════════════════════
-//  OVERVIEW
-// ════════════════════════════════════════════════════════
+function toTitleCase(s) {
+  return s.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
+}
 
+// ── OVERVIEW ──────────────────────────────────────────────
+let overviewBuilt = false;
 function buildOverview() {
-  // EM aggregations
-  const emIds = ['gibner','glenn','janus','higginbotham'];
-  const emData = {};
-  emIds.forEach(id => {
-    const ps = PROJECTS.filter(p => p.em_id === id);
-    emData[id] = {
-      forecast: ps.reduce((s,p) => s + p.forecast, 0),
-      actual:   ps.reduce((s,p) => s + p.actual, 0),
-      budget:   ps.reduce((s,p) => s + p.budget, 0),
-      variance: ps.reduce((s,p) => s + p.variance, 0),
-    };
-  });
+  if (overviewBuilt) return;
+  overviewBuilt = true;
 
-  const sorted = [...emIds].sort((a,b) => emData[b].forecast - emData[a].forecast);
+  // Alerts
+  const az = document.getElementById('alert-zone');
+  const burnRate = burnPct(TOTAL_ACTUAL, TOTAL_FORECAST);
+  const delta = burnRate - YR_ELAPSED;
+  if (delta < -5) {
+    az.innerHTML = `<div class="alert alert-warn">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      <span><strong>Spend Pacing Behind:</strong> Overall burn rate is ${burnRate.toFixed(1)}% with ${YR_ELAPSED}% of year elapsed — ${Math.abs(delta).toFixed(1)} pts behind pace. Review Q3/Q4 commitments.</span>
+      <span class="alert-note">${fmtM(TOTAL_FORECAST - TOTAL_ACTUAL)} remaining</span>
+    </div>`;
+  }
 
-  // EM bar chart
-  new Chart(document.getElementById('emChart'), {
+  // Portfolio bar chart (top 15)
+  const top15 = PORTFOLIOS.slice(0, 15);
+  const portCtx = document.getElementById('ch-portfolio').getContext('2d');
+  new Chart(portCtx, {
     type: 'bar',
     data: {
-      labels: sorted.map(id => EM_NAMES[id].replace(', ','<br>')),
+      labels: top15.map(p => p.name.length > 24 ? p.name.slice(0, 22) + '…' : p.name),
       datasets: [
-        {
-          label: 'Forecast', data: sorted.map(id => emData[id].forecast/1e6),
-          backgroundColor: sorted.map(id => EM_COLORS[id]),
-          borderRadius: 4, stack:'a',
-        },
-        {
-          label: 'Budget', data: sorted.map(id => emData[id].budget/1e6),
-          backgroundColor: sorted.map(id => EM_COLORS[id]+'33'),
-          borderRadius: 4, stack:'b',
-          borderColor: sorted.map(id => EM_COLORS[id]),
-          borderWidth: 1,
-        },
-      ],
+        {label:'FY Forecast', data: top15.map(p => p.forecast/1e6), backgroundColor:'rgba(249,99,2,.15)', borderColor:'#F96302', borderWidth:1.5, borderRadius:3},
+        {label:'YTD Actual', data: top15.map(p => p.actual/1e6), backgroundColor:'rgba(249,99,2,.7)', borderColor:'#D95A00', borderWidth:0, borderRadius:3},
+      ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {position:'top', labels:{font:{size:11},color:'#667085',boxWidth:10,padding:10}},
-        tooltip: {callbacks:{label: ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw*1e6)}`}},
-      },
-      scales: {
-        x: {ticks:{font:{size:11},color:'#667085'},grid:{display:false},border:{display:false}},
-        y: {ticks:{callback:v=>`$${v.toFixed(0)}M`,font:{size:10},color:'#98A2B3'},grid:{color:'#F2F4F7'},border:{display:false}},
-      },
-    },
-  });
-
-  // Composition donut
-  const totalForecast = PROJECTS.reduce((s,p)=>s+p.forecast,0);
-  const laborForecast = PROJECTS.filter(p=>p.type==='Labor').reduce((s,p)=>s+p.forecast,0);
-  const hcForecast    = PROJECTS.filter(p=>p.type==='Hard Cap').reduce((s,p)=>s+p.forecast,0);
-
-  new Chart(document.getElementById('compChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Hard Cap','Labor'],
-      datasets: [{
-        data: [hcForecast, laborForecast],
-        backgroundColor: ['#344054','#F96302'],
-        borderWidth: 2, borderColor: '#fff',
-      }],
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false, cutout:'66%',
-      plugins: {
-        legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)}`}},
-      },
-    },
-  });
-
-  const cl = document.getElementById('compLegend');
-  [
-    {label:'Hard Cap', val:hcForecast, color:'#344054'},
-    {label:'Labor',    val:laborForecast, color:'#F96302'},
-  ].forEach(item => {
-    const pct = (item.val/totalForecast*100).toFixed(1);
-    cl.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:12px">
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="width:8px;height:8px;border-radius:50%;background:${item.color}"></div>
-        <span style="color:var(--g600)">${item.label}</span>
-      </div>
-      <span style="font-weight:600;color:var(--g700)">${fmtM(item.val)} <span style="color:var(--g400);font-weight:400">(${pct}%)</span></span>
-    </div>`;
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:10,padding:12}}, tooltip:{callbacks:{label:c=>' $'+c.raw.toFixed(1)+'M'}}},
+      scales:{
+        x:{grid:{display:false}, ticks:{font:{size:10},maxRotation:35,minRotation:25}},
+        y:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10},callback:v=>'$'+v.toFixed(0)+'M'}}
+      }
+    }
   });
 
   // Monthly chart
-  const months = MONTHLY.map(m => m.month);
-  const forecastData = MONTHLY.map(m => m.forecast/1e6);
-  const actualData   = MONTHLY.map(m => m.actual !== null ? m.actual/1e6 : null);
-
-  new Chart(document.getElementById('monthlyChart'), {
+  const mCtx = document.getElementById('ch-monthly').getContext('2d');
+  new Chart(mCtx, {
     type: 'bar',
     data: {
-      labels: months,
-      datasets: [
-        {
-          label: 'Actual',
-          data: actualData,
-          backgroundColor: ctx => {
-            const m = MONTHLY[ctx.dataIndex];
-            if (!m) return '#F96302';
-            return m.current ? 'rgba(249,99,2,0.6)' : '#F96302';
-          },
-          borderRadius: 3, order: 1,
-        },
-        {
-          label: 'Forecast',
-          data: forecastData,
-          type: 'line',
-          borderColor: '#98A2B3', backgroundColor:'transparent',
-          borderWidth: 1.5, pointRadius: 3, pointBackgroundColor: '#98A2B3',
-          borderDash: [4,3], tension: 0, order: 0,
-        },
-      ],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {display:false},
-        tooltip: {callbacks:{label: ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw*1e6)}`}},
-      },
-      scales: {
-        x: {ticks:{font:{size:10},color:'#667085'},grid:{display:false},border:{display:false}},
-        y: {ticks:{callback:v=>`$${v.toFixed(0)}M`,font:{size:10},color:'#98A2B3'},grid:{color:'#F2F4F7'},border:{display:false}},
-      },
-    },
-  });
-
-  // EM summary cards
-  const cardsEl = document.getElementById('emSummaryCards');
-  const emColorList = ['#344054','#667085','#F96302','#98A2B3'];
-  sorted.forEach((id, i) => {
-    const d = emData[id];
-    const burnPctVal = (d.actual/d.forecast*100).toFixed(1);
-    const varFav = d.variance >= 0;
-    const projects = PROJECTS.filter(p=>p.em_id===id);
-    const laborPs  = projects.filter(p=>p.type==='Labor');
-    const hcPs     = projects.filter(p=>p.type==='Hard Cap');
-
-    cardsEl.innerHTML += `<div class="card">
-      <div class="card-body">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-          <div style="width:10px;height:10px;border-radius:50%;background:${emColorList[i]};flex-shrink:0"></div>
-          <div>
-            <div style="font-size:13.5px;font-weight:700;color:var(--g900)">${EM_NAMES[id]}</div>
-            <div style="font-size:11.5px;color:var(--g500)">${projects.length} projects · ${laborPs.length} Labor · ${hcPs.length} Hard Cap</div>
-          </div>
-          <div style="margin-left:auto">${varFav
-            ? `<span class="badge b-green"><span class="b-dot"></span>+${fmtM(d.variance)} fav</span>`
-            : `<span class="badge b-red"><span class="b-dot"></span>${fmtM(Math.abs(d.variance))} over</span>`}
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-          <div>
-            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Forecast</div>
-            <div style="font-size:18px;font-weight:800;color:var(--g900);letter-spacing:-.03em">${fmtM(d.forecast)}</div>
-          </div>
-          <div>
-            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Actual YTD</div>
-            <div style="font-size:18px;font-weight:800;color:var(--g700);letter-spacing:-.03em">${fmtM(d.actual)}</div>
-          </div>
-          <div>
-            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Budget</div>
-            <div style="font-size:18px;font-weight:800;color:var(--g700);letter-spacing:-.03em">${fmtM(d.budget)}</div>
-          </div>
-        </div>
-        <div style="margin-top:10px">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g500);margin-bottom:4px">
-            <span>Burn rate</span><span style="font-weight:600;color:var(--g700)">${burnPctVal}% of forecast</span>
-          </div>
-          <div style="background:var(--g150);border-radius:99px;height:5px">
-            <div style="width:${Math.min(parseFloat(burnPctVal),100)}%;height:5px;border-radius:99px;background:${emColorList[i]}"></div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  });
-}
-
-// ════════════════════════════════════════════════════════
-//  LABOR
-// ════════════════════════════════════════════════════════
-
-function buildLabor() {
-  const laborPs = PROJECTS.filter(p => p.type === 'Labor');
-  const totForecast = laborPs.reduce((s,p)=>s+p.forecast,0);
-  const totActual   = laborPs.reduce((s,p)=>s+p.actual,0);
-  const totBudget   = laborPs.reduce((s,p)=>s+p.budget,0);
-  const totVariance = laborPs.reduce((s,p)=>s+p.variance,0);
-
-  const body = document.getElementById('laborTableBody');
-  const sorted = [...laborPs].sort((a,b)=>b.forecast-a.forecast);
-  sorted.forEach(p => {
-    const burn = burnPct(p.actual, p.forecast);
-    body.innerHTML += `<tr>
-      <td class="mono" style="color:var(--g500);font-size:11.5px">${p.id}</td>
-      <td class="td-name" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.subProduct}</td>
-      <td class="td-muted">${p.em.split(',')[0]}</td>
-      <td class="r mono">${fmtM(p.forecast)}</td>
-      <td class="r mono">${fmtM(p.actual)}</td>
-      <td class="r">${burnBadge(burn)}</td>
-      <td class="r mono" style="color:var(--g500)">${fmtM(p.budget)}</td>
-      <td class="r mono" ${varCellStyle(p.variance)}>${p.variance >= 0 ? '+' : ''}${fmtM(p.variance)}</td>
-    </tr>`;
-  });
-
-  document.getElementById('laborTableFoot').innerHTML = `<tr>
-    <td colspan="3">Total · ${laborPs.length} Labor Projects</td>
-    <td class="r grand">${fmtM(totForecast)}</td>
-    <td class="r">${fmtM(totActual)}</td>
-    <td class="r">${burnPct(totActual,totForecast)}%</td>
-    <td class="r" style="color:var(--g500)">${fmtM(totBudget)}</td>
-    <td class="r" ${varCellStyle(totVariance)}>${totVariance >= 0 ? '+' : ''}${fmtM(totVariance)}</td>
-  </tr>`;
-
-  // Labor by EM bars
-  const emBarsEl = document.getElementById('laborEmBars');
-  const emIds = ['gibner','glenn','janus','higginbotham'];
-  const emColorList = ['#344054','#667085','#F96302','#98A2B3'];
-  const maxFc = Math.max(...emIds.map(id => laborPs.filter(p=>p.em_id===id).reduce((s,p)=>s+p.forecast,0)));
-
-  emIds.forEach((id, i) => {
-    const ps = laborPs.filter(p=>p.em_id===id);
-    if (!ps.length) return;
-    const fc = ps.reduce((s,p)=>s+p.forecast,0);
-    const act = ps.reduce((s,p)=>s+p.actual,0);
-    const pct = (fc/maxFc*100).toFixed(0);
-    emBarsEl.innerHTML += `<div class="pbar-row">
-      <div class="pbar-label" title="${EM_NAMES[id]}">${EM_NAMES[id].split(',')[0]}</div>
-      <div class="pbar-track">
-        <div class="pbar-fill" style="width:${pct}%;background:${emColorList[i]}"></div>
-      </div>
-      <div class="pbar-val">${fmtM(fc)}</div>
-    </div>`;
-  });
-
-  // Burn rate bars
-  const burnBarsEl = document.getElementById('laborBurnBars');
-  sorted.slice(0,6).forEach(p => {
-    const burn = parseFloat(burnPct(p.actual, p.forecast));
-    const color = burn > 40 ? 'var(--yellow700)' : 'var(--g400)';
-    burnBarsEl.innerHTML += `<div style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g500);margin-bottom:3px">
-        <span style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.id}</span>
-        <span style="font-weight:600;color:var(--g700)">${burn.toFixed(1)}%</span>
-      </div>
-      <div style="background:var(--g150);border-radius:99px;height:5px">
-        <div style="width:${Math.min(burn,100)}%;height:5px;border-radius:99px;background:${color}"></div>
-      </div>
-    </div>`;
-  });
-  burnBarsEl.innerHTML += `<div style="font-size:11px;color:var(--g400);margin-top:4px">Target: ~30.8% at P4</div>`;
-}
-
-// ════════════════════════════════════════════════════════
-//  HARDCAP
-// ════════════════════════════════════════════════════════
-
-function buildHardcap() {
-  const hcPs = PROJECTS.filter(p => p.type === 'Hard Cap');
-  const totForecast = hcPs.reduce((s,p)=>s+p.forecast,0);
-  const totActual   = hcPs.reduce((s,p)=>s+p.actual,0);
-  const totBudget   = hcPs.reduce((s,p)=>s+p.budget,0);
-  const totVariance = hcPs.reduce((s,p)=>s+p.variance,0);
-
-  const sorted = [...hcPs].sort((a,b)=>b.forecast-a.forecast);
-
-  const body = document.getElementById('hcTableBody');
-  sorted.forEach(p => {
-    const burn = burnPct(Math.max(p.actual,0), p.forecast);
-    const overBudget = p.variance < -10000;
-    body.innerHTML += `<tr${overBudget ? ' style="background:rgba(254,226,226,.25)"' : ''}>
-      <td class="mono" style="color:var(--g500);font-size:11.5px">${p.id}</td>
-      <td class="td-name" style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.subProduct}</td>
-      <td class="td-muted">${p.em.split(',')[0]}</td>
-      <td class="r mono" style="font-weight:700;color:var(--g900)">${fmtM(p.forecast)}</td>
-      <td class="r mono">${fmtM(Math.max(p.actual,0))}</td>
-      <td class="r">${burnBadge(burn)}</td>
-      <td class="r mono" style="color:var(--g500)">${fmtM(p.budget)}</td>
-      <td class="r mono" ${varCellStyle(p.variance)}>${p.variance >= 0 ? '+' : ''}${fmtM(p.variance)}</td>
-    </tr>`;
-  });
-
-  document.getElementById('hcTableFoot').innerHTML = `<tr>
-    <td colspan="3">Total · ${hcPs.length} Hard Cap Projects</td>
-    <td class="r grand">${fmtM(totForecast)}</td>
-    <td class="r">${fmtM(totActual)}</td>
-    <td class="r">${burnPct(totActual,totForecast)}%</td>
-    <td class="r" style="color:var(--g500)">${fmtM(totBudget)}</td>
-    <td class="r" ${varCellStyle(totVariance)}>${totVariance >= 0 ? '+' : ''}${fmtM(totVariance)}</td>
-  </tr>`;
-
-  // HC donut
-  const pieColors = ['#0C111D','#344054','#475467','#667085','#98A2B3','#D0D5DD','#F96302'];
-  new Chart(document.getElementById('hcPieChart'), {
-    type: 'doughnut',
-    data: {
-      labels: sorted.map(p=>p.id),
+      labels: MONTHLY.map(m => m.period + ' ' + m.month),
       datasets: [{
-        data: sorted.map(p=>Math.max(p.forecast,0)),
-        backgroundColor: pieColors,
-        borderWidth: 2, borderColor:'#fff',
-      }],
+        label:'Spend ($M)',
+        data: MONTHLY.map(m => m.af/1e6),
+        backgroundColor: MONTHLY.map(m => m.fcst ? 'rgba(152,162,179,.25)' : m.current ? 'rgba(249,99,2,.55)' : 'rgba(249,99,2,.8)'),
+        borderColor: MONTHLY.map(m => m.fcst ? 'rgba(152,162,179,.5)' : '#F96302'),
+        borderWidth: 1, borderRadius: 4,
+      }]
     },
     options: {
-      responsive:true, maintainAspectRatio:false, cutout:'60%',
-      plugins: {
-        legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)}`}},
-      },
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' $'+c.raw.toFixed(0)+'M'}}},
+      scales:{
+        x:{grid:{display:false}, ticks:{font:{size:10}}},
+        y:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10},callback:v=>'$'+v+'M'}}
+      }
+    }
+  });
+
+  // VP burn chart
+  const vpBurnCtx = document.getElementById('ch-vp-burn').getContext('2d');
+  const vpTop10 = VPS.filter(v => v.actual > 0).slice(0, 10);
+  const vpBurns = vpTop10.map(v => burnPct(v.actual, v.forecast));
+  new Chart(vpBurnCtx, {
+    type: 'bar',
+    data: {
+      labels: vpTop10.map(v => {
+        const parts = v.name.split(',');
+        return parts.length > 1 ? parts[0].trim() : v.name.split(' ')[0];
+      }),
+      datasets: [{
+        label:'Burn %',
+        data: vpBurns,
+        backgroundColor: vpBurns.map(b => b > YR_ELAPSED+5 ? 'rgba(180,35,24,.65)' : b > YR_ELAPSED-3 ? 'rgba(181,71,8,.55)' : 'rgba(18,183,106,.6)'),
+        borderRadius: 4,
+      }]
     },
+    options: {
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' '+c.raw.toFixed(1)+'%'}}},
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10},callback:v=>v+'%'}, max:40},
+        y:{grid:{display:false}, ticks:{font:{size:10}}}
+      }
+    }
   });
-
-  const legEl = document.getElementById('hcPieLegend');
-  sorted.forEach((p, i) => {
-    const pct = (p.forecast/totForecast*100).toFixed(1);
-    legEl.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
-      <div style="display:flex;align-items:center;gap:5px">
-        <div style="width:7px;height:7px;border-radius:50%;background:${pieColors[i]}"></div>
-        <span style="color:var(--g600)">${p.id}</span>
-      </div>
-      <span style="font-weight:600;color:var(--g700)">${pct}%</span>
-    </div>`;
-  });
-
-  // Velocity bars
-  const velEl = document.getElementById('hcVelocityBars');
-  sorted.forEach(p => {
-    const burn = parseFloat(burnPct(Math.max(p.actual,0), p.forecast));
-    const color = burn > 50 ? 'var(--hd)' : burn < 10 ? 'var(--g300)' : 'var(--g500)';
-    velEl.innerHTML += `<div style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g600);margin-bottom:3px">
-        <span>${p.id}</span>
-        <span style="font-weight:600">${burn.toFixed(1)}%</span>
-      </div>
-      <div style="background:var(--g150);border-radius:99px;height:5px">
-        <div style="width:${Math.min(burn,100)}%;height:5px;border-radius:99px;background:${color}"></div>
-      </div>
-    </div>`;
-  });
-  velEl.innerHTML += `<div style="font-size:11px;color:var(--g400);margin-top:2px;border-top:1px solid var(--g200);padding-top:8px">
-    <span style="color:var(--hd);font-weight:600">■</span> High burn · <span style="color:var(--g500);font-weight:600">■</span> On pace · <span style="color:var(--g300);font-weight:600">■</span> Low burn
-  </div>`;
 }
 
-// ════════════════════════════════════════════════════════
-//  ALL PROJECTS
-// ════════════════════════════════════════════════════════
-
-let currentTypeFilter = 'all';
-let currentEmFilter   = 'all';
-
-function filterProjects(type) {
-  if (type === 'all' || type === 'labor' || type === 'hc') currentTypeFilter = type;
-  currentEmFilter = document.getElementById('emFilter').value;
-
-  // Update filter buttons
-  ['all','labor','hc'].forEach(t => {
-    const btn = document.getElementById('filt-' + t);
-    if (btn) btn.classList.toggle('active', t === currentTypeFilter);
-  });
-
-  let filtered = PROJECTS;
-  if (currentTypeFilter === 'labor') filtered = filtered.filter(p=>p.type==='Labor');
-  if (currentTypeFilter === 'hc')    filtered = filtered.filter(p=>p.type==='Hard Cap');
-  if (currentEmFilter !== 'all')     filtered = filtered.filter(p=>p.em_id===currentEmFilter);
-
-  const sorted = [...filtered].sort((a,b)=>b.forecast-a.forecast);
-
-  const body = document.getElementById('allProjectsBody');
-  body.innerHTML = '';
-  sorted.forEach(p => {
-    const burn = burnPct(Math.max(p.actual,0), p.forecast);
-    body.innerHTML += `<tr>
-      <td class="mono" style="color:var(--g500);font-size:11.5px">${p.id}</td>
-      <td style="font-size:12px;color:var(--g700);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.subProduct}</td>
-      <td><span class="badge ${p.type==='Labor'?'type-labor':'type-hc'}">${p.type}</span></td>
-      <td class="td-muted">${p.em.split(',')[0]}</td>
-      <td class="r mono" style="font-weight:700;color:var(--g900)">${fmtM(p.forecast)}</td>
-      <td class="r mono">${fmtM(Math.max(p.actual,0))}</td>
-      <td class="r">${burnBadge(burn)}</td>
-      <td class="r mono" style="color:var(--g400)">${fmtM(p.planned)}</td>
-      <td class="r mono" style="color:var(--g500)">${fmtM(p.budget)}</td>
-      <td class="r mono" ${varCellStyle(p.variance)}>${p.variance >= 0 ? '+' : ''}${fmtM(p.variance)}</td>
-      <td class="r">${statusBadge(p)}</td>
+// ── PORTFOLIOS ────────────────────────────────────────────
+let portfoliosBuilt = false;
+let portFilter = '';
+function buildPortfolios() {
+  if (portfoliosBuilt) return;
+  portfoliosBuilt = true;
+  renderPortfolios();
+}
+function filterPortfolios() {
+  portFilter = document.getElementById('port-search').value.toLowerCase();
+  renderPortfolios();
+}
+function renderPortfolios() {
+  const list = PORTFOLIOS.filter(p => !portFilter || p.name.toLowerCase().includes(portFilter) || p.vp.toLowerCase().includes(portFilter));
+  document.getElementById('port-ct').textContent = list.length + ' portfolios';
+  const tb = document.getElementById('port-tbody');
+  tb.innerHTML = list.map(p => {
+    const pct = burnPct(p.actual, p.forecast);
+    const col = burnColor(pct);
+    return `<tr>
+      <td><div class="td-name">${p.name}</div></td>
+      <td><span style="font-size:12px;color:var(--g600)">${toTitleCase(p.vp)}</span></td>
+      <td class="r"><strong>$${fmtM(p.forecast)}</strong></td>
+      <td class="r">$${fmtM(p.actual)}</td>
+      <td class="r"><strong style="color:var(--${col === 'green' ? 'green600' : col === 'red' ? 'red600' : 'yellow700'})">${pct.toFixed(1)}%</strong></td>
+      <td>${burnBar(pct, col)}</td>
+      <td class="r">${p.managers}</td>
+      <td>${burnBadge(pct)}</td>
     </tr>`;
-  });
-
-  const totForecast = filtered.reduce((s,p)=>s+p.forecast,0);
-  const totActual   = filtered.reduce((s,p)=>s+p.actual,0);
-  const totBudget   = filtered.reduce((s,p)=>s+p.budget,0);
-  const totVariance = filtered.reduce((s,p)=>s+p.variance,0);
-  const totPlanned  = filtered.reduce((s,p)=>s+p.planned,0);
-
-  document.getElementById('allProjectsFoot').innerHTML = `<tr>
-    <td colspan="4">Total · ${filtered.length} projects</td>
-    <td class="r grand">${fmtM(totForecast)}</td>
-    <td class="r">${fmtM(Math.max(totActual,0))}</td>
-    <td class="r">${burnPct(Math.max(totActual,0),totForecast)}%</td>
-    <td class="r" style="color:var(--g400)">${fmtM(totPlanned)}</td>
-    <td class="r" style="color:var(--g500)">${fmtM(totBudget)}</td>
-    <td class="r" ${varCellStyle(totVariance)}>${totVariance >= 0 ? '+' : ''}${fmtM(totVariance)}</td>
-    <td></td>
-  </tr>`;
-
-  document.getElementById('allProjectsTitle').textContent =
-    `${filtered.length} Projects — FY2026${currentEmFilter !== 'all' ? ' · ' + EM_NAMES[currentEmFilter] : ''}`;
-
-  // Sub-product rollup
-  buildSubProductRollup();
+  }).join('');
 }
 
-function buildSubProductRollup() {
-  const spMap = {};
-  PROJECTS.forEach(p => {
-    const key = p.subProduct + '|' + p.em;
-    if (!spMap[key]) spMap[key] = {subProduct:p.subProduct, em:p.em, em_id:p.em_id, forecast:0, actual:0, budget:0, variance:0, count:0};
-    spMap[key].forecast += p.forecast;
-    spMap[key].actual   += p.actual;
-    spMap[key].budget   += p.budget;
-    spMap[key].variance += p.variance;
-    spMap[key].count    += 1;
-  });
+// ── VPs ───────────────────────────────────────────────────
+let vpsBuilt = false;
+function buildVPs() {
+  if (vpsBuilt) return;
+  vpsBuilt = true;
+  const grid = document.getElementById('vp-grid');
+  grid.innerHTML = VPS.map(v => {
+    const pct = burnPct(v.actual, v.forecast);
+    const col = burnColor(pct);
+    const colVar = col === 'green' ? 'var(--green600)' : col === 'red' ? 'var(--red600)' : '#B54708';
+    const name = toTitleCase(v.name);
+    return `<div class="vp-card">
+      <div class="vp-name">${name}</div>
+      <div class="vp-portfolio">${v.portfolios} portfolio${v.portfolios>1?'s':''}</div>
+      <div class="vp-stat-row">
+        <div class="vp-stat">
+          <div class="vp-stat-label">FY Forecast</div>
+          <div class="vp-stat-val hd">$${fmtM(v.forecast)}</div>
+        </div>
+        <div class="vp-stat">
+          <div class="vp-stat-label">YTD Actual</div>
+          <div class="vp-stat-val">$${fmtM(v.actual)}</div>
+        </div>
+      </div>
+      <div class="vp-burn-row">
+        <div class="vp-burn-label">${pct.toFixed(1)}% burn</div>
+        <div class="vp-burn-bar"><div class="vp-burn-fill ${col}" style="width:${Math.min(pct,100)}%"></div></div>
+        <div class="vp-burn-pct" style="color:${colVar}">${pct > 0 ? (pct > YR_ELAPSED+5 ? '▲ Over' : pct > YR_ELAPSED-3 ? '≈ On track' : '▼ Under') : 'No actuals'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-  const items = Object.values(spMap).sort((a,b)=>b.forecast-a.forecast);
-  const body = document.getElementById('subprodBody');
-  body.innerHTML = '';
-  items.forEach(sp => {
-    const burn = burnPct(Math.max(sp.actual,0), sp.forecast);
-    body.innerHTML += `<tr>
-      <td class="td-name" style="font-size:12.5px">${sp.subProduct}</td>
-      <td class="td-muted">${sp.em.split(',')[0]}</td>
-      <td class="r mono" style="font-weight:700;color:var(--g900)">${fmtM(sp.forecast)}</td>
-      <td class="r mono">${fmtM(Math.max(sp.actual,0))}</td>
-      <td class="r">${burnBadge(burn)}</td>
-      <td class="r mono" style="color:var(--g500)">${fmtM(sp.budget)}</td>
-      <td class="r mono" ${varCellStyle(sp.variance)}>${sp.variance >= 0 ? '+' : ''}${fmtM(sp.variance)}</td>
-      <td class="r" style="color:var(--g400);font-size:12px">${sp.count}</td>
+// ── SUB-PRODUCTS ──────────────────────────────────────────
+let spBuilt = false;
+let spPortFilter = '';
+function buildSP() {
+  if (spBuilt) return;
+  spBuilt = true;
+  // Build portfolio filter tabs
+  const uniquePortfolios = [...new Set(SP.map(s => s.portfolio))].sort();
+  const filters = document.getElementById('sp-portfolio-filters');
+  uniquePortfolios.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'ftab';
+    btn.textContent = p.length > 20 ? p.slice(0,18)+'…' : p;
+    btn.title = p;
+    btn.onclick = function() { filterSP(this, p); };
+    filters.appendChild(btn);
+  });
+  renderSP();
+}
+function filterSP(btn, portfolio) {
+  spPortFilter = portfolio;
+  document.querySelectorAll('#sp-portfolio-filters .ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSP();
+}
+function renderSP() {
+  const q = (document.getElementById('sp-search').value || '').toLowerCase();
+  const list = SP.filter(s => {
+    if (spPortFilter && s.portfolio !== spPortFilter) return false;
+    if (!q) return true;
+    return s.name.toLowerCase().includes(q) || s.vp.toLowerCase().includes(q) || s.mgr.toLowerCase().includes(q) || s.portfolio.toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
+  });
+  document.getElementById('sp-ct').textContent = list.length + ' items';
+  const tb = document.getElementById('sp-tbody');
+  tb.innerHTML = list.map(s => {
+    const pct = burnPct(s.actual, s.forecast);
+    const col = burnColor(pct);
+    return `<tr>
+      <td>
+        <div class="td-name">${s.name}</div>
+        <div class="td-sub">${s.id} · ${s.dept}</div>
+      </td>
+      <td><span style="font-size:12px;color:var(--g600)">${s.portfolio}</span></td>
+      <td><span style="font-size:12px;color:var(--g600)">${toTitleCase(s.vp)}</span></td>
+      <td><span style="font-size:12px;color:var(--g600)">${toTitleCase(s.mgr)}</span></td>
+      <td class="r"><strong>$${fmtM(s.forecast)}</strong></td>
+      <td class="r">$${fmtM(s.actual)}</td>
+      <td class="r"><strong style="color:var(--${col === 'green' ? 'green600' : col === 'red' ? 'red600' : 'yellow700'})">${s.actual > 0 ? pct.toFixed(1)+'%' : '—'}</strong></td>
+      <td>${burnBadge(pct)}</td>
     </tr>`;
-  });
-
-  const totF = items.reduce((s,sp)=>s+sp.forecast,0);
-  const totA = items.reduce((s,sp)=>s+sp.actual,0);
-  const totB = items.reduce((s,sp)=>s+sp.budget,0);
-  const totV = items.reduce((s,sp)=>s+sp.variance,0);
-  document.getElementById('subprodFoot').innerHTML = `<tr>
-    <td colspan="2">Total · ${items.length} sub-products</td>
-    <td class="r grand">${fmtM(totF)}</td>
-    <td class="r">${fmtM(Math.max(totA,0))}</td>
-    <td class="r">${burnPct(Math.max(totA,0),totF)}%</td>
-    <td class="r" style="color:var(--g500)">${fmtM(totB)}</td>
-    <td class="r" ${varCellStyle(totV)}>${totV >= 0 ? '+' : ''}${fmtM(totV)}</td>
-    <td></td>
-  </tr>`;
+  }).join('');
 }
 
-// ════════════════════════════════════════════════════════
-//  NAV
-// ════════════════════════════════════════════════════════
-
-const initialized = {overview:false, labor:false, hardcap:false, projects:false};
+// ── NAV ───────────────────────────────────────────────────
+const builders = {overview: buildOverview, portfolios: buildPortfolios, vps: buildVPs, subproducts: buildSP};
 
 function switchTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.s-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('sec-' + id).classList.add('active');
-  document.querySelector(`[data-section="${id}"]`).classList.add('active');
-  if (!initialized[id]) {
-    initialized[id] = true;
-    if (id === 'overview') buildOverview();
-    if (id === 'labor')    buildLabor();
-    if (id === 'hardcap')  buildHardcap();
-    if (id === 'projects') { filterProjects('all'); }
-  }
+  document.querySelectorAll('.s-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  document.querySelectorAll('.s-item')[['overview','portfolios','vps','subproducts'].indexOf(id)].classList.add('active');
+  (builders[id] || (() => {}))();
 }
 
-switchTab('overview');
+buildOverview();
 </script>
 </body>
 </html>
