@@ -494,11 +494,8 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
             </div>
             <div class="cc-sub">Labor only · excludes Hard Cap · <span class="ct">KTLO<span class="ct-tip">Keep-The-Lights-On (KTLO) spend covers mandatory operational work: running existing systems, compliance, support desks, and sustaining infrastructure. Not discretionary — cutting it risks system failures.</span></span> vs net-new investment</div>
           </div>
-          <div style="display:flex;align-items:center;gap:20px;flex:1">
-            <div class="cc-chart" style="height:180px;width:180px;flex-shrink:0;position:relative">
-              <canvas id="ch-ktlo"></canvas>
-            </div>
-            <div id="ch-ktlo-legend" style="flex:1;display:flex;flex-direction:column;gap:10px"></div>
+          <div class="cc-chart" style="height:220px;position:relative">
+            <canvas id="ch-ktlo"></canvas>
           </div>
         </div>
 
@@ -506,7 +503,7 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
         <div class="chart-card">
           <div class="cc-hd">
             <div class="cc-title-row">
-              <div class="cc-title">Labor Mix · By Transaction Class</div>
+              <div class="cc-title">Labor Mix</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Shows how the FY26 budget is distributed across spend categories: direct employee labor (FTE), contract and staff-aug resources, consulting engagements, hardware/software hard caps, and miscellaneous. Helps identify where resource cost is concentrated.</span></button>
             </div>
             <div class="cc-sub">Resource allocation cost by <span class="ct">transaction class<span class="ct-tip">Transaction Class categorizes spend by the type of resource or cost: FTE (direct employees), Contract (contingent labor billed hourly), Consulting (project-based SOW engagements), Hard Cap (hardware, licenses, infrastructure), and Other.</span></span></div>
@@ -1694,7 +1691,7 @@ function buildOverview() {
       labels: TRANSACTION_MIX.map(d => d.cls),
       datasets: [
         {
-          label: 'FY26 Budget',
+          label: 'FY26 Plan',
           data: TRANSACTION_MIX.map(d => d.forecast / 1e6),
           backgroundColor: txColors.map(c => c + '33'),
           borderColor: txColors,
@@ -1743,7 +1740,7 @@ function buildOverview() {
       labels: RESOURCE_MIX.map(r => r.type),
       datasets: [
         {
-          label: 'FY26 Budget',
+          label: 'FY26 Plan',
           data: RESOURCE_MIX.map(r => +(r.forecast/1e6).toFixed(0)),
           backgroundColor: 'rgba(249,99,2,0.15)',
           borderColor: '#F96302',
@@ -1770,7 +1767,7 @@ function buildOverview() {
               const r = RESOURCE_MIX[c.dataIndex];
               const pct = (r.forecast / totalLaborFcst * 100).toFixed(0);
               const burn = (r.actual / r.forecast * 100).toFixed(1);
-              if (c.datasetIndex === 0) return ` $${c.raw}M FY26 budget (${pct}% of labor)`;
+              if (c.datasetIndex === 0) return ` $${c.raw}M FY26 plan (${pct}% of labor)`;
               return ` $${c.raw}M YTD actual · ${burn}% burn`;
             }
           }
@@ -1794,31 +1791,49 @@ function buildOverview() {
   const ktloTotal = ktloFcst.reduce((a,b)=>a+b,0);
   const ktloCtx   = document.getElementById('ch-ktlo').getContext('2d');
   new Chart(ktloCtx, {
-    type: 'doughnut',
+    type: 'bar',
     data: {
       labels: ktloTypes,
-      datasets: [{ data: ktloFcst.map(v=>v/1e6), backgroundColor: ktloColors, borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
+      datasets: [
+        {
+          label: 'FY26 Plan',
+          data: ktloFcst.map(v => +(v/1e6).toFixed(0)),
+          backgroundColor: ktloColors.map(c => c + '26'),
+          borderColor: ktloColors,
+          borderWidth: 1.5,
+          borderRadius: 4,
+          barPercentage: 0.6,
+        },
+        {
+          label: 'YTD Actual',
+          data: ktloAct.map(v => +(v/1e6).toFixed(0)),
+          backgroundColor: ktloColors,
+          borderRadius: 4,
+          barPercentage: 0.6,
+        }
+      ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false, cutout: '68%',
+      responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => { const pct=(ktloFcst[c.dataIndex]/ktloTotal*100).toFixed(0); return [`$${(c.raw).toFixed(0)}M (${pct}%)`, `Actual $${(ktloAct[c.dataIndex]/1e6).toFixed(0)}M`]; } } }
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const pct = (ktloFcst[c.dataIndex] / ktloTotal * 100).toFixed(0);
+              const burn = (ktloAct[c.dataIndex] / ktloFcst[c.dataIndex] * 100).toFixed(1);
+              if (c.datasetIndex === 0) return ` $${c.raw}M FY26 plan (${pct}% of labor)`;
+              return ` $${c.raw}M YTD actual · ${burn}% burn`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$'+v+'M' } }
       }
     }
   });
-  document.getElementById('ch-ktlo-legend').innerHTML = ktloTypes.map((t,i)=>{
-    const pct = (ktloFcst[i]/ktloTotal*100).toFixed(0);
-    const burn = (ktloAct[i]/ktloFcst[i]*100).toFixed(1);
-    return `<div style="display:flex;align-items:flex-start;gap:10px">
-      <div style="width:12px;height:12px;border-radius:3px;background:${ktloColors[i]};flex-shrink:0;margin-top:2px"></div>
-      <div>
-        <div style="font-size:12px;font-weight:600;color:var(--g900)">${t}</div>
-        <div style="font-size:11px;color:var(--g500)">$${(ktloFcst[i]/1e6).toFixed(0)}M forecast · ${pct}% of total</div>
-        <div style="font-size:11px;font-weight:600;color:${_dpColor(burnColor(parseFloat(burn)))}"> ${burn}% burn · $${(ktloAct[i]/1e6).toFixed(0)}M actual</div>
-      </div>
-    </div>`;
-  }).join('');
 
 }
 
