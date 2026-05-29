@@ -451,7 +451,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
             <div class="hm-li"><div class="hm-sw" style="background:#F9FAFB;border-color:var(--g300)"></div>On pace (30–36%)</div>
             <div class="hm-li"><div class="hm-sw" style="background:#FEE4E2"></div>Over pace (36–43%)</div>
             <div class="hm-li"><div class="hm-sw" style="background:#D92D20"></div>Significantly over (43%+)</div>
-            <div class="hm-li"><div class="hm-sw" style="background:#F2F4F7;border-color:var(--g300)"></div>No spend recorded</div>
+            <div class="hm-li"><div class="hm-sw" style="background:#D0D5DD"></div>No spend recorded</div>
           </div>
         </div>
       </div>
@@ -1508,7 +1508,7 @@ function buildOverview() {
   // ── Chart 2: Portfolio Heat Map ────────────────────────
   const hmEl = document.getElementById('ch-heatmap');
   function hmStyle(pct, actual) {
-    if (!actual || actual <= 0) return {bg:'#F2F4F7', text:'#98A2B3', border:''};
+    if (!actual || actual <= 0) return {bg:'#D0D5DD', text:'#344054', border:''};
     if (pct < 20)               return {bg:'#ECFDF3', text:'#101828', border:''};
     if (pct < 30)               return {bg:'#D1FADF', text:'#101828', border:''};
     if (pct < 36)               return {bg:'#F9FAFB', text:'#101828', border:'border-left:3px solid #12B76A'};
