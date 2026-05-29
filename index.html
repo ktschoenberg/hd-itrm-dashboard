@@ -336,6 +336,10 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         Sub-Products
       </button>
+      <button class="s-item" onclick="switchTab('managers')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        By Manager
+      </button>
     </div>
     <div class="s-footer">
       <strong>HD IT — Full Org</strong>
@@ -463,6 +467,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one fiscal period's spend. Solid orange = recorded actuals. Outlined bars = remaining period forecasts. The green dashed line is "even pace" — what we'd spend per month if the annual budget were spread perfectly across 12 periods. Click any bar for period details.</span></button>
             </div>
             <div class="cc-sub">Solid = actual · Outlined = forecast · Green dashed = even pace</div>
+            <div id="accel-badge" style="margin-top:6px"></div>
           </div>
           <div class="cc-chart" style="height:220px;position:relative">
             <canvas id="ch-monthly"></canvas>
@@ -513,6 +518,42 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
             <canvas id="ch-vp-burn"></canvas>
           </div>
         </div>
+      </div>
+
+      <!-- Row 5a: Forecast Restatement + KTLO Split -->
+      <div class="ov-row ov-row-3">
+
+        <!-- Forecast Restatement Tracker -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div class="cc-title-row">
+              <div class="cc-title">Forecast Restatement Tracker</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Compares the original SPP-approved annual forecast to the current P4 forecast for portfolios that have changed. Increases (red) mean scope or cost expanded. Decreases (green) mean deferrals or efficiency gains. Large swings mid-year warrant leadership review.</span></button>
+            </div>
+            <div class="cc-sub">Original SPP plan vs current P4 forecast · delta in $M</div>
+          </div>
+          <div class="cc-chart" style="height:220px;position:relative">
+            <canvas id="ch-restate"></canvas>
+          </div>
+        </div>
+
+        <!-- Initiative vs KTLO Split -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div class="cc-title-row">
+              <div class="cc-title">Initiative vs KTLO Split</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Breaks FY26 spend into new initiative investment vs keeping-the-lights-on operational spend vs hard cap hardware/software. Leadership uses this ratio to defend budget requests and assess how much capacity is available for strategic work vs mandatory operations.</span></button>
+            </div>
+            <div class="cc-sub">Sub-product classification by spend type · <span class="ct">KTLO<span class="ct-tip">Keep-The-Lights-On (KTLO) spend covers mandatory operational work: running existing systems, compliance, support desks, and sustaining infrastructure. Not discretionary — cutting it risks system failures.</span></span> vs net-new investment</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px;flex:1">
+            <div class="cc-chart" style="height:180px;width:180px;flex-shrink:0;position:relative">
+              <canvas id="ch-ktlo"></canvas>
+            </div>
+            <div id="ch-ktlo-legend" style="flex:1;display:flex;flex-direction:column;gap:10px"></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Row 5: Labor Mix + Resource Type Mix -->
@@ -653,6 +694,35 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
           <tbody id="sp-tbody"></tbody>
         </table>
         </div>
+      </div>
+    </section>
+
+    <!-- MANAGERS -->
+    <section class="section" id="s-managers">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">By Manager</div>
+          <div class="page-sub">All Engineering Managers ranked by burn rate · FY26</div>
+        </div>
+      </div>
+      <div class="pill-filters" id="mgr-vp-pills" style="margin-bottom:16px"></div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <div class="tbl-title">Manager Burn Rate Accountability</div>
+          <div class="tbl-meta" id="mgr-count">—</div>
+        </div>
+        <table class="tbl" id="mgr-tbl">
+          <thead><tr>
+            <th>Manager</th>
+            <th>VP</th>
+            <th>Portfolio</th>
+            <th style="text-align:right">Forecast</th>
+            <th style="text-align:right">Actual</th>
+            <th style="text-align:right">Burn Rate</th>
+            <th style="min-width:120px">Pace</th>
+          </tr></thead>
+          <tbody id="mgr-tbody"></tbody>
+        </table>
       </div>
     </section>
 
@@ -992,6 +1062,16 @@ const RESOURCE_MIX = [
   { type: 'Offshore',      forecast: 512000000, actual: 126900000 },
 ];
 
+// Forecast restatements vs original SPP plan
+const RESTATEMENTS = [
+  { portfolio:'Infrastructure & Operations', original:432000000, current:409900000 },
+  { portfolio:'Cybersecurity',               original: 95000000, current:103800000 },
+  { portfolio:'Online',                      original:107000000, current:102700000 },
+  { portfolio:'Core AI',                     original: 10000000, current: 12900000 },
+  { portfolio:'Canada',                      original: 15000000, current: 19600000 },
+  { portfolio:'Store Systems',              original: 88000000, current: 84600000 },
+];
+
 function fmtM(v, dp=1) {
   if (v === null || v === undefined) return '—';
   const abs = Math.abs(v);
@@ -1191,6 +1271,31 @@ function openDp(type, data) {
         </div>
       </div>`).join('')}`;
 
+  } else if (type === 'mgr') {
+    const m = data;
+    const burn = burnPct(m.actual, m.forecast);
+    const sps = SP.filter(s => s.mgr === m.name).sort((a,b) => b.forecast - a.forecast);
+    eyebrow.textContent = 'Engineering Manager';
+    title.textContent   = toTitleCase(m.name);
+    body.innerHTML = `
+      <div class="dp-context">
+        <div class="dp-context-row"><strong>VP</strong> · ${toTitleCase(m.vp)}</div>
+        <div class="dp-context-row"><strong>Portfolio</strong> · ${m.portfolio}</div>
+      </div>
+      <div class="dp-kpi-row">
+        ${_dpKpi('FY Forecast','$'+fmtM(m.forecast),'')}
+        ${_dpKpi('YTD Actual','$'+fmtM(m.actual),'var(--hd)')}
+        ${_dpKpi('Burn Rate',burn.toFixed(1)+'%',_dpColor(burnColor(burn)))}
+      </div>
+      ${_dpBurn(m.actual,m.forecast)}
+      <div class="dp-section">Sub-Products (${sps.length})</div>
+      ${sps.map(s=>{const sb=burnPct(s.actual,s.forecast);return`<div class="dp-row">
+        <div style="flex:1;min-width:0"><div class="dp-row-title">${s.name}</div><div class="dp-row-sub">${s.portfolio}</div></div>
+        <div style="text-align:right;padding-left:12px;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:${_dpColor(burnColor(sb))}">${sb.toFixed(1)}%</div>
+          <div style="font-size:10.5px;color:var(--g400)">$${fmtM(s.forecast)}</div>
+        </div></div>`;}).join('')}`;
+
   } else if (type === 'sp') {
     const s = data;
     const burn = burnPct(s.actual, s.forecast);
@@ -1289,7 +1394,34 @@ function buildOverview() {
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:15px;height:15px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
     <span><strong>Overburn Risk Detected:</strong> ${overburns.length} portfolio${overburns.length>1?'s':''} projected to exceed FY budget at current run rate — ${overburns.map(p=>`<strong>${p.name}</strong> (${((p.actual/PERIODS_ELAPSED*TOTAL_PERIODS/p.forecast)*100).toFixed(0)}% projected)`).join(', ')}.</span>
   </div>`);
+  // Under-committed / zero-spend portfolios
+  const zeroSpend = PORTFOLIOS.filter(p => p.actual === 0 && p.forecast > 15000000);
+  const lowBurnP = PORTFOLIOS.filter(p => p.actual > 0 && burnPct(p.actual, p.forecast) < 15 && p.forecast > 15000000);
+  const underRisk = [...zeroSpend, ...lowBurnP];
+  if (underRisk.length > 0) {
+    alerts.push(`<div style="background:#FFFAEB;border:1px solid #FEF0C7;border-left:3px solid #F79009;border-radius:var(--r8);padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:#B54708;margin-bottom:12px">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:15px;height:15px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      <span><strong>Late-Year Cramming Risk:</strong> ${underRisk.map(p=>`<strong>${p.name}</strong> (${p.actual===0?'no spend':burnPct(p.actual,p.forecast).toFixed(1)+'% burn'}, $${fmtM(p.forecast)} forecast)`).join(' · ')}. Portfolios under 15% burn with significant budget remaining may face pressure to accelerate spend in Q3/Q4.</span>
+    </div>`);
+  }
   az.innerHTML = alerts.join('');
+
+  // Burn acceleration badge
+  const actuals = MONTHLY.filter(m => !m.fcst);
+  if (actuals.length >= 2) {
+    const prev = actuals[actuals.length - 2];
+    const curr = actuals[actuals.length - 1];
+    const chg = ((curr.af - prev.af) / prev.af * 100);
+    const accel = chg > 5;
+    const decel = chg < -5;
+    const arrow = accel ? '▲' : decel ? '▼' : '→';
+    const clr = accel ? 'var(--red600)' : decel ? 'var(--green600)' : 'var(--g500)';
+    const bg  = accel ? 'var(--red50)' : decel ? 'var(--green50)' : 'var(--g100)';
+    const bc  = accel ? 'var(--red100)' : decel ? 'var(--green100)' : 'var(--g200)';
+    const label = accel ? 'Spend accelerating' : decel ? 'Spend decelerating' : 'Stable spend';
+    const el = document.getElementById('accel-badge');
+    if (el) el.innerHTML = `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:9999px;background:${bg};color:${clr};border:1px solid ${bc}">${arrow} ${label}: ${curr.period} $${(curr.af/1e6).toFixed(0)}M vs ${prev.period} $${(prev.af/1e6).toFixed(0)}M (${chg>0?'+':''}${chg.toFixed(0)}%)</span>`;
+  }
 
   // ── Chart 1: Spend Pace Gauge ──────────────────────────
   const gaugeCtx = document.getElementById('ch-gauge').getContext('2d');
@@ -1378,10 +1510,10 @@ function buildOverview() {
   const hmEl = document.getElementById('ch-heatmap');
   function hmStyle(pct, actual) {
     if (!actual || actual <= 0) return {bg:'#F2F4F7', text:'#98A2B3', border:''};
-    if (pct < 20)               return {bg:'#ECFDF3', text:'#027A48', border:''};
-    if (pct < 30)               return {bg:'#D1FADF', text:'#027A48', border:''};
-    if (pct < 36)               return {bg:'#F9FAFB', text:'#344054', border:'border-left:3px solid #12B76A'};
-    if (pct < 43)               return {bg:'#FEE4E2', text:'#B42318', border:''};
+    if (pct < 20)               return {bg:'#ECFDF3', text:'#101828', border:''};
+    if (pct < 30)               return {bg:'#D1FADF', text:'#101828', border:''};
+    if (pct < 36)               return {bg:'#F9FAFB', text:'#101828', border:'border-left:3px solid #12B76A'};
+    if (pct < 43)               return {bg:'#FEE4E2', text:'#101828', border:''};
     return                              {bg:'#D92D20', text:'#FFFFFF', border:''};
   }
   hmEl.innerHTML = PORTFOLIOS.map(p => {
@@ -1732,6 +1864,85 @@ function buildOverview() {
     </div>`;
   }).join('');
 
+  // ── Chart: Forecast Restatement ───────────────────────────
+  const restDelta = RESTATEMENTS.map(r => ({
+    name: r.portfolio,
+    delta: (r.current - r.original) / 1e6,
+    pct: ((r.current - r.original) / r.original * 100).toFixed(1),
+  })).sort((a, b) => a.delta - b.delta);
+  const restCtx = document.getElementById('ch-restate').getContext('2d');
+  new Chart(restCtx, {
+    type: 'bar',
+    data: {
+      labels: restDelta.map(d => d.name.length > 22 ? d.name.slice(0,20)+'…' : d.name),
+      datasets: [{
+        label: 'Forecast Change ($M)',
+        data: restDelta.map(d => d.delta),
+        backgroundColor: restDelta.map(d => d.delta > 0 ? 'rgba(217,45,32,0.8)' : 'rgba(18,183,106,0.8)'),
+        borderRadius: 4,
+        barPercentage: 0.65,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => { const d = restDelta[c.dataIndex]; return ` ${c.raw > 0 ? '+' : ''}$${c.raw.toFixed(0)}M (${d.pct > 0 ? '+' : ''}${d.pct}% vs original plan)`; } } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font:{size:10}, callback: v => (v>=0?'+':'')+v+'M' } },
+        y: { grid: { display: false }, ticks: { font:{size:10} } }
+      }
+    },
+    plugins: [{
+      id: 'zeroline',
+      afterDraw(chart) {
+        const {ctx, chartArea, scales} = chart;
+        const xPos = scales.x.getPixelForValue(0);
+        ctx.save(); ctx.strokeStyle='rgba(16,24,40,0.25)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(xPos, chartArea.top); ctx.lineTo(xPos, chartArea.bottom); ctx.stroke();
+        ctx.restore();
+      }
+    }]
+  });
+
+  // ── Chart: Initiative vs KTLO Split ───────────────────────
+  const isHC   = s => s.name.includes('Hard Cap');
+  const isKTLO = s => !isHC(s) && (s.name.includes('KTLO') || s.name.includes('Operations') || s.name.includes('Support Center') || s.name.includes('Unallocated') || s.name.includes('Variance') || s.name.includes('Portfolio Services'));
+  const ktloColors = ['#F96302','#667085','#D0D5DD'];
+  const ktloTypes = ['Initiative', 'KTLO / Run Ops', 'Hard Cap (HW/SW)'];
+  const ktloFcst  = [SP.filter(s=>!isKTLO(s)&&!isHC(s)).reduce((t,s)=>t+s.forecast,0), SP.filter(isKTLO).reduce((t,s)=>t+s.forecast,0), SP.filter(isHC).reduce((t,s)=>t+s.forecast,0)];
+  const ktloAct   = [SP.filter(s=>!isKTLO(s)&&!isHC(s)).reduce((t,s)=>t+s.actual,0), SP.filter(isKTLO).reduce((t,s)=>t+s.actual,0), SP.filter(isHC).reduce((t,s)=>t+s.actual,0)];
+  const ktloTotal = ktloFcst.reduce((a,b)=>a+b,0);
+  const ktloCtx   = document.getElementById('ch-ktlo').getContext('2d');
+  new Chart(ktloCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ktloTypes,
+      datasets: [{ data: ktloFcst.map(v=>v/1e6), backgroundColor: ktloColors, borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
+    },
+    options: {
+      responsive: false, cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => { const pct=(ktloFcst[c.dataIndex]/ktloTotal*100).toFixed(0); return [`$${(c.raw).toFixed(0)}M (${pct}%)`, `Actual $${(ktloAct[c.dataIndex]/1e6).toFixed(0)}M`]; } } }
+      }
+    }
+  });
+  document.getElementById('ch-ktlo-legend').innerHTML = ktloTypes.map((t,i)=>{
+    const pct = (ktloFcst[i]/ktloTotal*100).toFixed(0);
+    const burn = (ktloAct[i]/ktloFcst[i]*100).toFixed(1);
+    return `<div style="display:flex;align-items:flex-start;gap:10px">
+      <div style="width:12px;height:12px;border-radius:3px;background:${ktloColors[i]};flex-shrink:0;margin-top:2px"></div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--g900)">${t}</div>
+        <div style="font-size:11px;color:var(--g500)">$${(ktloFcst[i]/1e6).toFixed(0)}M forecast · ${pct}% of total</div>
+        <div style="font-size:11px;font-weight:600;color:${_dpColor(burnColor(parseFloat(burn)))}"> ${burn}% burn · $${(ktloAct[i]/1e6).toFixed(0)}M actual</div>
+      </div>
+    </div>`;
+  }).join('');
+
 }
 
 // ── PORTFOLIOS ────────────────────────────────────────────
@@ -1919,14 +2130,68 @@ function renderSP() {
   }).join('');
 }
 
+// ── MANAGERS ─────────────────────────────────────────────
+let managersBuilt = false;
+let mgrVpFilter = '';
+function buildManagers() {
+  if (managersBuilt) return; managersBuilt = true;
+  // Build VP filter pills
+  const pills = document.getElementById('mgr-vp-pills');
+  const allBtn = document.createElement('button');
+  allBtn.className = 'pill active-vp active'; allBtn.textContent = 'All VPs';
+  allBtn.onclick = () => { mgrVpFilter = ''; renderMgrs(); document.querySelectorAll('#mgr-vp-pills .pill').forEach(p=>p.classList.remove('active')); allBtn.classList.add('active'); };
+  pills.appendChild(allBtn);
+  const vpNames = [...new Set(SP.map(s=>s.vp))].sort();
+  vpNames.forEach(vp => {
+    const b = document.createElement('button');
+    b.className = 'pill'; b.textContent = toTitleCase(vp);
+    b.onclick = () => { mgrVpFilter = vp; renderMgrs(); document.querySelectorAll('#mgr-vp-pills .pill').forEach(p=>p.classList.remove('active')); b.classList.add('active'); };
+    pills.appendChild(b);
+  });
+  renderMgrs();
+}
+function renderMgrs() {
+  // Aggregate SP by manager
+  const mgrMap = {};
+  SP.forEach(s => {
+    if (mgrVpFilter && s.vp !== mgrVpFilter) return;
+    const key = s.mgr;
+    if (!mgrMap[key]) mgrMap[key] = { name:s.mgr, vp:s.vp, portfolio:s.portfolio, forecast:0, actual:0 };
+    mgrMap[key].forecast += s.forecast;
+    mgrMap[key].actual   += s.actual;
+  });
+  const rows = Object.values(mgrMap).sort((a,b) => burnPct(b.actual,b.forecast) - burnPct(a.actual,a.forecast));
+  document.getElementById('mgr-count').textContent = rows.length + ' managers';
+  document.getElementById('mgr-tbody').innerHTML = rows.map(m => {
+    const burn = burnPct(m.actual, m.forecast);
+    const clr  = _dpColor(burnColor(burn));
+    const barW = Math.min(burn / (YR_ELAPSED * 2) * 100, 100).toFixed(1);
+    const paceL = Math.min(YR_ELAPSED / (YR_ELAPSED * 2) * 100, 100).toFixed(1);
+    return `<tr onclick="openDp('mgr',${JSON.stringify(m).replace(/"/g,'&quot;')})" style="cursor:pointer">
+      <td><strong>${toTitleCase(m.name)}</strong></td>
+      <td style="color:var(--g500)">${toTitleCase(m.vp)}</td>
+      <td style="color:var(--g500)">${m.portfolio}</td>
+      <td style="text-align:right">$${fmtM(m.forecast)}</td>
+      <td style="text-align:right;color:var(--hd);font-weight:600">$${fmtM(m.actual)}</td>
+      <td style="text-align:right;font-weight:700;color:${clr}">${burn.toFixed(1)}%</td>
+      <td>
+        <div style="position:relative;height:6px;background:var(--g150);border-radius:3px;margin-top:2px">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${barW}%;background:${burn>YR_ELAPSED+5?'var(--red500)':burn<YR_ELAPSED-5?'var(--green500)':'var(--hd)'};border-radius:3px"></div>
+          <div style="position:absolute;top:-2px;bottom:-2px;left:${paceL}%;width:2px;background:var(--green600);border-radius:1px"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
 // ── NAV ───────────────────────────────────────────────────
-const builders = {overview: buildOverview, portfolios: buildPortfolios, vps: buildVPs, subproducts: buildSP};
+const builders = {overview: buildOverview, portfolios: buildPortfolios, vps: buildVPs, subproducts: buildSP, managers: buildManagers};
 
 function switchTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.s-item').forEach(s => s.classList.remove('active'));
   document.getElementById('s-' + id).classList.add('active');
-  document.querySelectorAll('.s-item')[['overview','portfolios','vps','subproducts'].indexOf(id)].classList.add('active');
+  document.querySelectorAll('.s-item')[['overview','portfolios','vps','subproducts','managers'].indexOf(id)].classList.add('active');
   (builders[id] || (() => {}))();
 }
 
