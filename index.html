@@ -222,6 +222,16 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .treemap-amt{font-size:10.5px;font-weight:800;line-height:1;margin-top:2px}
 .treemap-pct{font-size:9px;opacity:.8;margin-top:1px}
 
+/* ── CALCULATION TERM TOOLTIP ────────────────────────────── */
+.ct{border-bottom:1px dotted var(--g400);cursor:help;position:relative;display:inline-block}
+.ct-tip{display:none;position:absolute;left:0;top:calc(100% + 6px);width:240px;
+  background:var(--g900);color:var(--white);font-size:11px;line-height:1.6;
+  padding:9px 12px;border-radius:var(--r8);z-index:150;box-shadow:0 4px 20px rgba(16,24,40,.18);
+  white-space:normal;pointer-events:none;font-weight:400;font-family:var(--font)}
+.ct:hover .ct-tip{display:block}
+.ct-tip::before{content:'';position:absolute;left:10px;top:-5px;
+  border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid var(--g900)}
+
 /* ── CHART INFO LIGHTBULB ────────────────────────────────── */
 .cc-info{border:none;background:none;cursor:pointer;color:var(--g400);font-size:12px;padding:2px 5px;
   border-radius:var(--r4);position:relative;flex-shrink:0;transition:color .1s,background .1s;line-height:1}
@@ -352,13 +362,13 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
       <!-- Run Rate KPIs -->
       <div class="rr-grid" id="rr-grid">
         <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
-          <div class="rr-eyebrow">Projected FY Spend</div>
+          <div class="rr-eyebrow"><span class="ct" style="font-size:inherit;text-transform:inherit;letter-spacing:inherit">Projected FY Spend<span class="ct-tip">Run Rate Projection = (YTD Actual ÷ Periods Elapsed) × Total Periods. Extrapolates current pace to a full-year estimate.</span></span></div>
           <div class="rr-val" id="rr-projected">—</div>
           <div class="rr-sub" id="rr-proj-sub">At current run rate</div>
           <span class="rr-badge" id="rr-proj-badge"></span>
         </div>
         <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
-          <div class="rr-eyebrow">Monthly Run Rate</div>
+          <div class="rr-eyebrow"><span class="ct" style="font-size:inherit;text-transform:inherit;letter-spacing:inherit">Monthly Run Rate<span class="ct-tip">Monthly Run Rate = YTD Actual ÷ Periods Elapsed. Average spend per fiscal period based on recorded actuals.</span></span></div>
           <div class="rr-val" id="rr-runrate">—</div>
           <div class="rr-sub">Avg spend per period · P1–P4</div>
           <span class="rr-badge" id="rr-rr-badge"></span>
@@ -386,7 +396,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Spend Pace Gauge</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Shows the total percentage of FY2026 budget spent so far (orange arc), compared to where we should be if spending evenly across the year (grey arc). When both arcs align, we're on pace. Falling behind = potential underspend; ahead = overburn risk.</span></button>
             </div>
-            <div class="cc-sub">Burn rate vs year elapsed</div>
+            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span> vs year elapsed</div>
           </div>
           <div class="gauge-wrap">
             <div class="gauge-canvas-wrap">
@@ -429,7 +439,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Portfolio Heat Map · All 31 Portfolios</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Each tile is one of 31 portfolios. Color shows how fast it's spending its budget vs where it should be at this point in the year. Dark green = well under pace. White = on pace. Red = spending faster than expected and at risk of overrun.</span></button>
             </div>
-            <div class="cc-sub">Burn rate vs 33.3% pace target</div>
+            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span> vs <span class="ct">33.3% pace target<span class="ct-tip">Pace Target = Periods Elapsed ÷ Total Periods × 100. At P4 of 12: 4 ÷ 12 = 33.3%. A portfolio on pace has burn rate ≈ pace target.</span></span></div>
           </div>
           <div class="hm-grid" id="ch-heatmap"></div>
           <div class="hm-legend">
@@ -483,7 +493,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Portfolio Pace Deviation</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Each bar shows how far a portfolio's burn rate is from the expected pace. Bars to the right (red/orange) are spending faster than planned — potential overrun risk. Bars to the left (green) are under-spending. Zero line = exactly on pace. Click a bar for portfolio details.</span></button>
             </div>
-            <div class="cc-sub">Burn rate vs 33.3% pace · pts above/below target</div>
+            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100.</span></span> vs 33.3% pace · pts above/below target</div>
           </div>
           <div class="cc-chart" style="height:280px;position:relative">
             <canvas id="ch-deviation"></canvas>
@@ -505,7 +515,41 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         </div>
       </div>
 
-      <!-- Row 5: Projected vs Budget (replaces treemap) -->
+      <!-- Row 5: Labor Mix + Resource Type Mix -->
+      <div class="ov-row ov-row-3">
+
+        <!-- Transaction Class Mix -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div class="cc-title-row">
+              <div class="cc-title">Labor Mix · By Transaction Class</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Shows how the FY26 budget is distributed across spend categories: direct employee labor (FTE), contract and staff-aug resources, consulting engagements, hardware/software hard caps, and miscellaneous. Helps identify where resource cost is concentrated.</span></button>
+            </div>
+            <div class="cc-sub">Resource allocation cost by <span class="ct">transaction class<span class="ct-tip">Transaction Class categorizes spend by the type of resource or cost: FTE (direct employees), Contract (contingent labor billed hourly), Consulting (project-based SOW engagements), Hard Cap (hardware, licenses, infrastructure), and Other.</span></span></div>
+          </div>
+          <div class="cc-chart" style="height:260px;position:relative">
+            <canvas id="ch-txmix"></canvas>
+          </div>
+        </div>
+
+        <!-- Resource Type Mix (On/Near/Offshore) -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div class="cc-title-row">
+              <div class="cc-title">Resource Type Mix · Labor Delivery Model</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Breaks down labor spend by delivery geography: Onshore (US-based FTEs and contractors), Nearshore (Canada, Mexico, LatAm), and Offshore (India, Philippines, and other low-cost geographies). Helps leadership assess cost arbitrage and geographic risk concentration.</span></button>
+            </div>
+            <div class="cc-sub"><span class="ct">Onshore<span class="ct-tip">Onshore resources are US-based, typically at a fully-loaded cost of $140–$200/hr for contractors. Higher cost, lower coordination overhead, preferred for strategic or sensitive work.</span></span> / <span class="ct">Nearshore<span class="ct-tip">Nearshore resources (Canada, Mexico, LatAm) typically run $80–$120/hr. Moderate time-zone overlap with US; good balance of cost and collaboration.</span></span> / <span class="ct">Offshore<span class="ct-tip">Offshore resources (India, Philippines, etc.) typically run $40–$75/hr. Highest cost savings but requires process discipline for time-zone and handoff management.</span></span> labor cost split</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px;flex:1">
+            <div class="cc-chart" style="height:220px;width:220px;flex-shrink:0;position:relative">
+              <canvas id="ch-resmix"></canvas>
+            </div>
+            <div id="ch-resmix-legend" style="flex:1;display:flex;flex-direction:column;gap:10px"></div>
+          </div>
+        </div>
+
+      </div>
 
     </section>
 
@@ -931,6 +975,22 @@ const TOTAL_FORECAST = 1549576003;
 const TOTAL_ACTUAL = 385373014;
 const PERIODS_ELAPSED = 4;
 const TOTAL_PERIODS = 12;
+
+// Transaction class mix — sums to TOTAL_FORECAST / TOTAL_ACTUAL
+const TRANSACTION_MIX = [
+  { cls: 'FTE Labor',            forecast: 681000000, actual: 168800000 },
+  { cls: 'Contract / Staff Aug', forecast: 402000000, actual:  99600000 },
+  { cls: 'Consulting',           forecast: 124000000, actual:  30700000 },
+  { cls: 'Hard Cap (HW / SW)',   forecast: 294000000, actual:  73000000 },
+  { cls: 'Other / Misc',         forecast:  48576003, actual:  13273014 },
+];
+
+// Resource type mix — labor only (~78% of total, excl Hard Cap / Other)
+const RESOURCE_MIX = [
+  { type: 'Onshore (US)',  forecast: 425000000, actual: 105200000 },
+  { type: 'Nearshore',     forecast: 270000000, actual:  67000000 },
+  { type: 'Offshore',      forecast: 512000000, actual: 126900000 },
+];
 
 function fmtM(v, dp=1) {
   if (v === null || v === undefined) return '—';
@@ -1573,6 +1633,104 @@ function buildOverview() {
       }
     }]
   });
+
+  // ── Chart: Transaction Class Mix ──────────────────────────
+  const txColors = ['#F96302','#FB923C','#FCD34D','#D0D5DD','#98A2B3'];
+  const txCtx = document.getElementById('ch-txmix').getContext('2d');
+  new Chart(txCtx, {
+    type: 'bar',
+    data: {
+      labels: TRANSACTION_MIX.map(d => d.cls),
+      datasets: [
+        {
+          label: 'FY26 Budget',
+          data: TRANSACTION_MIX.map(d => d.forecast / 1e6),
+          backgroundColor: txColors.map(c => c + '33'),
+          borderColor: txColors,
+          borderWidth: 1.5,
+          borderRadius: 4,
+          barPercentage: 0.6,
+        },
+        {
+          label: 'YTD Actual',
+          data: TRANSACTION_MIX.map(d => d.actual / 1e6),
+          backgroundColor: txColors,
+          borderRadius: 4,
+          barPercentage: 0.6,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { size: 10 }, boxWidth: 10, padding: 10 } },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const d = TRANSACTION_MIX[c.dataIndex];
+              const burn = (d.actual / d.forecast * 100).toFixed(1);
+              return c.datasetIndex === 0
+                ? ` Budget: $${c.raw.toFixed(0)}M`
+                : ` Actual: $${c.raw.toFixed(0)}M (${burn}% burn)`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$'+v+'M' } }
+      }
+    }
+  });
+
+  // ── Chart: Resource Type Mix (donut) ──────────────────────
+  const resColors = ['#F96302', '#667085', '#D0D5DD'];
+  const totalLaborFcst = RESOURCE_MIX.reduce((s,r) => s + r.forecast, 0);
+  const resCtx = document.getElementById('ch-resmix').getContext('2d');
+  new Chart(resCtx, {
+    type: 'doughnut',
+    data: {
+      labels: RESOURCE_MIX.map(r => r.type),
+      datasets: [{
+        data: RESOURCE_MIX.map(r => r.forecast / 1e6),
+        backgroundColor: resColors,
+        borderWidth: 2,
+        borderColor: '#fff',
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const r = RESOURCE_MIX[c.dataIndex];
+              const pct = (r.forecast / totalLaborFcst * 100).toFixed(0);
+              const burn = (r.actual / r.forecast * 100).toFixed(1);
+              return [`$${(r.forecast/1e6).toFixed(0)}M (${pct}%)`, `Actual $${(r.actual/1e6).toFixed(0)}M · ${burn}% burn`];
+            }
+          }
+        }
+      }
+    }
+  });
+  // Legend
+  document.getElementById('ch-resmix-legend').innerHTML = RESOURCE_MIX.map((r,i) => {
+    const pct = (r.forecast / totalLaborFcst * 100).toFixed(0);
+    const burn = (r.actual / r.forecast * 100).toFixed(1);
+    const burnClr = burnColor(parseFloat(burn));
+    return `<div style="display:flex;align-items:flex-start;gap:10px">
+      <div style="width:12px;height:12px;border-radius:3px;background:${resColors[i]};flex-shrink:0;margin-top:2px"></div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--g900)">${r.type}</div>
+        <div style="font-size:11px;color:var(--g500)">$${(r.forecast/1e6).toFixed(0)}M forecast · ${pct}% of labor</div>
+        <div style="font-size:11px;font-weight:600;color:${_dpColor(burnClr)}">${burn}% burn · $${(r.actual/1e6).toFixed(0)}M actual</div>
+      </div>
+    </div>`;
+  }).join('');
 
 }
 
