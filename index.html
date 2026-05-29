@@ -485,36 +485,6 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
         </div>
       </div>
 
-      <!-- Row 4: Deviation + VP Scorecard -->
-      <div class="ov-row ov-row-4">
-        <!-- Chart 6: Burn Deviation (replaces bubble) -->
-        <div class="chart-card">
-          <div class="cc-hd">
-            <div class="cc-title-row">
-              <div class="cc-title">Portfolio Pace Deviation</div>
-              <button class="cc-info">ⓘ<span class="cc-tip">Each bar shows how far a portfolio's burn rate is from the expected pace. Bars to the right (red/orange) are spending faster than planned — potential overrun risk. Bars to the left (green) are under-spending. Zero line = exactly on pace. Click a bar for portfolio details.</span></button>
-            </div>
-            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100.</span></span> vs 33.3% pace · pts above/below target</div>
-          </div>
-          <div class="cc-chart" style="height:280px;position:relative">
-            <canvas id="ch-deviation"></canvas>
-          </div>
-        </div>
-
-        <!-- Chart 5: VP Burn Scorecard -->
-        <div class="chart-card">
-          <div class="cc-hd">
-            <div class="cc-title-row">
-              <div class="cc-title">VP Burn Accountability · Pace = 33.3%</div>
-              <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one VP's current burn rate — the percentage of their total budget spent so far. The green dashed line marks where they should be at this point in the year (33.3%). Red bars are over pace; green bars are under. Click a bar for VP details including their portfolios and top sub-products.</span></button>
-            </div>
-            <div class="cc-sub">All 16 VPs sorted by burn rate · dashed = year elapsed</div>
-          </div>
-          <div class="cc-chart" style="height:280px;position:relative">
-            <canvas id="ch-vp-burn"></canvas>
-          </div>
-        </div>
-      </div>
 
       <!-- Row 5: Initiative vs KTLO + Labor Mix + Resource Type Mix -->
       <div class="ov-row ov-row-6">
@@ -523,7 +493,7 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
         <div class="chart-card">
           <div class="cc-hd">
             <div class="cc-title-row">
-              <div class="cc-title">Initiative vs KTLO Split</div>
+              <div class="cc-title">Labor · Initiatives vs KTLO</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Breaks FY26 spend into new initiative investment vs keeping-the-lights-on operational spend vs hard cap hardware/software. Leadership uses this ratio to defend budget requests and assess how much capacity is available for strategic work vs mandatory operations.</span></button>
             </div>
             <div class="cc-sub">Labor only · excludes Hard Cap · <span class="ct">KTLO<span class="ct-tip">Keep-The-Lights-On (KTLO) spend covers mandatory operational work: running existing systems, compliance, support desks, and sustaining infrastructure. Not discretionary — cutting it risks system failures.</span></span> vs net-new investment</div>
@@ -1584,122 +1554,10 @@ function buildOverview() {
     }]
   });
 
-  // ── Chart 5: VP Burn Scorecard ─────────────────────────
+  // VP sort kept for detail pane usage
   const vpSorted = [...VPS].sort((a, b) => burnPct(b.actual, b.forecast) - burnPct(a.actual, a.forecast));
   _vpSorted = vpSorted;
-  const vpBurns = vpSorted.map(v => burnPct(v.actual, v.forecast));
-  const vpBurnCtx = document.getElementById('ch-vp-burn').getContext('2d');
-  const vpChart = new Chart(vpBurnCtx, {
-    type: 'bar',
-    data: {
-      labels: vpSorted.map(v => {
-        const parts = v.name.split(',');
-        return parts[0].trim();
-      }),
-      datasets: [{
-        label: 'Burn %',
-        data: vpBurns,
-        backgroundColor: vpBurns.map(b =>
-          b > YR_ELAPSED + 5 ? '#D92D20' :
-          b < YR_ELAPSED - 3 ? '#12B76A' :
-          '#98A2B3'
-        ),
-        borderRadius: 3,
-        barPercentage: 0.7,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => ' ' + c.raw.toFixed(1) + '%' } }
-      },
-      onClick: (evt, elements) => { if (elements.length) openDp('vp', _vpSorted[elements[0].index]); },
-      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => Math.round(v) + '%' }, max: Math.ceil(Math.max(...vpBurns) * 1.15 / 10) * 10 },
-        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
-      }
-    },
-    plugins: [{
-      id: 'paceLine',
-      afterDraw(chart) {
-        const { ctx, scales: { x, y }, chartArea } = chart;
-        const xPos = x.getPixelForValue(YR_ELAPSED);
-        ctx.save();
-        ctx.beginPath();
-        ctx.setLineDash([5, 3]);
-        ctx.strokeStyle = '#039855';
-        ctx.lineWidth = 1.5;
-        ctx.moveTo(xPos, chartArea.top);
-        ctx.lineTo(xPos, chartArea.bottom);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.font = '600 9px Inter, sans-serif';
-        ctx.fillStyle = '#039855';
-        ctx.textAlign = 'center';
-        ctx.fillText('Pace', xPos, chartArea.top - 2);
-        ctx.restore();
-      }
-    }]
-  });
 
-  // ── Chart 6: Burn Rate Deviation (replaces bubble) ────────
-  const devRaw = PORTFOLIOS.filter(p => p.actual > 0)
-    .map(p => ({ name: p.name, dev: +(burnPct(p.actual, p.forecast) - YR_ELAPSED).toFixed(2) }))
-    .sort((a, b) => b.dev - a.dev);
-  const devCtx = document.getElementById('ch-deviation').getContext('2d');
-  new Chart(devCtx, {
-    type: 'bar',
-    data: {
-      labels: devRaw.map(d => d.name.length > 24 ? d.name.slice(0, 22) + '…' : d.name),
-      datasets: [{
-        data: devRaw.map(d => d.dev),
-        backgroundColor: devRaw.map(d => d.dev > 9.7 ? '#D92D20' : d.dev > 0 ? '#F96302' : '#12B76A'),
-        borderRadius: 3,
-        barPercentage: 0.75,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => ` ${c.raw >= 0 ? '+' : ''}${c.raw.toFixed(1)} pts vs pace (${(+YR_ELAPSED + c.raw).toFixed(1)}% burn)` } }
-      },
-      onClick: (evt, elements) => { if (elements.length) { const p = PORTFOLIOS.find(x => x.name === devRaw[elements[0].index].name); if (p) openDp('portfolio', p); } },
-      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
-      scales: {
-        x: {
-          grid: { color: 'rgba(0,0,0,0.04)' },
-          ticks: { font: { size: 10 }, callback: v => (v >= 0 ? '+' : '') + v + '%' },
-        },
-        y: { grid: { display: false }, ticks: { font: { size: 9.5 } } }
-      }
-    },
-    plugins: [{
-      id: 'zeroline',
-      afterDraw(chart) {
-        const { ctx, scales: { x, y }, chartArea } = chart;
-        const xPos = x.getPixelForValue(0);
-        ctx.save();
-        ctx.beginPath();
-        ctx.strokeStyle = '#667085';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([4, 3]);
-        ctx.moveTo(xPos, chartArea.top);
-        ctx.lineTo(xPos, chartArea.bottom);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.font = '600 9px Inter, sans-serif';
-        ctx.fillStyle = '#667085';
-        ctx.textAlign = 'center';
-        ctx.fillText('Pace', xPos, chartArea.top - 4);
-        ctx.restore();
-      }
-    }]
-  });
 
   // ── Chart: Transaction Class Mix ──────────────────────────
   const txColors = ['#F96302','#FB923C','#FCD34D','#D0D5DD','#98A2B3'];
