@@ -192,9 +192,9 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .hm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:2px}
 .hm-cell{border-radius:6px;padding:10px 10px 8px;cursor:default;transition:opacity .1s}
 .hm-cell:hover{opacity:.85}
-.hm-name{font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;text-transform:uppercase;letter-spacing:.03em;opacity:.8}
+.hm-name{font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;text-transform:uppercase;letter-spacing:.03em}
 .hm-pct{font-size:18px;font-weight:800;letter-spacing:-.03em;line-height:1}
-.hm-flag{font-size:9px;font-weight:600;margin-top:2px;opacity:.75}
+.hm-flag{font-size:9px;font-weight:600;margin-top:2px}
 
 /* Spend Breakdown (Chart 7) */
 .sb-wrap{display:flex;flex-direction:column;gap:14px;justify-content:flex-start;flex:1}
@@ -1831,7 +1831,8 @@ function buildOverview() {
       }]
     },
     options: {
-      responsive: false,
+      responsive: true,
+      maintainAspectRatio: false,
       cutout: '68%',
       plugins: {
         legend: { display: false },
@@ -1922,7 +1923,7 @@ function buildOverview() {
       datasets: [{ data: ktloFcst.map(v=>v/1e6), backgroundColor: ktloColors, borderWidth:2, borderColor:'#fff', hoverOffset:6 }]
     },
     options: {
-      responsive: false, cutout: '68%',
+      responsive: true, maintainAspectRatio: false, cutout: '68%',
       plugins: {
         legend: { display: false },
         tooltip: { callbacks: { label: c => { const pct=(ktloFcst[c.dataIndex]/ktloTotal*100).toFixed(0); return [`$${(c.raw).toFixed(0)}M (${pct}%)`, `Actual $${(ktloAct[c.dataIndex]/1e6).toFixed(0)}M`]; } } }
