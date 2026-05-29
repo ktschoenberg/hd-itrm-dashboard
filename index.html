@@ -215,11 +215,52 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 
 /* Treemap */
 .treemap-wrap{position:relative;overflow:hidden;border-radius:var(--r8)}
-.treemap-cell{position:absolute;box-sizing:border-box;border:1.5px solid rgba(255,255,255,.5);border-radius:4px;overflow:hidden;cursor:default;transition:opacity .1s;display:flex;flex-direction:column;justify-content:flex-end;padding:6px 7px 5px}
+.treemap-cell{position:absolute;box-sizing:border-box;border:1.5px solid rgba(255,255,255,.5);border-radius:4px;overflow:hidden;cursor:pointer;transition:opacity .1s;display:flex;flex-direction:column;justify-content:flex-end;padding:6px 7px 5px}
 .treemap-cell:hover{opacity:.88;z-index:2}
 .treemap-name{font-size:9.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
 .treemap-amt{font-size:10.5px;font-weight:800;line-height:1;margin-top:2px}
 .treemap-pct{font-size:9px;opacity:.8;margin-top:1px}
+
+/* ── DETAIL PANE ─────────────────────────────────────────── */
+.dp-overlay{position:fixed;inset:0;background:rgba(16,24,40,.28);z-index:200;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+.dp-overlay.open{opacity:1;pointer-events:auto}
+#dp{position:fixed;top:0;right:0;width:420px;height:100vh;background:var(--white);
+  z-index:201;box-shadow:-8px 0 40px rgba(16,24,40,.15);
+  transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden}
+#dp.open{transform:translateX(0)}
+.dp-hd{padding:18px 20px 14px;border-bottom:1px solid var(--g200);
+  display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.dp-eyebrow{font-size:10.5px;font-weight:700;color:var(--hd);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:4px}
+.dp-title{font-size:16px;font-weight:800;color:var(--g900);line-height:1.25;max-width:340px}
+.dp-close{border:none;background:none;cursor:pointer;color:var(--g400);padding:4px;
+  border-radius:var(--r4);flex-shrink:0;transition:color .1s;line-height:1}
+.dp-close:hover{color:var(--g900);background:var(--g150)}
+.dp-body{flex:1;overflow-y:auto;padding:16px 20px 40px}
+.dp-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.dp-kpi{background:var(--g100);border:1px solid var(--g200);border-radius:var(--r8);padding:10px 12px}
+.dp-kpi-label{font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:4px}
+.dp-kpi-val{font-size:15px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
+.dp-burn-wrap{margin-bottom:4px}
+.dp-burn-track{height:8px;background:var(--g200);border-radius:4px;
+  position:relative;overflow:visible;margin:6px 0 3px}
+.dp-burn-fill{height:100%;border-radius:4px}
+.dp-pace-tick{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--green500);
+  border-radius:1px;transform:translateX(-50%)}
+.dp-pace-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--g400)}
+.dp-section{font-size:10.5px;font-weight:700;color:var(--g400);text-transform:uppercase;
+  letter-spacing:.07em;margin:16px 0 6px;padding-top:14px;border-top:1px solid var(--g200)}
+.dp-row{display:flex;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--g200)}
+.dp-row:last-child{border-bottom:none}
+.dp-row-title{font-size:12.5px;font-weight:600;color:var(--g900);line-height:1.3}
+.dp-row-sub{font-size:10.5px;color:var(--g500);margin-top:2px}
+.dp-context{background:var(--g100);border:1px solid var(--g200);border-radius:var(--r8);
+  padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:3px}
+.dp-context-row{font-size:11.5px;color:var(--g600)}
+.dp-context-row strong{color:var(--g800);font-weight:700}
 </style>
 </head>
 <body>
@@ -510,6 +551,21 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
     </section>
 
   </main>
+</div>
+
+<!-- Detail Pane -->
+<div class="dp-overlay" id="dp-overlay" onclick="closeDp()"></div>
+<div id="dp">
+  <div class="dp-hd">
+    <div style="min-width:0">
+      <div class="dp-eyebrow" id="dp-eyebrow">Detail</div>
+      <div class="dp-title" id="dp-title"></div>
+    </div>
+    <button class="dp-close" onclick="closeDp()" title="Close">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
 </div>
 
 <script>
@@ -849,6 +905,161 @@ function toTitleCase(s) {
   return s.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
 }
 
+// ── DETAIL PANE ───────────────────────────────────────────
+let _vpSorted = [], _yoyData = [], _bubbleData = [];
+
+function _dpColor(c) {
+  return c === 'green' ? 'var(--green600)' : c === 'yellow' ? 'var(--yellow700)' : 'var(--red600)';
+}
+function _dpKpi(label, val, color) {
+  return `<div class="dp-kpi"><div class="dp-kpi-label">${label}</div><div class="dp-kpi-val"${color?` style="color:${color}"`:''}>${val}</div></div>`;
+}
+function _dpBurn(actual, forecast) {
+  const pct = burnPct(actual, forecast);
+  const col = burnColor(pct);
+  const fill = Math.min(pct, 100).toFixed(1);
+  const pace = Math.min(YR_ELAPSED, 100).toFixed(1);
+  const delta = pct - YR_ELAPSED;
+  return `<div class="dp-burn-wrap">
+    <div class="dp-burn-track">
+      <div class="dp-burn-fill" style="width:${fill}%;background:${_dpColor(col)}"></div>
+      <div class="dp-pace-tick" style="left:${pace}%"></div>
+    </div>
+    <div class="dp-pace-labels"><span>0%</span><span style="color:var(--green600);font-weight:600">Pace ${YR_ELAPSED}%</span><span>100%</span></div>
+    <div style="margin-top:6px">${burnBadge(pct)}</div>
+  </div>`;
+}
+function openDp(type, data) {
+  document.getElementById('dp-overlay').classList.add('open');
+  document.getElementById('dp').classList.add('open');
+  const eyebrow = document.getElementById('dp-eyebrow');
+  const title   = document.getElementById('dp-title');
+  const body    = document.getElementById('dp-body');
+
+  if (type === 'vp') {
+    const v = data;
+    const burn = burnPct(v.actual, v.forecast);
+    const ports = PORTFOLIOS.filter(p => p.vp === v.name).sort((a,b) => b.forecast - a.forecast);
+    const sps   = SP.filter(s => s.vp === v.name).sort((a,b) => b.forecast - a.forecast).slice(0, 8);
+    eyebrow.textContent = 'Vice President';
+    title.textContent   = toTitleCase(v.name);
+    body.innerHTML = `
+      <div class="dp-kpi-row">
+        ${_dpKpi('FY Forecast','$'+fmtM(v.forecast),'')}
+        ${_dpKpi('YTD Actual','$'+fmtM(v.actual),'var(--hd)')}
+        ${_dpKpi('Burn Rate',burn.toFixed(1)+'%',_dpColor(burnColor(burn)))}
+      </div>
+      ${_dpBurn(v.actual,v.forecast)}
+      <div class="dp-section">Portfolios (${ports.length})</div>
+      ${ports.map(p=>{const pb=burnPct(p.actual,p.forecast);return`<div class="dp-row">
+        <div style="flex:1;min-width:0"><div class="dp-row-title">${p.name}</div><div class="dp-row-sub">${p.managers} mgrs · $${fmtM(p.forecast)}</div></div>
+        <div style="text-align:right;padding-left:12px;flex-shrink:0">
+          <div style="font-size:13px;font-weight:700;color:${_dpColor(burnColor(pb))}">${pb.toFixed(1)}%</div>
+          <div style="font-size:10.5px;color:var(--g400)">$${fmtM(p.actual)} actual</div>
+        </div></div>`;}).join('')}
+      <div class="dp-section">Top Sub-Products</div>
+      ${sps.map(s=>{const sb=burnPct(s.actual,s.forecast);return`<div class="dp-row">
+        <div style="flex:1;min-width:0"><div class="dp-row-title">${s.name}</div><div class="dp-row-sub">${toTitleCase(s.mgr)}</div></div>
+        <div style="text-align:right;padding-left:12px;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:${_dpColor(burnColor(sb))}">${sb.toFixed(1)}%</div>
+          <div style="font-size:10.5px;color:var(--g400)">$${fmtM(s.forecast)}</div>
+        </div></div>`;}).join('')}`;
+
+  } else if (type === 'portfolio') {
+    const p = data;
+    const burn = burnPct(p.actual, p.forecast);
+    const sps  = SP.filter(s => s.portfolio === p.name).sort((a,b) => b.forecast - a.forecast);
+    eyebrow.textContent = 'Portfolio';
+    title.textContent   = p.name;
+    body.innerHTML = `
+      <div class="dp-context"><div class="dp-context-row"><strong>VP</strong> · ${toTitleCase(p.vp)}</div></div>
+      <div class="dp-kpi-row">
+        ${_dpKpi('FY Forecast','$'+fmtM(p.forecast),'')}
+        ${_dpKpi('YTD Actual','$'+fmtM(p.actual),'var(--hd)')}
+        ${_dpKpi('Burn Rate',burn.toFixed(1)+'%',_dpColor(burnColor(burn)))}
+      </div>
+      ${_dpBurn(p.actual,p.forecast)}
+      <div class="dp-section">Sub-Products (${sps.length})</div>
+      ${sps.map(s=>{const sb=burnPct(s.actual,s.forecast);return`<div class="dp-row">
+        <div style="flex:1;min-width:0"><div class="dp-row-title">${s.name}</div><div class="dp-row-sub">${toTitleCase(s.mgr)}</div></div>
+        <div style="text-align:right;padding-left:12px;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:${_dpColor(burnColor(sb))}">${sb.toFixed(1)}%</div>
+          <div style="font-size:10.5px;color:var(--g400)">$${fmtM(s.forecast)}</div>
+        </div></div>`;}).join('')}`;
+
+  } else if (type === 'monthly') {
+    const m = data;
+    const evenPace = TOTAL_FORECAST / 12;
+    const idx  = MONTHLY.findIndex(x => x.period === m.period);
+    const ytd  = MONTHLY.slice(0, idx + 1).reduce((s,x) => s + x.af, 0);
+    const delta = m.af - evenPace;
+    const isFcst = !!m.fcst;
+    eyebrow.textContent = isFcst ? 'Forecast · Period' : 'Actual · Period';
+    title.textContent   = m.period + ' · ' + m.month;
+    body.innerHTML = `
+      <div class="dp-kpi-row">
+        ${_dpKpi(isFcst?'Fcst Spend':'Actual Spend','$'+(m.af/1e6).toFixed(0)+'M','var(--hd)')}
+        ${_dpKpi('Even Pace','$'+(evenPace/1e6).toFixed(0)+'M','')}
+        ${_dpKpi('YTD Running','$'+fmtM(ytd),'')}
+      </div>
+      <div class="dp-section">vs Even Pace</div>
+      <div class="dp-row" style="align-items:center">
+        <div style="flex:1"><div class="dp-row-title">${m.period} ${m.month}</div><div class="dp-row-sub">${isFcst?'Forecasted':'Recorded'} this period</div></div>
+        <div style="font-size:15px;font-weight:800;padding-left:12px;color:${delta>0?'var(--red600)':'var(--green600)'}">
+          ${delta>0?'+':''}$${(Math.abs(delta)/1e6).toFixed(0)}M vs pace
+        </div>
+      </div>
+      <div class="dp-section">YTD through ${m.month}</div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:11.5px;color:var(--g600);font-weight:600">Running total</span>
+          <span style="font-size:14px;font-weight:800;color:var(--g900)">$${fmtM(ytd)}</span>
+        </div>
+        <div class="dp-burn-track">
+          <div class="dp-burn-fill" style="width:${Math.min(ytd/TOTAL_FORECAST*100,100).toFixed(1)}%;background:var(--hd)"></div>
+          <div class="dp-pace-tick" style="left:${Math.min(YR_ELAPSED,100)}%"></div>
+        </div>
+        <div style="font-size:10.5px;color:var(--g400);margin-top:3px">
+          ${(ytd/TOTAL_FORECAST*100).toFixed(1)}% of $${fmtM(TOTAL_FORECAST)} FY forecast
+        </div>
+      </div>`;
+
+  } else if (type === 'sp') {
+    const s = data;
+    const burn = burnPct(s.actual, s.forecast);
+    const portTotal = SP.filter(x => x.portfolio === s.portfolio).reduce((t,x) => t + x.forecast, 0);
+    eyebrow.textContent = 'Sub-Product';
+    title.textContent   = s.name;
+    body.innerHTML = `
+      <div class="dp-context">
+        <div class="dp-context-row"><strong>Portfolio</strong> · ${s.portfolio}</div>
+        <div class="dp-context-row"><strong>VP</strong> · ${toTitleCase(s.vp)}</div>
+        <div class="dp-context-row"><strong>Manager</strong> · ${toTitleCase(s.mgr)}</div>
+      </div>
+      <div class="dp-kpi-row">
+        ${_dpKpi('FY Forecast','$'+fmtM(s.forecast),'')}
+        ${_dpKpi('YTD Actual','$'+fmtM(s.actual),'var(--hd)')}
+        ${_dpKpi('Burn Rate',burn.toFixed(1)+'%',_dpColor(burnColor(burn)))}
+      </div>
+      ${_dpBurn(s.actual,s.forecast)}
+      <div class="dp-section">Portfolio Context</div>
+      <div class="dp-row" style="align-items:center">
+        <div style="flex:1"><div class="dp-row-title">Share of ${s.portfolio}</div><div class="dp-row-sub">vs total portfolio forecast</div></div>
+        <div style="font-size:15px;font-weight:800;padding-left:12px;color:var(--g900)">${(s.forecast/portTotal*100).toFixed(1)}%</div>
+      </div>`;
+  }
+}
+function closeDp() {
+  document.getElementById('dp-overlay').classList.remove('open');
+  document.getElementById('dp').classList.remove('open');
+}
+function openDpPortfolio(name) {
+  const p = PORTFOLIOS.find(x => x.name === name); if (p) openDp('portfolio', p);
+}
+function openDpSP(id) {
+  const s = SP.find(x => x.id === id); if (s) openDp('sp', s);
+}
+
 // ── OVERVIEW ──────────────────────────────────────────────
 let overviewBuilt = false;
 function buildOverview() {
@@ -976,7 +1187,7 @@ function buildOverview() {
     const s = hmStyle(pct, p.actual);
     const shortName = p.name.length > 16 ? p.name.slice(0,15) + '…' : p.name;
     const overFlag = pct >= 43 ? `<div class="hm-flag">OVER PACE</div>` : '';
-    return `<div class="hm-cell" title="${p.name} · ${pct.toFixed(1)}% burn · $${fmtM(p.actual)} actual" style="background:${s.bg};${s.border}">
+    return `<div class="hm-cell" title="${p.name} · ${pct.toFixed(1)}% burn · $${fmtM(p.actual)} actual" onclick="openDpPortfolio('${p.name.replace(/'/g,"\\'")}')" style="background:${s.bg};${s.border};cursor:pointer">
       <div class="hm-name" style="color:${s.text}">${shortName}</div>
       <div class="hm-pct" style="color:${s.text}">${p.actual > 0 ? pct.toFixed(1) + '%' : '—'}</div>
       ${overFlag}
@@ -1028,6 +1239,8 @@ function buildOverview() {
         legend: { display: true, position: 'top', labels: { font: { size: 10 }, boxWidth: 10, padding: 10, filter: i => i.datasetIndex === 1 } },
         tooltip: { callbacks: { label: c => ' $' + c.raw.toFixed(0) + 'M' } }
       },
+      onClick: (evt, elements) => { if (elements.length) openDp('monthly', MONTHLY[elements[0].index]); },
+      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
         y: { max: 175, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } }
@@ -1058,6 +1271,7 @@ function buildOverview() {
     const port = PORTFOLIOS.find(p => p.name === d.name) || { forecast: 0 };
     return { name: d.name, fy25: d.fy25, fy26: port.forecast };
   }).sort((a, b) => b.fy26 - a.fy26);
+  _yoyData = yoyData;
   new Chart(yoyCtx, {
     type: 'bar',
     data: {
@@ -1092,6 +1306,8 @@ function buildOverview() {
           }
         }
       },
+      onClick: (evt, elements) => { if (elements.length) { const d = _yoyData[elements[0].index]; const p = PORTFOLIOS.find(x => x.name === d.name); if (p) openDp('portfolio', p); } },
+      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
       scales: {
         x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
         y: { grid: { display: false }, ticks: { font: { size: 10 } } }
@@ -1101,6 +1317,7 @@ function buildOverview() {
 
   // ── Chart 5: VP Burn Scorecard ─────────────────────────
   const vpSorted = [...VPS].sort((a, b) => burnPct(b.actual, b.forecast) - burnPct(a.actual, a.forecast));
+  _vpSorted = vpSorted;
   const vpBurns = vpSorted.map(v => burnPct(v.actual, v.forecast));
   const vpBurnCtx = document.getElementById('ch-vp-burn').getContext('2d');
   const vpChart = new Chart(vpBurnCtx, {
@@ -1129,6 +1346,8 @@ function buildOverview() {
         legend: { display: false },
         tooltip: { callbacks: { label: c => ' ' + c.raw.toFixed(1) + '%' } }
       },
+      onClick: (evt, elements) => { if (elements.length) openDp('vp', _vpSorted[elements[0].index]); },
+      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
       scales: {
         x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => Math.round(v) + '%' }, max: Math.ceil(Math.max(...vpBurns) * 1.15 / 10) * 10 },
         y: { grid: { display: false }, ticks: { font: { size: 10 } } }
@@ -1168,6 +1387,7 @@ function buildOverview() {
       'rgba(18,183,106,0.6)';
     return { x: s.forecast / 1e6, y: b, r, color, name: s.name, burn: b, forecast: s.forecast };
   });
+  _bubbleData = bubbleData;
   const bubbleCtx = document.getElementById('ch-bubble').getContext('2d');
   new Chart(bubbleCtx, {
     type: 'bubble',
@@ -1193,6 +1413,8 @@ function buildOverview() {
           }
         }
       },
+      onClick: (evt, elements) => { if (elements.length) { const d = _bubbleData[elements[0].index]; const s = SP.find(x => x.name === d.name); if (s) openDp('sp', s); } },
+      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
       scales: {
         x: { grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'Forecast ($M)', font: { size: 10 }, color: '#667085' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
         y: { grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'Burn %', font: { size: 10 }, color: '#667085' }, ticks: { font: { size: 10 }, callback: v => v + '%' } }
@@ -1310,6 +1532,7 @@ function buildOverview() {
     const showLabel = w > 60;
     const shortName = item.name.length > 16 ? item.name.slice(0, 14) + '…' : item.name;
     return `<div class="treemap-cell" title="${item.name} · $${fmtM(item.forecast)} · ${pct.toFixed(1)}% burn"
+      onclick="openDpPortfolio('${item.name.replace(/'/g,"\\'")}')"
       style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;background:${s.bg};color:${s.text}">
       ${showLabel ? `
         <div class="treemap-name">${shortName}</div>
