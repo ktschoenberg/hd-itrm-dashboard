@@ -521,13 +521,13 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
         </div>
 
         <!-- Resource Type Mix (On/Near/Offshore) -->
-        <div class="chart-card">
+        <div class="chart-card" onclick="openDp('resmix',{})" style="cursor:pointer">
           <div class="cc-hd">
             <div class="cc-title-row">
-              <div class="cc-title">Resource Type Mix · Labor Delivery Model</div>
+              <div class="cc-title">Labor - by Resource Type</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Breaks down labor spend by delivery geography: Onshore (US-based FTEs and contractors), Nearshore (Canada, Mexico, LatAm), and Offshore (India, Philippines, and other low-cost geographies). Helps leadership assess cost arbitrage and geographic risk concentration.</span></button>
             </div>
-            <div class="cc-sub"><span class="ct">Onshore<span class="ct-tip">Onshore resources are US-based, typically at a fully-loaded cost of $140–$200/hr for contractors. Higher cost, lower coordination overhead, preferred for strategic or sensitive work.</span></span> / <span class="ct">Nearshore<span class="ct-tip">Nearshore resources (Canada, Mexico, LatAm) typically run $80–$120/hr. Moderate time-zone overlap with US; good balance of cost and collaboration.</span></span> / <span class="ct">Offshore<span class="ct-tip">Offshore resources (India, Philippines, etc.) typically run $40–$75/hr. Highest cost savings but requires process discipline for time-zone and handoff management.</span></span> FY26 budget vs YTD actual</div>
+            <div class="cc-sub"><span class="ct">Onshore<span class="ct-tip">Onshore resources are US-based, typically at a fully-loaded cost of $140–$200/hr for contractors. Higher cost, lower coordination overhead, preferred for strategic or sensitive work.</span></span> / <span class="ct">Nearshore<span class="ct-tip">Nearshore resources (Canada, Mexico, LatAm) typically run $80–$120/hr. Moderate time-zone overlap with US; good balance of cost and collaboration.</span></span> / <span class="ct">Offshore<span class="ct-tip">Offshore resources (India, Philippines, etc.) typically run $40–$75/hr. Highest cost savings but requires process discipline for time-zone and handoff management.</span></span></div>
           </div>
           <div class="cc-chart" style="height:220px;position:relative">
             <canvas id="ch-resmix"></canvas>
@@ -1214,6 +1214,56 @@ function openDp(type, data) {
           <div style="font-size:10px;color:var(--g400)">${r.overburn?'⚠ overburn risk':'on track'}</div>
         </div>
       </div>`).join('')}`;
+
+  } else if (type === 'resmix') {
+    const totalFcst = RESOURCE_MIX.reduce((s,r) => s + r.forecast, 0);
+    const totalAct  = RESOURCE_MIX.reduce((s,r) => s + r.actual, 0);
+    const overallBurn = burnPct(totalAct, totalFcst);
+    const offshore = RESOURCE_MIX.find(r => r.type === 'Offshore');
+    const offPct   = (offshore.forecast / totalFcst * 100).toFixed(0);
+    eyebrow.textContent = 'Labor Mix';
+    title.textContent   = 'Labor · by Resource Type';
+    body.innerHTML = `
+      <div class="dp-kpi-row">
+        ${_dpKpi('Total Labor Fcst','$'+fmtM(totalFcst),'')}
+        ${_dpKpi('YTD Actual','$'+fmtM(totalAct),'var(--hd)')}
+        ${_dpKpi('Burn Rate',overallBurn.toFixed(1)+'%',_dpColor(burnColor(overallBurn)))}
+      </div>
+      ${_dpBurn(totalAct, totalFcst)}
+      <div class="dp-section">By Delivery Geography</div>
+      ${RESOURCE_MIX.map(r => {
+        const burn = burnPct(r.actual, r.forecast);
+        const sharePct = (r.forecast / totalFcst * 100).toFixed(0);
+        return `<div class="dp-row">
+          <div style="flex:1;min-width:0">
+            <div class="dp-row-title">${r.type}</div>
+            <div class="dp-row-sub">${sharePct}% of labor budget · $${fmtM(r.forecast)} forecast</div>
+          </div>
+          <div style="text-align:right;padding-left:12px;flex-shrink:0">
+            <div style="font-size:13px;font-weight:700;color:${_dpColor(burnColor(burn))}">${burn.toFixed(1)}%</div>
+            <div style="font-size:10.5px;color:var(--g400)">$${fmtM(r.actual)} actual</div>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="dp-section">Cost Efficiency Context</div>
+      <div style="background:var(--g100);border-radius:var(--r8);padding:12px 14px;font-size:11.5px;color:var(--g700);line-height:1.85">
+        <div><strong>Onshore (US)</strong> — $140–200/hr fully loaded. Higher cost, lower coordination overhead. Preferred for strategic or security-sensitive work.</div>
+        <div style="margin-top:6px"><strong>Nearshore</strong> — $80–120/hr. Moderate US time-zone overlap; good cost/collaboration balance.</div>
+        <div style="margin-top:6px"><strong>Offshore</strong> — $40–75/hr. ${offPct}% of FY26 labor budget. Highest savings; requires disciplined handoff and async process management.</div>
+      </div>
+      <div class="dp-section">Portfolio Insights</div>
+      <div class="dp-row" style="align-items:flex-start">
+        <div style="flex:1;min-width:0">
+          <div class="dp-row-title">Geographic Concentration</div>
+          <div class="dp-row-sub">Offshore is the largest segment at ${offPct}% of labor, followed by Onshore (${(RESOURCE_MIX.find(r=>r.type==='Onshore (US)').forecast/totalFcst*100).toFixed(0)}%) and Nearshore (${(RESOURCE_MIX.find(r=>r.type==='Nearshore').forecast/totalFcst*100).toFixed(0)}%). Monitor concentration risk if offshore capacity is disrupted.</div>
+        </div>
+      </div>
+      <div class="dp-row" style="align-items:flex-start">
+        <div style="flex:1;min-width:0">
+          <div class="dp-row-title">Burn Pacing</div>
+          <div class="dp-row-sub">All delivery types are tracking at ~${overallBurn.toFixed(0)}% burn vs the ${YR_ELAPSED}% pace target — aligned with overall organization pacing.</div>
+        </div>
+      </div>`;
 
   } else if (type === 'mgr') {
     const m = data;
