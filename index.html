@@ -1135,9 +1135,21 @@ function openDp(type, data) {
     const m = data;
     const evenPace = TOTAL_FORECAST / 12;
     const idx  = MONTHLY.findIndex(x => x.period === m.period);
-    const ytd  = MONTHLY.slice(0, idx + 1).reduce((s,x) => s + x.af, 0);
-    const delta = m.af - evenPace;
-    const isFcst = !!m.fcst;
+    const ytd      = MONTHLY.slice(0, idx + 1).reduce((s,x) => s + x.af, 0);
+    const delta    = m.af - evenPace;
+    const isFcst   = !!m.fcst;
+    const prev     = MONTHLY[idx - 1];
+    const popDelta = prev ? m.af - prev.af : null;
+    const popPct   = prev ? ((m.af - prev.af) / prev.af * 100) : null;
+    const actuals  = MONTHLY.filter(x => !x.fcst);
+    const ytdAvg   = actuals.length ? actuals.reduce((s,x)=>s+x.af,0) / actuals.length : evenPace;
+    const vsAvg    = m.af - ytdAvg;
+    const remaining = TOTAL_FORECAST - ytd;
+    const periodsLeft = TOTAL_PERIODS - (idx + 1);
+    const projFY   = !isFcst ? (m.af / 1) * (TOTAL_PERIODS / (idx + 1)) * ytd / ytd /* = ytd/idx+1 * 12 */ : null;
+    const projFY2  = !isFcst ? (ytd / (idx + 1)) * TOTAL_PERIODS : null;
+    const reqPerPeriod = periodsLeft > 0 ? remaining / periodsLeft : 0;
+
     eyebrow.textContent = isFcst ? 'Forecast · Period' : 'Actual · Period';
     title.textContent   = m.period + ' · ' + m.month;
     body.innerHTML = `
@@ -1146,27 +1158,87 @@ function openDp(type, data) {
         ${_dpKpi('Even Pace','$'+(evenPace/1e6).toFixed(0)+'M','')}
         ${_dpKpi('YTD Running','$'+fmtM(ytd),'')}
       </div>
-      <div class="dp-section">vs Even Pace</div>
+
+      <div class="dp-section">Period Comparisons</div>
       <div class="dp-row" style="align-items:center">
-        <div style="flex:1"><div class="dp-row-title">${m.period} ${m.month}</div><div class="dp-row-sub">${isFcst?'Forecasted':'Recorded'} this period</div></div>
-        <div style="font-size:15px;font-weight:800;padding-left:12px;color:${delta>0?'var(--red600)':'var(--green600)'}">
-          ${delta>0?'+':''}$${(Math.abs(delta)/1e6).toFixed(0)}M vs pace
+        <div style="flex:1"><div class="dp-row-title">vs Even Pace</div><div class="dp-row-sub">Expected if budget evenly spread</div></div>
+        <div style="font-size:13px;font-weight:700;padding-left:12px;color:${delta>0?'var(--red600)':'var(--green600)'}">
+          ${delta>0?'+':''}$${(Math.abs(delta)/1e6).toFixed(0)}M
         </div>
       </div>
+      ${prev ? `<div class="dp-row" style="align-items:center">
+        <div style="flex:1"><div class="dp-row-title">vs Prior Period (${prev.period} ${prev.month})</div><div class="dp-row-sub">$${(prev.af/1e6).toFixed(0)}M prior · ${popPct>0?'spending accelerated':'spending decelerated'}</div></div>
+        <div style="font-size:13px;font-weight:700;padding-left:12px;color:${popDelta>0?'var(--red600)':'var(--green600)'}">
+          ${popDelta>0?'+':''}$${(Math.abs(popDelta)/1e6).toFixed(0)}M (${popPct>0?'+':''}${popPct.toFixed(0)}%)
+        </div>
+      </div>` : ''}
+      ${!isFcst ? `<div class="dp-row" style="align-items:center">
+        <div style="flex:1"><div class="dp-row-title">vs YTD Period Average</div><div class="dp-row-sub">Avg actual period: $${(ytdAvg/1e6).toFixed(0)}M</div></div>
+        <div style="font-size:13px;font-weight:700;padding-left:12px;color:${vsAvg>0?'var(--red600)':'var(--green600)'}">
+          ${vsAvg>0?'+':''}$${(Math.abs(vsAvg)/1e6).toFixed(0)}M
+        </div>
+      </div>` : ''}
+
       <div class="dp-section">YTD through ${m.month}</div>
-      <div>
+      <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;margin-bottom:5px">
           <span style="font-size:11.5px;color:var(--g600);font-weight:600">Running total</span>
           <span style="font-size:14px;font-weight:800;color:var(--g900)">$${fmtM(ytd)}</span>
         </div>
         <div class="dp-burn-track">
           <div class="dp-burn-fill" style="width:${Math.min(ytd/TOTAL_FORECAST*100,100).toFixed(1)}%;background:var(--hd)"></div>
-          <div class="dp-pace-tick" style="left:${Math.min(YR_ELAPSED,100)}%"></div>
+          <div class="dp-pace-tick" style="left:${((idx+1)/TOTAL_PERIODS*100).toFixed(1)}%"></div>
         </div>
-        <div style="font-size:10.5px;color:var(--g400);margin-top:3px">
-          ${(ytd/TOTAL_FORECAST*100).toFixed(1)}% of $${fmtM(TOTAL_FORECAST)} FY forecast
+        <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--g400);margin-top:3px">
+          <span>${(ytd/TOTAL_FORECAST*100).toFixed(1)}% of $${fmtM(TOTAL_FORECAST)} budget consumed</span>
+          <span>$${fmtM(remaining)} left</span>
         </div>
-      </div>`;
+      </div>
+      <div class="dp-row" style="align-items:center">
+        <div style="flex:1"><div class="dp-row-title">Periods remaining</div><div class="dp-row-sub">Required avg: $${(reqPerPeriod/1e6).toFixed(0)}M/period to finish on budget</div></div>
+        <div style="font-size:13px;font-weight:700;padding-left:12px;color:var(--g700)">${periodsLeft} of ${TOTAL_PERIODS}</div>
+      </div>
+
+      ${!isFcst ? `
+      <div class="dp-section">Full-Year Projection</div>
+      <div class="dp-row" style="align-items:center">
+        <div style="flex:1"><div class="dp-row-title">At YTD average pace</div><div class="dp-row-sub">($${fmtM(ytd)} ÷ ${idx+1} periods) × 12</div></div>
+        <div style="text-align:right;padding-left:12px;flex-shrink:0">
+          <div style="font-size:13px;font-weight:700;color:${projFY2>TOTAL_FORECAST?'var(--red600)':'var(--green600)'}">${(projFY2/TOTAL_FORECAST*100).toFixed(0)}% of budget</div>
+          <div style="font-size:10.5px;color:var(--g400)">$${fmtM(projFY2)} projected</div>
+        </div>
+      </div>
+      <div style="background:var(--g100);border-radius:var(--r8);padding:10px 14px;font-size:11.5px;color:var(--g700);line-height:1.7;margin-top:2px">
+        ${projFY2 < TOTAL_FORECAST
+          ? `On track to finish <strong style="color:var(--green700)">$${fmtM(TOTAL_FORECAST-projFY2)} under budget</strong> if current pace holds through year-end.`
+          : `Projecting <strong style="color:var(--red700)">$${fmtM(projFY2-TOTAL_FORECAST)} over budget</strong> at current pace — review Q3/Q4 commitments.`}
+      </div>` : `
+      <div class="dp-section">Forecast Context</div>
+      <div class="dp-row" style="align-items:center">
+        <div style="flex:1"><div class="dp-row-title">Required avg per remaining period</div><div class="dp-row-sub">To consume full remaining budget evenly</div></div>
+        <div style="font-size:13px;font-weight:700;padding-left:12px;color:${reqPerPeriod > evenPace ? 'var(--red600)' : 'var(--green600)'}">${reqPerPeriod>evenPace?'Above':'Below'} even pace</div>
+      </div>
+      <div style="background:var(--g100);border-radius:var(--r8);padding:10px 14px;font-size:11.5px;color:var(--g700);line-height:1.7;margin-top:2px">
+        $${fmtM(remaining)} budget remaining across ${periodsLeft} periods = <strong>$${(reqPerPeriod/1e6).toFixed(0)}M/period avg needed</strong>. Even pace target is $${(evenPace/1e6).toFixed(0)}M/period.
+      </div>`}
+
+      <div class="dp-section">All Periods</div>
+      ${MONTHLY.map((x,i) => {
+        const isCurr = x.period === m.period;
+        const xPrev  = MONTHLY[i-1];
+        const chg    = xPrev ? ((x.af-xPrev.af)/xPrev.af*100) : null;
+        const arrow  = chg === null ? '' : chg > 5 ? '▲' : chg < -5 ? '▼' : '→';
+        const aClr   = chg === null ? '' : chg > 5 ? 'var(--red600)' : chg < -5 ? 'var(--green600)' : 'var(--g400)';
+        return `<div class="dp-row" style="align-items:center;${isCurr?'background:var(--hd-50);margin:0 -20px;padding:6px 20px;border-radius:0;':''}">
+          <div style="flex:1;min-width:0">
+            <div class="dp-row-title" style="${isCurr?'color:var(--hd-dark);font-weight:800;':''}">${x.period} ${x.month}${x.fcst?' <span style="font-size:9px;color:var(--g400);font-weight:500">fcst</span>':''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+            ${chg !== null ? `<span style="font-size:11px;font-weight:600;color:${aClr}">${arrow} ${chg>0?'+':''}${chg.toFixed(0)}%</span>` : ''}
+            <div style="font-size:12px;font-weight:${isCurr?'800':'600'};color:${isCurr?'var(--hd)':'var(--g700)'}">$${(x.af/1e6).toFixed(0)}M</div>
+          </div>
+        </div>`;
+      }).join('')}`;
 
   } else if (type === 'runrate') {
     const pElapsed = PERIODS_ELAPSED;
