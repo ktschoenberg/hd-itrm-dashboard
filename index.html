@@ -529,7 +529,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Forecast Restatement Tracker</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Compares the original SPP-approved annual forecast to the current P4 forecast for portfolios that have changed. Increases (red) mean scope or cost expanded. Decreases (green) mean deferrals or efficiency gains. Large swings mid-year warrant leadership review.</span></button>
             </div>
-            <div class="cc-sub">Original SPP plan vs current P4 forecast · delta in $M</div>
+            <div class="cc-sub">Original SPP plan vs current P4 forecast · sorted by % change</div>
           </div>
           <div class="cc-chart" style="height:220px;position:relative">
             <canvas id="ch-restate"></canvas>
@@ -579,13 +579,10 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Resource Type Mix · Labor Delivery Model</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Breaks down labor spend by delivery geography: Onshore (US-based FTEs and contractors), Nearshore (Canada, Mexico, LatAm), and Offshore (India, Philippines, and other low-cost geographies). Helps leadership assess cost arbitrage and geographic risk concentration.</span></button>
             </div>
-            <div class="cc-sub"><span class="ct">Onshore<span class="ct-tip">Onshore resources are US-based, typically at a fully-loaded cost of $140–$200/hr for contractors. Higher cost, lower coordination overhead, preferred for strategic or sensitive work.</span></span> / <span class="ct">Nearshore<span class="ct-tip">Nearshore resources (Canada, Mexico, LatAm) typically run $80–$120/hr. Moderate time-zone overlap with US; good balance of cost and collaboration.</span></span> / <span class="ct">Offshore<span class="ct-tip">Offshore resources (India, Philippines, etc.) typically run $40–$75/hr. Highest cost savings but requires process discipline for time-zone and handoff management.</span></span> labor cost split</div>
+            <div class="cc-sub"><span class="ct">Onshore<span class="ct-tip">Onshore resources are US-based, typically at a fully-loaded cost of $140–$200/hr for contractors. Higher cost, lower coordination overhead, preferred for strategic or sensitive work.</span></span> / <span class="ct">Nearshore<span class="ct-tip">Nearshore resources (Canada, Mexico, LatAm) typically run $80–$120/hr. Moderate time-zone overlap with US; good balance of cost and collaboration.</span></span> / <span class="ct">Offshore<span class="ct-tip">Offshore resources (India, Philippines, etc.) typically run $40–$75/hr. Highest cost savings but requires process discipline for time-zone and handoff management.</span></span> FY26 budget vs YTD actual</div>
           </div>
-          <div style="display:flex;align-items:center;gap:20px;flex:1">
-            <div class="cc-chart" style="height:220px;width:220px;flex-shrink:0;position:relative">
-              <canvas id="ch-resmix"></canvas>
-            </div>
-            <div id="ch-resmix-legend" style="flex:1;display:flex;flex-direction:column;gap:10px"></div>
+          <div class="cc-chart" style="height:220px;position:relative">
+            <canvas id="ch-resmix"></canvas>
           </div>
         </div>
 
@@ -1814,97 +1811,107 @@ function buildOverview() {
     }
   });
 
-  // ── Chart: Resource Type Mix (donut) ──────────────────────
-  const resColors = ['#F96302', '#667085', '#D0D5DD'];
+  // ── Chart: Resource Type Mix (grouped bar) ───────────────
   const totalLaborFcst = RESOURCE_MIX.reduce((s,r) => s + r.forecast, 0);
   const resCtx = document.getElementById('ch-resmix').getContext('2d');
   new Chart(resCtx, {
-    type: 'doughnut',
+    type: 'bar',
     data: {
       labels: RESOURCE_MIX.map(r => r.type),
-      datasets: [{
-        data: RESOURCE_MIX.map(r => r.forecast / 1e6),
-        backgroundColor: resColors,
-        borderWidth: 2,
-        borderColor: '#fff',
-        hoverOffset: 6,
-      }]
+      datasets: [
+        {
+          label: 'FY26 Budget',
+          data: RESOURCE_MIX.map(r => +(r.forecast/1e6).toFixed(0)),
+          backgroundColor: 'rgba(249,99,2,0.15)',
+          borderColor: '#F96302',
+          borderWidth: 1.5,
+          borderRadius: 4,
+          barPercentage: 0.6,
+        },
+        {
+          label: 'YTD Actual',
+          data: RESOURCE_MIX.map(r => +(r.actual/1e6).toFixed(0)),
+          backgroundColor: '#F96302',
+          borderRadius: 4,
+          barPercentage: 0.6,
+        }
+      ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '68%',
+      responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, padding: 12 } },
         tooltip: {
           callbacks: {
             label: c => {
               const r = RESOURCE_MIX[c.dataIndex];
               const pct = (r.forecast / totalLaborFcst * 100).toFixed(0);
               const burn = (r.actual / r.forecast * 100).toFixed(1);
-              return [`$${(r.forecast/1e6).toFixed(0)}M (${pct}%)`, `Actual $${(r.actual/1e6).toFixed(0)}M · ${burn}% burn`];
+              if (c.datasetIndex === 0) return ` $${c.raw}M FY26 budget (${pct}% of labor)`;
+              return ` $${c.raw}M YTD actual · ${burn}% burn`;
             }
           }
         }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$'+v+'M' } }
       }
     }
   });
-  // Legend
-  document.getElementById('ch-resmix-legend').innerHTML = RESOURCE_MIX.map((r,i) => {
-    const pct = (r.forecast / totalLaborFcst * 100).toFixed(0);
-    const burn = (r.actual / r.forecast * 100).toFixed(1);
-    const burnClr = burnColor(parseFloat(burn));
-    return `<div style="display:flex;align-items:flex-start;gap:10px">
-      <div style="width:12px;height:12px;border-radius:3px;background:${resColors[i]};flex-shrink:0;margin-top:2px"></div>
-      <div>
-        <div style="font-size:12px;font-weight:600;color:var(--g900)">${r.type}</div>
-        <div style="font-size:11px;color:var(--g500)">$${(r.forecast/1e6).toFixed(0)}M forecast · ${pct}% of labor</div>
-        <div style="font-size:11px;font-weight:600;color:${_dpColor(burnClr)}">${burn}% burn · $${(r.actual/1e6).toFixed(0)}M actual</div>
-      </div>
-    </div>`;
-  }).join('');
 
   // ── Chart: Forecast Restatement ───────────────────────────
-  const restDelta = RESTATEMENTS.map(r => ({
-    name: r.portfolio,
-    delta: (r.current - r.original) / 1e6,
-    pct: ((r.current - r.original) / r.original * 100).toFixed(1),
-  })).sort((a, b) => a.delta - b.delta);
+  const restSorted = [...RESTATEMENTS].sort((a,b) => {
+    const pctA = (a.current - a.original) / a.original;
+    const pctB = (b.current - b.original) / b.original;
+    return pctA - pctB;
+  });
   const restCtx = document.getElementById('ch-restate').getContext('2d');
   new Chart(restCtx, {
     type: 'bar',
     data: {
-      labels: restDelta.map(d => d.name.length > 22 ? d.name.slice(0,20)+'…' : d.name),
-      datasets: [{
-        label: 'Forecast Change ($M)',
-        data: restDelta.map(d => d.delta),
-        backgroundColor: restDelta.map(d => d.delta > 0 ? 'rgba(217,45,32,0.8)' : 'rgba(18,183,106,0.8)'),
-        borderRadius: 4,
-        barPercentage: 0.65,
-      }]
+      labels: restSorted.map(r => r.portfolio.length > 22 ? r.portfolio.slice(0,20)+'…' : r.portfolio),
+      datasets: [
+        {
+          label: 'Original SPP',
+          data: restSorted.map(r => +(r.original/1e6).toFixed(0)),
+          backgroundColor: 'rgba(102,112,133,0.2)',
+          borderColor: '#667085',
+          borderWidth: 1.5,
+          borderRadius: 3,
+          barPercentage: 0.65,
+        },
+        {
+          label: 'Current P4 Forecast',
+          data: restSorted.map(r => +(r.current/1e6).toFixed(0)),
+          backgroundColor: restSorted.map(r => r.current > r.original ? 'rgba(217,45,32,0.75)' : 'rgba(18,183,106,0.75)'),
+          borderRadius: 3,
+          barPercentage: 0.65,
+        }
+      ]
     },
     options: {
       indexAxis: 'y',
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => { const d = restDelta[c.dataIndex]; return ` ${c.raw > 0 ? '+' : ''}$${c.raw.toFixed(0)}M (${d.pct > 0 ? '+' : ''}${d.pct}% vs original plan)`; } } }
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const r = restSorted[c.dataIndex];
+              const delta = ((r.current - r.original)/1e6).toFixed(0);
+              const pct = ((r.current - r.original)/r.original*100).toFixed(1);
+              if (c.datasetIndex === 0) return ` $${c.raw}M original SPP plan`;
+              return ` $${c.raw}M current forecast (${delta > 0 ? '+' : ''}$${delta}M · ${pct > 0 ? '+' : ''}${pct}%)`;
+            }
+          }
+        }
       },
       scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font:{size:10}, callback: v => (v>=0?'+':'')+v+'M' } },
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font:{size:10}, callback: v => '$'+v+'M' } },
         y: { grid: { display: false }, ticks: { font:{size:10} } }
       }
-    },
-    plugins: [{
-      id: 'zeroline',
-      afterDraw(chart) {
-        const {ctx, chartArea, scales} = chart;
-        const xPos = scales.x.getPixelForValue(0);
-        ctx.save(); ctx.strokeStyle='rgba(16,24,40,0.25)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
-        ctx.beginPath(); ctx.moveTo(xPos, chartArea.top); ctx.lineTo(xPos, chartArea.bottom); ctx.stroke();
-        ctx.restore();
-      }
-    }]
+    }
   });
 
   // ── Chart: Initiative vs KTLO Split (labor only — excludes Hard Cap) ───────
