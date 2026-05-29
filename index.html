@@ -93,7 +93,8 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 .chart-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:18px 20px;box-shadow:var(--sh-xs)}
 .chart-card.full{grid-column:1/-1}
-.cc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cc-hd{margin-bottom:14px}
+.cc-title-row{display:flex;align-items:center;gap:2px;margin-bottom:1px}
 .cc-title{font-size:13px;font-weight:700;color:var(--g900)}
 .cc-sub{font-size:11.5px;color:var(--g500)}
 .cc-chart{position:relative}
@@ -162,7 +163,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .pill{padding:3px 11px;border-radius:var(--rfull);font-size:12px;font-weight:500;cursor:pointer;
   border:1px solid var(--g200);background:var(--white);color:var(--g600);
   transition:all .12s;line-height:1.6;font-family:var(--font)}
-.pill:hover:not(.active){border-color:var(--g300);background:var(--g100);color:var(--g900)}
+.pill:hover:not(.active){border-color:#000;background:#000;color:#fff}
 .pill.active{background:var(--hd);border-color:var(--hd);color:#fff;font-weight:600}
 .pill.active-vp{background:var(--g800);border-color:var(--g800);color:#fff;font-weight:600}
 .pill.dim{opacity:.45}
@@ -222,9 +223,9 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .treemap-pct{font-size:9px;opacity:.8;margin-top:1px}
 
 /* ── CHART INFO LIGHTBULB ────────────────────────────────── */
-.cc-info{border:none;background:none;cursor:pointer;color:var(--g300);font-size:13px;padding:3px 6px;
-  border-radius:var(--r4);position:relative;flex-shrink:0;transition:color .1s;margin-left:6px;line-height:1}
-.cc-info:hover{color:var(--g600);background:var(--g150)}
+.cc-info{border:none;background:none;cursor:pointer;color:var(--g400);font-size:12px;padding:2px 5px;
+  border-radius:var(--r4);position:relative;flex-shrink:0;transition:color .1s,background .1s;line-height:1}
+.cc-info:hover{color:#fff;background:#000}
 .cc-tip{display:none;position:absolute;right:0;top:calc(100% + 8px);width:260px;
   background:var(--g900);color:var(--white);font-size:11.5px;line-height:1.6;
   padding:10px 14px;border-radius:var(--r8);z-index:100;box-shadow:0 4px 20px rgba(16,24,40,.18);
@@ -265,7 +266,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .dp-title{font-size:16px;font-weight:800;color:var(--g900);line-height:1.25;max-width:340px}
 .dp-close{border:none;background:none;cursor:pointer;color:var(--g400);padding:4px;
   border-radius:var(--r4);flex-shrink:0;transition:color .1s;line-height:1}
-.dp-close:hover{color:var(--g900);background:var(--g150)}
+.dp-close:hover{color:#fff;background:#000}
 .dp-body{flex:1;overflow-y:auto;padding:16px 20px 40px}
 .dp-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .dp-kpi{background:var(--g100);border:1px solid var(--g200);border-radius:var(--r8);padding:10px 12px}
@@ -380,11 +381,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <!-- Chart 1: Spend Pace Gauge -->
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">Spend Pace Gauge</div>
-              <div class="cc-sub">Burn rate vs year elapsed</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Shows the total percentage of FY2026 budget spent so far (orange arc), compared to where we should be if spending evenly across the year (grey arc). When both arcs align, we're on pace. Falling behind = potential underspend; ahead = overburn risk.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Shows the total percentage of FY2026 budget spent so far (orange arc), compared to where we should be if spending evenly across the year (grey arc). When both arcs align, we're on pace. Falling behind = potential underspend; ahead = overburn risk.</span></button>
+            <div class="cc-sub">Burn rate vs year elapsed</div>
           </div>
           <div class="gauge-wrap">
             <div class="gauge-canvas-wrap">
@@ -411,11 +412,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <!-- Chart 7: Budget vs Forecast vs Actual -->
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">Forecast vs Actuals · Year-over-Year</div>
-              <div class="cc-sub">FY26 budget, YTD spend, and FY25 comparison</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Compares this year's $1.55B budget and what's been spent so far, against last year's full-year actual ($1.30B). The +19% shows how much bigger the FY26 budget is year-over-year.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Compares this year's $1.55B budget and what's been spent so far, against last year's full-year actual ($1.30B). The +19% shows how much bigger the FY26 budget is year-over-year.</span></button>
+            <div class="cc-sub">FY26 budget, YTD spend, and FY25 comparison</div>
           </div>
           <div id="ch-spend-breakdown" class="sb-wrap" style="padding-top:4px"></div>
         </div>
@@ -423,11 +424,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <!-- Heat Map -->
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">Portfolio Heat Map · All 31 Portfolios</div>
-              <div class="cc-sub">Burn rate vs 33.3% pace target</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Each tile is one of 31 portfolios. Color shows how fast it's spending its budget vs where it should be at this point in the year. Dark green = well under pace. White = on pace. Red = spending faster than expected and at risk of overrun.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Each tile is one of 31 portfolios. Color shows how fast it's spending its budget vs where it should be at this point in the year. Dark green = well under pace. White = on pace. Red = spending faster than expected and at risk of overrun.</span></button>
+            <div class="cc-sub">Burn rate vs 33.3% pace target</div>
           </div>
           <div class="hm-grid" id="ch-heatmap"></div>
           <div class="hm-legend">
@@ -445,11 +446,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <!-- Chart 3: Monthly Burn Trend -->
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">Monthly Spend · Act + Fcst</div>
-              <div class="cc-sub">Solid = actual · Outlined = forecast · Green dashed = even pace</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one fiscal period's spend. Solid orange = recorded actuals. Outlined bars = remaining period forecasts. The green dashed line is "even pace" — what we'd spend per month if the annual budget were spread perfectly across 12 periods. Click any bar for period details.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one fiscal period's spend. Solid orange = recorded actuals. Outlined bars = remaining period forecasts. The green dashed line is "even pace" — what we'd spend per month if the annual budget were spread perfectly across 12 periods. Click any bar for period details.</span></button>
+            <div class="cc-sub">Solid = actual · Outlined = forecast · Green dashed = even pace</div>
           </div>
           <div class="cc-chart" style="height:220px;position:relative">
             <canvas id="ch-monthly"></canvas>
@@ -459,11 +460,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <!-- Chart 4: YoY Portfolio Comparison -->
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">FY25 vs FY26 · Top 8 Portfolios</div>
-              <div class="cc-sub">Prior year actuals vs FY26 forecast</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Compares each major portfolio's prior year actual spend (grey) vs this year's forecast (orange). Longer orange bar = bigger budget this year. Helps identify where leadership has significantly increased or decreased investment year-over-year. Click a bar for portfolio details.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Compares each major portfolio's prior year actual spend (grey) vs this year's forecast (orange). Longer orange bar = bigger budget this year. Helps identify where leadership has significantly increased or decreased investment year-over-year. Click a bar for portfolio details.</span></button>
+            <div class="cc-sub">Prior year actuals vs FY26 forecast</div>
           </div>
           <div class="cc-chart" style="height:220px">
             <canvas id="ch-yoy"></canvas>
@@ -476,11 +477,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <!-- Chart 6: Burn Deviation (replaces bubble) -->
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">Portfolio Pace Deviation</div>
-              <div class="cc-sub">Burn rate vs 33.3% pace · pts above/below target</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Each bar shows how far a portfolio's burn rate is from the expected pace. Bars to the right (red/orange) are spending faster than planned — potential overrun risk. Bars to the left (green) are under-spending. Zero line = exactly on pace. Click a bar for portfolio details.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Each bar shows how far a portfolio's burn rate is from the expected pace. Bars to the right (red/orange) are spending faster than planned — potential overrun risk. Bars to the left (green) are under-spending. Zero line = exactly on pace. Click a bar for portfolio details.</span></button>
+            <div class="cc-sub">Burn rate vs 33.3% pace · pts above/below target</div>
           </div>
           <div class="cc-chart" style="height:280px;position:relative">
             <canvas id="ch-deviation"></canvas>
@@ -490,11 +491,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <!-- Chart 5: VP Burn Scorecard -->
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">VP Burn Accountability · Pace = 33.3%</div>
-              <div class="cc-sub">All 16 VPs sorted by burn rate · dashed = year elapsed</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one VP's current burn rate — the percentage of their total budget spent so far. The green dashed line marks where they should be at this point in the year (33.3%). Red bars are over pace; green bars are under. Click a bar for VP details including their portfolios and top sub-products.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one VP's current burn rate — the percentage of their total budget spent so far. The green dashed line marks where they should be at this point in the year (33.3%). Red bars are over pace; green bars are under. Click a bar for VP details including their portfolios and top sub-products.</span></button>
+            <div class="cc-sub">All 16 VPs sorted by burn rate · dashed = year elapsed</div>
           </div>
           <div class="cc-chart" style="height:280px;position:relative">
             <canvas id="ch-vp-burn"></canvas>
@@ -506,11 +507,11 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
       <div class="ov-row ov-row-5">
         <div class="chart-card">
           <div class="cc-hd">
-            <div>
+            <div class="cc-title-row">
               <div class="cc-title">Run Rate Projection · Forecast vs Projected FY Spend</div>
-              <div class="cc-sub">Projected full-year spend at current run rate vs approved budget · red = overburn risk</div>
+              <button class="cc-info">ⓘ<span class="cc-tip">Grey bars = approved FY26 budget. Colored bars = projected full-year spend if the current spending rate continues for all 12 periods. Red = on track to exceed budget (overburn risk). Green = on track to stay within budget. Only portfolios with recorded actuals are shown. Click a bar for portfolio details.</span></button>
             </div>
-            <button class="cc-info">ⓘ<span class="cc-tip">Grey bars = approved FY26 budget. Colored bars = projected full-year spend if the current spending rate continues for all 12 periods. Red = on track to exceed budget (overburn risk). Green = on track to stay within budget. Only portfolios with recorded actuals are shown. Click a bar for portfolio details.</span></button>
+            <div class="cc-sub">Projected full-year spend at current run rate vs approved budget · red = overburn risk</div>
           </div>
           <div class="cc-chart" style="height:340px;position:relative">
             <canvas id="ch-projection"></canvas>
