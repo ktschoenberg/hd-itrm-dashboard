@@ -409,9 +409,9 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
           <div class="cc-hd">
             <div class="cc-title-row">
               <div class="cc-title">Spend Pace Gauge</div>
-              <button class="cc-info">ⓘ<span class="cc-tip">Shows the total percentage of FY2026 budget spent so far (orange arc), compared to where we should be if spending evenly across the year (grey arc). When both arcs align, we're on pace. Falling behind = potential underspend; ahead = overburn risk.</span></button>
+              <button class="cc-info">ⓘ<span class="cc-tip">Labor only — excludes Hard Cap hardware and software spend. Shows the percentage of FY26 labor budget spent so far (orange arc), compared to where we should be if spending evenly across the year (grey arc). When both arcs align, we're on pace.</span></button>
             </div>
-            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span><sup class="fn">3</sup> vs year elapsed</div>
+            <div class="cc-sub">Labor only · <span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span><sup class="fn">3</sup> vs year elapsed</div>
           </div>
           <div class="gauge-wrap">
             <div class="gauge-canvas-wrap">
@@ -428,8 +428,8 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
                 <div class="gauge-stat-label">Year elapsed</div>
               </div>
               <div class="gauge-stat">
-                <div class="gauge-stat-val">$385M / $1.55B</div>
-                <div class="gauge-stat-label">Actual / Forecast</div>
+                <div class="gauge-stat-val" id="gauge-actual-fcst">$370M / $1.45B</div>
+                <div class="gauge-stat-label">Labor Actual / Forecast</div>
               </div>
             </div>
           </div>
@@ -440,7 +440,7 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
           <div class="cc-hd">
             <div class="cc-title-row">
               <div class="cc-title">Forecast vs Actuals · Year-over-Year</div>
-              <button class="cc-info">ⓘ<span class="cc-tip">Compares this year's $1.55B budget and what's been spent so far, against last year's full-year actual ($1.30B). The +19% shows how much bigger the FY26 budget is year-over-year.</span></button>
+              <button class="cc-info">ⓘ<span class="cc-tip">Labor only — excludes Hard Cap hardware and software spend. Compares FY26 labor forecast ($1.45B) and YTD actual against estimated FY25 labor spend. The YoY delta shows labor budget growth year-over-year.</span></button>
             </div>
             <div class="cc-sub">FY26 budget, YTD spend, and FY25 comparison</div>
           </div>
@@ -1343,6 +1343,13 @@ function buildOverview() {
     {name:'Executive and Admin',         fy25:46677685},
   ];
 
+  // ── Labor-only totals (org-wide: subtract HC from TRANSACTION_MIX) ────
+  const _hc = TRANSACTION_MIX.find(t => t.cls.includes('Hard Cap'));
+  const LABOR_FORECAST = TOTAL_FORECAST - _hc.forecast;
+  const LABOR_ACTUAL   = TOTAL_ACTUAL   - _hc.actual;
+  const laborBurnRate  = burnPct(LABOR_ACTUAL, LABOR_FORECAST);
+  const FY25_LABOR     = Math.round(1302219353 * LABOR_FORECAST / TOTAL_FORECAST);
+
   // ── Run Rate KPIs ─────────────────────────────────────────
   const runRatePerPeriod = TOTAL_ACTUAL / PERIODS_ELAPSED;
   const projectedFY = runRatePerPeriod * TOTAL_PERIODS;
@@ -1417,17 +1424,18 @@ function buildOverview() {
     if (el) el.innerHTML = `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:9999px;background:${bg};color:${clr};border:1px solid ${bc}">${arrow} ${label}: ${curr.period} $${(curr.af/1e6).toFixed(0)}M vs ${prev.period} $${(prev.af/1e6).toFixed(0)}M (${chg>0?'+':''}${chg.toFixed(0)}%)</span>`;
   }
 
-  // ── Chart 1: Spend Pace Gauge ──────────────────────────
+  // ── Chart 1: Spend Pace Gauge (labor only) ───────────────
   const gaugeCtx = document.getElementById('ch-gauge').getContext('2d');
-  document.getElementById('gauge-big').textContent = burnRate.toFixed(1) + '%';
-  const ptsDelta = (burnRate - YR_ELAPSED).toFixed(1);
+  document.getElementById('gauge-big').textContent = laborBurnRate.toFixed(1) + '%';
+  document.getElementById('gauge-actual-fcst').textContent = '$' + fmtM(LABOR_ACTUAL) + ' / $' + fmtM(LABOR_FORECAST);
+  const ptsDelta = (laborBurnRate - YR_ELAPSED).toFixed(1);
   document.getElementById('gauge-delta').textContent = (ptsDelta >= 0 ? '+' : '') + ptsDelta + ' pts vs pace';
   new Chart(gaugeCtx, {
     type: 'doughnut',
     data: {
       datasets: [
         {
-          data: [burnRate, 100 - burnRate],
+          data: [laborBurnRate, 100 - laborBurnRate],
           backgroundColor: ['#F96302', '#EAECF0'],
           borderWidth: 0,
           cutout: '72%',
@@ -1452,21 +1460,21 @@ function buildOverview() {
     }
   });
 
-  // ── Chart 7: Spend Breakdown (HTML/CSS) ───────────────
-  const FY25_TOTAL = 1302219353; // sum of FY25_DATA
+  // ── Chart 7: Spend Breakdown (HTML/CSS, labor only) ──────
+  const FY25_TOTAL = 1302219353; // full-org FY25 actual
   const spendEl = document.getElementById('ch-spend-breakdown');
-  const actPct = (TOTAL_ACTUAL / TOTAL_FORECAST * 100).toFixed(1);
-  const fy25PctOfFy26 = (FY25_TOTAL / TOTAL_FORECAST * 100).toFixed(1);
-  const yoyChg = ((TOTAL_FORECAST / FY25_TOTAL - 1) * 100).toFixed(0);
+  const actPct      = (LABOR_ACTUAL   / LABOR_FORECAST * 100).toFixed(1);
+  const fy25PctOfFy26 = (FY25_LABOR  / LABOR_FORECAST * 100).toFixed(1);
+  const yoyChg      = ((LABOR_FORECAST / FY25_LABOR - 1) * 100).toFixed(0);
   spendEl.innerHTML = `
     <div class="sb-callout">
       <div class="sb-callout-big">+${yoyChg}%</div>
-      <div class="sb-callout-sub">vs prior year forecast<br><span style="font-size:10px;color:var(--g400)">FY26 $1.55B vs FY25 $1.30B</span></div>
+      <div class="sb-callout-sub">vs prior year · labor only<br><span style="font-size:10px;color:var(--g400)">FY26 $${fmtM(LABOR_FORECAST)} vs FY25 est. $${fmtM(FY25_LABOR)}</span></div>
     </div>
     <div class="sb-row">
       <div class="sb-label-row">
-        <span class="sb-label">FY26 Forecast</span>
-        <span class="sb-amount">$1.55B</span>
+        <span class="sb-label">FY26 Labor Forecast</span>
+        <span class="sb-amount">$${fmtM(LABOR_FORECAST)}</span>
       </div>
       <div class="sb-track" style="height:16px">
         <div style="display:flex;height:100%;width:100%">
@@ -1478,7 +1486,7 @@ function buildOverview() {
     <div class="sb-row">
       <div class="sb-label-row">
         <span class="sb-label">YTD Actual (P1–P4)</span>
-        <span class="sb-amount" style="color:var(--hd)">$385M <span style="font-size:11px;font-weight:600;color:var(--g500)">(${actPct}%)</span></span>
+        <span class="sb-amount" style="color:var(--hd)">$${fmtM(LABOR_ACTUAL)} <span style="font-size:11px;font-weight:600;color:var(--g500)">(${actPct}%)</span></span>
       </div>
       <div class="sb-track" style="height:10px">
         <div style="width:${actPct}%;background:var(--hd);border-radius:5px;height:100%"></div>
@@ -1486,8 +1494,8 @@ function buildOverview() {
     </div>
     <div class="sb-row">
       <div class="sb-label-row">
-        <span class="sb-label">FY25 Full Year</span>
-        <span class="sb-amount" style="color:var(--g500)">$1.30B</span>
+        <span class="sb-label">FY25 Full Year (est. labor)</span>
+        <span class="sb-amount" style="color:var(--g500)">$${fmtM(FY25_LABOR)}</span>
       </div>
       <div class="sb-track" style="height:10px">
         <div style="width:${fy25PctOfFy26}%;background:var(--g300);border-radius:5px;height:100%"></div>
