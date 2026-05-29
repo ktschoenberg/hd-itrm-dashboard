@@ -170,7 +170,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 
 /* ── OVERVIEW v2 ─────────────────────────────── */
 .ov-row{display:grid;gap:16px;margin-bottom:16px}
-.ov-row-1{grid-template-columns:300px 1fr}
+.ov-row-1{grid-template-columns:260px 300px 1fr}
 .ov-row-2{grid-template-columns:1fr}
 .ov-row-3{grid-template-columns:1fr 1fr}
 .ov-row-4{grid-template-columns:1fr 2fr}
@@ -189,7 +189,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .gauge-stat-label{font-size:10px;color:var(--g500);margin-top:1px}
 
 /* Heat Map */
-.hm-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:2px}
+.hm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:2px}
 .hm-cell{border-radius:6px;padding:10px 10px 8px;cursor:default;transition:opacity .1s}
 .hm-cell:hover{opacity:.85}
 .hm-name{font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;text-transform:uppercase;letter-spacing:.03em;opacity:.8}
@@ -320,15 +320,13 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
           </div>
           <div id="ch-spend-breakdown" class="sb-wrap" style="padding-top:4px"></div>
         </div>
-      </div>
 
-      <!-- Row 2: Heat Map -->
-      <div class="ov-row ov-row-2">
+        <!-- Heat Map -->
         <div class="chart-card">
           <div class="cc-hd">
             <div>
               <div class="cc-title">Portfolio Heat Map · All 31 Portfolios</div>
-              <div class="cc-sub">Burn rate vs pace target · Pace target: 33.3%</div>
+              <div class="cc-sub">Burn rate vs pace · Target: 33.3%</div>
             </div>
           </div>
           <div class="hm-grid" id="ch-heatmap"></div>
