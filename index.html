@@ -175,7 +175,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .ov-row-3{grid-template-columns:1fr 1fr}
 .ov-row-4{grid-template-columns:1fr 2fr}
 .ov-row-5{grid-template-columns:1fr}
-.ov-row-6{grid-template-columns:repeat(3,1fr)}
+.ov-row-6{grid-template-columns:repeat(4,1fr)}
 
 /* Gauge */
 .gauge-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
@@ -468,8 +468,9 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
         </div>
       </div>
 
-      <!-- Row 3: Monthly Burn Trend (full width) -->
-      <div class="ov-row ov-row-5">
+      <!-- Row 5: Monthly Spend + Initiative vs KTLO + Labor Mix + Resource Type Mix -->
+      <div class="ov-row ov-row-6">
+
         <div class="chart-card">
           <div class="cc-hd">
             <div class="cc-title-row">
@@ -483,11 +484,6 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
             <canvas id="ch-monthly"></canvas>
           </div>
         </div>
-      </div>
-
-
-      <!-- Row 5: Initiative vs KTLO + Labor Mix + Resource Type Mix -->
-      <div class="ov-row ov-row-6">
 
         <!-- Initiative vs KTLO Split -->
         <div class="chart-card">
