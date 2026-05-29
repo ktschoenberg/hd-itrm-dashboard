@@ -152,11 +152,21 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .vp-burn-fill.red{background:var(--red600)}
 .vp-burn-pct{font-size:11px;font-weight:700;white-space:nowrap}
 
-.filter-tabs{display:flex;gap:4px;margin-bottom:16px}
-.ftab{padding:6px 14px;border-radius:var(--r6);font-size:12px;font-weight:600;cursor:pointer;
-  border:1px solid var(--g200);background:var(--white);color:var(--g600);transition:all .12s}
-.ftab.active{background:var(--g900);color:#fff;border-color:var(--g900)}
-.ftab:hover:not(.active){background:var(--g100)}
+.pill-filters{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);
+  padding:12px 16px;margin-bottom:16px;box-shadow:var(--sh-xs)}
+.pill-row{display:flex;align-items:flex-start;gap:10px}
+.pill-row+.pill-row{margin-top:10px;padding-top:10px;border-top:1px solid var(--g200)}
+.pill-label{font-size:10.5px;font-weight:700;color:var(--g400);text-transform:uppercase;
+  letter-spacing:.07em;white-space:nowrap;padding-top:5px;min-width:56px}
+.pill-group{display:flex;flex-wrap:wrap;gap:5px}
+.pill{padding:3px 11px;border-radius:var(--rfull);font-size:12px;font-weight:500;cursor:pointer;
+  border:1px solid var(--g200);background:var(--white);color:var(--g600);
+  transition:all .12s;line-height:1.6;font-family:var(--font)}
+.pill:hover:not(.active){border-color:var(--g300);background:var(--g100);color:var(--g900)}
+.pill.active{background:var(--hd);border-color:var(--hd);color:#fff;font-weight:600}
+.pill.active-vp{background:var(--g800);border-color:var(--g800);color:#fff;font-weight:600}
+.pill.dim{opacity:.45}
+.pill-group{display:flex;flex-wrap:wrap;gap:6px;flex:1}
 </style>
 </head>
 <body>
@@ -291,6 +301,12 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
           <div class="page-sub">All 31 portfolios · FY26 forecast, actuals, and burn rate</div>
         </div>
       </div>
+      <div class="pill-filters">
+        <div class="pill-row">
+          <span class="pill-label">VP</span>
+          <div class="pill-group" id="port-vp-pills"></div>
+        </div>
+      </div>
       <div class="tbl-wrap">
         <div class="tbl-head">
           <div><span class="tbl-title">All Portfolios</span><span class="tbl-ct" id="port-ct">31 portfolios</span></div>
@@ -340,8 +356,15 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
           <div class="page-sub">All 223 active sub-products across the full IT organization</div>
         </div>
       </div>
-      <div class="filter-tabs" id="sp-portfolio-filters">
-        <button class="ftab active" onclick="filterSP(this,'')">All</button>
+      <div class="pill-filters">
+        <div class="pill-row">
+          <span class="pill-label">VP</span>
+          <div class="pill-group" id="sp-vp-pills"></div>
+        </div>
+        <div class="pill-row">
+          <span class="pill-label">Portfolio</span>
+          <div class="pill-group" id="sp-port-pills"></div>
+        </div>
       </div>
       <div class="tbl-wrap">
         <div class="tbl-head">
@@ -376,7 +399,6 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
   </main>
 </div>
 
-<script>
 <script>
 const SP = [
   {id:'SP00055',name:'Supply Chain & Centralized Platforms',vp:'GRIDER, DANIEL',mgr:'TOMLINSON, CRAIG',portfolio:'Infrastructure & Operations',dept:'Open Systems Engineering',forecast:45763868,actual:32693667},
@@ -810,9 +832,31 @@ function buildOverview() {
 // ── PORTFOLIOS ────────────────────────────────────────────
 let portfoliosBuilt = false;
 let portFilter = '';
+let portVpFilter = '';
 function buildPortfolios() {
   if (portfoliosBuilt) return;
   portfoliosBuilt = true;
+  // Build VP pills
+  const vpPills = document.getElementById('port-vp-pills');
+  const allVpBtn = document.createElement('button');
+  allVpBtn.className = 'pill active-vp active';
+  allVpBtn.textContent = 'All VPs';
+  allVpBtn.onclick = () => selectPortVP(allVpBtn, '');
+  vpPills.appendChild(allVpBtn);
+  VPS.forEach(v => {
+    const btn = document.createElement('button');
+    btn.className = 'pill active-vp';
+    btn.textContent = toTitleCase(v.name);
+    btn.title = v.name;
+    btn.onclick = () => selectPortVP(btn, v.name);
+    vpPills.appendChild(btn);
+  });
+  renderPortfolios();
+}
+function selectPortVP(btn, vp) {
+  portVpFilter = vp;
+  document.querySelectorAll('#port-vp-pills .pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   renderPortfolios();
 }
 function filterPortfolios() {
@@ -820,8 +864,12 @@ function filterPortfolios() {
   renderPortfolios();
 }
 function renderPortfolios() {
-  const list = PORTFOLIOS.filter(p => !portFilter || p.name.toLowerCase().includes(portFilter) || p.vp.toLowerCase().includes(portFilter));
-  document.getElementById('port-ct').textContent = list.length + ' portfolios';
+  const list = PORTFOLIOS.filter(p => {
+    if (portVpFilter && p.vp !== portVpFilter) return false;
+    if (!portFilter) return true;
+    return p.name.toLowerCase().includes(portFilter) || p.vp.toLowerCase().includes(portFilter);
+  });
+  document.getElementById('port-ct').textContent = list.length + ' portfolio' + (list.length !== 1 ? 's' : '');
   const tb = document.getElementById('port-tbody');
   tb.innerHTML = list.map(p => {
     const pct = burnPct(p.actual, p.forecast);
@@ -874,37 +922,78 @@ function buildVPs() {
 
 // ── SUB-PRODUCTS ──────────────────────────────────────────
 let spBuilt = false;
+let spVpFilter = '';
 let spPortFilter = '';
+
 function buildSP() {
   if (spBuilt) return;
   spBuilt = true;
-  // Build portfolio filter tabs
-  const uniquePortfolios = [...new Set(SP.map(s => s.portfolio))].sort();
-  const filters = document.getElementById('sp-portfolio-filters');
-  uniquePortfolios.forEach(p => {
-    const btn = document.createElement('button');
-    btn.className = 'ftab';
-    btn.textContent = p.length > 20 ? p.slice(0,18)+'…' : p;
-    btn.title = p;
-    btn.onclick = function() { filterSP(this, p); };
-    filters.appendChild(btn);
+
+  // VP pills
+  const vpPills = document.getElementById('sp-vp-pills');
+  const allVpBtn = makeSpPill('All VPs', 'active-vp', () => selectSpVP(allVpBtn, ''));
+  vpPills.appendChild(allVpBtn);
+  VPS.forEach(v => {
+    const btn = makeSpPill(toTitleCase(v.name), 'active-vp', () => selectSpVP(btn, v.name));
+    btn.title = v.name;
+    vpPills.appendChild(btn);
   });
+
+  // Portfolio pills (all initially)
+  refreshPortPills('');
   renderSP();
 }
-function filterSP(btn, portfolio) {
+
+function makeSpPill(label, activeClass, handler) {
+  const btn = document.createElement('button');
+  btn.className = 'pill';
+  btn.dataset.activeClass = activeClass;
+  btn.textContent = label;
+  btn.onclick = handler;
+  return btn;
+}
+
+function selectSpVP(btn, vp) {
+  spVpFilter = vp;
+  spPortFilter = '';
+  document.querySelectorAll('#sp-vp-pills .pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  refreshPortPills(vp);
+  renderSP();
+}
+
+function refreshPortPills(vp) {
+  const portPills = document.getElementById('sp-port-pills');
+  portPills.innerHTML = '';
+  const allBtn = makeSpPill('All', 'active', () => selectSpPort(allBtn, ''));
+  allBtn.classList.add('active');
+  portPills.appendChild(allBtn);
+  const portfolios = [...new Set(
+    SP.filter(s => !vp || s.vp === vp).map(s => s.portfolio)
+  )].sort();
+  portfolios.forEach(p => {
+    const btn = makeSpPill(p, 'active', () => selectSpPort(btn, p));
+    btn.title = p;
+    portPills.appendChild(btn);
+  });
+}
+
+function selectSpPort(btn, portfolio) {
   spPortFilter = portfolio;
-  document.querySelectorAll('#sp-portfolio-filters .ftab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#sp-port-pills .pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderSP();
 }
+
 function renderSP() {
   const q = (document.getElementById('sp-search').value || '').toLowerCase();
   const list = SP.filter(s => {
+    if (spVpFilter && s.vp !== spVpFilter) return false;
     if (spPortFilter && s.portfolio !== spPortFilter) return false;
     if (!q) return true;
     return s.name.toLowerCase().includes(q) || s.vp.toLowerCase().includes(q) || s.mgr.toLowerCase().includes(q) || s.portfolio.toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
   });
-  document.getElementById('sp-ct').textContent = list.length + ' items';
+  document.getElementById('sp-ct').textContent = list.length + ' item' + (list.length !== 1 ? 's' : '');
   const tb = document.getElementById('sp-tbody');
   tb.innerHTML = list.map(s => {
     const pct = burnPct(s.actual, s.forecast);
