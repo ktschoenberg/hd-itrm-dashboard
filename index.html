@@ -260,6 +260,17 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .rr-badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;
   padding:2px 7px;border-radius:var(--rfull);margin-top:6px;align-self:flex-start}
 
+/* ── FOOTNOTES ───────────────────────────────────────────── */
+sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-weight:700;margin-left:1px;cursor:default}
+.footnotes{font-size:11px;color:var(--g500);line-height:1.85;padding:14px 18px;
+  background:var(--white);border:1px solid var(--g200);border-radius:var(--r8);
+  margin-top:4px;border-top:3px solid var(--g150)}
+.fn-row{display:flex;gap:9px;margin-bottom:3px}
+.fn-row:last-child{margin-bottom:0}
+.fn-num{flex-shrink:0;font-size:10.5px;color:var(--g400);font-weight:700;min-width:14px;padding-top:.5px}
+.fn-row strong{color:var(--g700);font-weight:600}
+.fn-row code{font-family:monospace;font-size:10.5px;background:var(--g100);padding:0 4px;border-radius:3px;color:var(--g700)}
+
 /* ── DETAIL PANE ─────────────────────────────────────────── */
 .dp-overlay{position:fixed;inset:0;background:rgba(16,24,40,.28);z-index:200;
   opacity:0;pointer-events:none;transition:opacity .2s}
@@ -365,25 +376,25 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
       <!-- Run Rate KPIs -->
       <div class="rr-grid" id="rr-grid">
         <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
-          <div class="rr-eyebrow"><span class="ct" style="font-size:inherit;text-transform:inherit;letter-spacing:inherit">Projected FY Spend<span class="ct-tip">Run Rate Projection = (YTD Actual ÷ Periods Elapsed) × Total Periods. Extrapolates current pace to a full-year estimate.</span></span></div>
+          <div class="rr-eyebrow"><span class="ct" style="font-size:inherit;text-transform:inherit;letter-spacing:inherit">Projected FY Spend<span class="ct-tip">Run Rate Projection = (YTD Actual ÷ Periods Elapsed) × Total Periods. Extrapolates current pace to a full-year estimate.</span></span><sup class="fn">1</sup></div>
           <div class="rr-val" id="rr-projected">—</div>
           <div class="rr-sub" id="rr-proj-sub">At current run rate</div>
           <span class="rr-badge" id="rr-proj-badge"></span>
         </div>
         <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
-          <div class="rr-eyebrow"><span class="ct" style="font-size:inherit;text-transform:inherit;letter-spacing:inherit">Monthly Run Rate<span class="ct-tip">Monthly Run Rate = YTD Actual ÷ Periods Elapsed. Average spend per fiscal period based on recorded actuals.</span></span></div>
+          <div class="rr-eyebrow"><span class="ct" style="font-size:inherit;text-transform:inherit;letter-spacing:inherit">Monthly Run Rate<span class="ct-tip">Monthly Run Rate = YTD Actual ÷ Periods Elapsed. Average spend per fiscal period based on recorded actuals.</span></span><sup class="fn">2</sup></div>
           <div class="rr-val" id="rr-runrate">—</div>
           <div class="rr-sub">Avg spend per period · P1–P4</div>
           <span class="rr-badge" id="rr-rr-badge"></span>
         </div>
         <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
-          <div class="rr-eyebrow">Portfolios Over Pace</div>
+          <div class="rr-eyebrow">Portfolios Over Pace<sup class="fn">4</sup></div>
           <div class="rr-val" id="rr-overpace">—</div>
           <div class="rr-sub">Burn rate &gt; pace target + 5 pts</div>
           <span class="rr-badge" id="rr-op-badge"></span>
         </div>
         <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
-          <div class="rr-eyebrow">Overburn Risk</div>
+          <div class="rr-eyebrow">Overburn Risk<sup class="fn">5</sup></div>
           <div class="rr-val" id="rr-overburn">—</div>
           <div class="rr-sub">Portfolios projected to exceed budget</div>
           <span class="rr-badge" id="rr-ob-badge"></span>
@@ -399,7 +410,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Spend Pace Gauge</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Shows the total percentage of FY2026 budget spent so far (orange arc), compared to where we should be if spending evenly across the year (grey arc). When both arcs align, we're on pace. Falling behind = potential underspend; ahead = overburn risk.</span></button>
             </div>
-            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span> vs year elapsed</div>
+            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span><sup class="fn">3</sup> vs year elapsed</div>
           </div>
           <div class="gauge-wrap">
             <div class="gauge-canvas-wrap">
@@ -442,7 +453,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Portfolio Heat Map · All 31 Portfolios</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Each tile is one of 31 portfolios. Color shows how fast it's spending its budget vs where it should be at this point in the year. Dark green = well under pace. White = on pace. Red = spending faster than expected and at risk of overrun.</span></button>
             </div>
-            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span> vs <span class="ct">33.3% pace target<span class="ct-tip">Pace Target = Periods Elapsed ÷ Total Periods × 100. At P4 of 12: 4 ÷ 12 = 33.3%. A portfolio on pace has burn rate ≈ pace target.</span></span></div>
+            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span><sup class="fn">3</sup> vs <span class="ct">33.3% pace target<span class="ct-tip">Pace Target = Periods Elapsed ÷ Total Periods × 100. At P4 of 12: 4 ÷ 12 = 33.3%. A portfolio on pace has burn rate ≈ pace target.</span></span><sup class="fn">4</sup></div>
           </div>
           <div class="hm-grid" id="ch-heatmap"></div>
           <div class="hm-legend">
@@ -586,6 +597,15 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
           </div>
         </div>
 
+      </div>
+
+      <!-- Footnotes -->
+      <div class="footnotes">
+        <div class="fn-row"><span class="fn-num">1</span><span><strong>Projected FY Spend</strong> = <code>(YTD Actual ÷ Periods Elapsed) × 12</code>. Extrapolates current monthly average to a full-year estimate. This is a pace projection — not the FY budget — and does not reflect uncommitted remaining spend or period-level budget allocations.</span></div>
+        <div class="fn-row"><span class="fn-num">2</span><span><strong>Monthly Run Rate</strong> = <code>YTD Actual ÷ Periods Elapsed</code>. Average fiscal-period spend based on P1–P4 recorded actuals. Current: $385.4M ÷ 4 = $96.3M/period.</span></div>
+        <div class="fn-row"><span class="fn-num">3</span><span><strong>Burn Rate</strong> = <code>(YTD Actual ÷ FY Forecast) × 100</code>. Percentage of the annual budget consumed to date. Organization-level at P4: $385.4M ÷ $1,549.6M = 24.9%.</span></div>
+        <div class="fn-row"><span class="fn-num">4</span><span><strong>Pace Target</strong> = <code>(Periods Elapsed ÷ 12) × 100</code>. Expected burn rate if the full-year budget were distributed evenly across all 12 fiscal periods. At P4: 4 ÷ 12 = 33.3%. Portfolios within ±5 pts of pace target are considered on pace.</span></div>
+        <div class="fn-row"><span class="fn-num">5</span><span><strong>Overburn Risk</strong> — A portfolio is flagged when its current <em>run rate projection</em> exceeds its FY forecast. Distinct from "over pace": a portfolio can be spending faster than planned without necessarily projecting a full-year overrun if its absolute spend level is low. <strong>Over Pace</strong> = burn rate exceeds pace target by &gt;5 pts.</span></div>
       </div>
 
     </section>
