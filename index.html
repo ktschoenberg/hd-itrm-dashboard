@@ -91,7 +91,7 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);
 .kpi-badge.on{background:var(--yellow50);color:var(--yellow700);border:1px solid var(--yellow100)}
 
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.chart-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:18px 20px;box-shadow:var(--sh-xs)}
+.chart-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:18px 20px;box-shadow:var(--sh-xs);display:flex;flex-direction:column}
 .chart-card.full{grid-column:1/-1}
 .cc-hd{margin-bottom:14px}
 .cc-title-row{display:flex;align-items:center;gap:2px;margin-bottom:1px}
@@ -198,7 +198,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .hm-flag{font-size:9px;font-weight:600;margin-top:2px;opacity:.75}
 
 /* Spend Breakdown (Chart 7) */
-.sb-wrap{display:flex;flex-direction:column;gap:14px;justify-content:center;height:100%}
+.sb-wrap{display:flex;flex-direction:column;gap:14px;justify-content:center;flex:1}
 .sb-row{display:flex;flex-direction:column;gap:4px}
 .sb-label-row{display:flex;align-items:baseline;justify-content:space-between}
 .sb-label{font-size:11.5px;font-weight:600;color:var(--g700)}
@@ -242,7 +242,8 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 /* Run rate row */
 .rr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .rr-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);
-  padding:14px 18px;box-shadow:var(--sh-xs);display:flex;flex-direction:column}
+  padding:14px 18px;box-shadow:var(--sh-xs);display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s}
+.rr-card:hover{border-color:var(--g400);box-shadow:var(--sh-sm)}
 .rr-eyebrow{font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;
   letter-spacing:.06em;margin-bottom:5px}
 .rr-val{font-size:22px;font-weight:800;color:var(--g900);letter-spacing:-.03em;line-height:1}
@@ -350,25 +351,25 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 
       <!-- Run Rate KPIs -->
       <div class="rr-grid" id="rr-grid">
-        <div class="rr-card">
+        <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
           <div class="rr-eyebrow">Projected FY Spend</div>
           <div class="rr-val" id="rr-projected">—</div>
           <div class="rr-sub" id="rr-proj-sub">At current run rate</div>
           <span class="rr-badge" id="rr-proj-badge"></span>
         </div>
-        <div class="rr-card">
+        <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
           <div class="rr-eyebrow">Monthly Run Rate</div>
           <div class="rr-val" id="rr-runrate">—</div>
           <div class="rr-sub">Avg spend per period · P1–P4</div>
           <span class="rr-badge" id="rr-rr-badge"></span>
         </div>
-        <div class="rr-card">
+        <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
           <div class="rr-eyebrow">Portfolios Over Pace</div>
           <div class="rr-val" id="rr-overpace">—</div>
           <div class="rr-sub">Burn rate &gt; pace target + 5 pts</div>
           <span class="rr-badge" id="rr-op-badge"></span>
         </div>
-        <div class="rr-card">
+        <div class="rr-card" onclick="openDp('runrate',{})" style="cursor:pointer">
           <div class="rr-eyebrow">Overburn Risk</div>
           <div class="rr-val" id="rr-overburn">—</div>
           <div class="rr-sub">Portfolios projected to exceed budget</div>
@@ -437,6 +438,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
             <div class="hm-li"><div class="hm-sw" style="background:#F9FAFB;border-color:var(--g300)"></div>On pace (30–36%)</div>
             <div class="hm-li"><div class="hm-sw" style="background:#FEE4E2"></div>Over pace (36–43%)</div>
             <div class="hm-li"><div class="hm-sw" style="background:#D92D20"></div>Significantly over (43%+)</div>
+            <div class="hm-li"><div class="hm-sw" style="background:#F2F4F7;border-color:var(--g300)"></div>No spend recorded</div>
           </div>
         </div>
       </div>
@@ -504,20 +506,6 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
       </div>
 
       <!-- Row 5: Projected vs Budget (replaces treemap) -->
-      <div class="ov-row ov-row-5">
-        <div class="chart-card">
-          <div class="cc-hd">
-            <div class="cc-title-row">
-              <div class="cc-title">Run Rate Projection · Forecast vs Projected FY Spend</div>
-              <button class="cc-info">ⓘ<span class="cc-tip">Grey bars = approved FY26 budget. Colored bars = projected full-year spend if the current spending rate continues for all 12 periods. Red = on track to exceed budget (overburn risk). Green = on track to stay within budget. Only portfolios with recorded actuals are shown. Click a bar for portfolio details.</span></button>
-            </div>
-            <div class="cc-sub">Projected full-year spend at current run rate vs approved budget · red = overburn risk</div>
-          </div>
-          <div class="cc-chart" style="height:340px;position:relative">
-            <canvas id="ch-projection"></canvas>
-          </div>
-        </div>
-      </div>
 
     </section>
 
@@ -941,6 +929,8 @@ const MONTHLY = [
 const YR_ELAPSED = 33.3;
 const TOTAL_FORECAST = 1549576003;
 const TOTAL_ACTUAL = 385373014;
+const PERIODS_ELAPSED = 4;
+const TOTAL_PERIODS = 12;
 
 function fmtM(v, dp=1) {
   if (v === null || v === undefined) return '—';
@@ -1098,6 +1088,49 @@ function openDp(type, data) {
         </div>
       </div>`;
 
+  } else if (type === 'runrate') {
+    const pElapsed = PERIODS_ELAPSED;
+    const pTotal   = TOTAL_PERIODS;
+    const runRate  = TOTAL_ACTUAL / pElapsed;
+    const projFY   = runRate * pTotal;
+    const projPct  = (projFY / TOTAL_FORECAST * 100).toFixed(1);
+    const projRows = PORTFOLIOS
+      .filter(p => p.actual > 0)
+      .map(p => ({
+        name: p.name,
+        forecast: p.forecast,
+        projected: (p.actual / pElapsed) * pTotal,
+        overburn: ((p.actual / pElapsed) * pTotal) > p.forecast,
+        pct: ((p.actual / pElapsed * pTotal) / p.forecast * 100).toFixed(0)
+      }))
+      .sort((a, b) => (b.projected / b.forecast) - (a.projected / a.forecast));
+    eyebrow.textContent = 'Run Rate Analysis';
+    title.textContent   = 'Projected FY Spend vs Budget';
+    body.innerHTML = `
+      <div class="dp-kpi-row">
+        ${_dpKpi('Projected FY','$'+fmtM(projFY),projFY>TOTAL_FORECAST?'var(--red600)':'var(--green600)')}
+        ${_dpKpi('Monthly Run Rate','$'+(runRate/1e6).toFixed(1)+'M','')}
+        ${_dpKpi('vs FY Budget',projPct+'%',projFY>TOTAL_FORECAST?'var(--red600)':'var(--green600)')}
+      </div>
+      <div class="dp-section">How it's calculated</div>
+      <div style="background:var(--g100);border-radius:var(--r8);padding:12px 14px;font-size:11.5px;color:var(--g700);line-height:1.7;font-family:monospace">
+        Monthly Run Rate = YTD Actual ÷ Periods Elapsed<br>
+        &nbsp;&nbsp;= $${fmtM(TOTAL_ACTUAL)} ÷ ${pElapsed} periods = $${(runRate/1e6).toFixed(1)}M/period<br><br>
+        Projected FY = Run Rate × Total Periods<br>
+        &nbsp;&nbsp;= $${(runRate/1e6).toFixed(1)}M × ${pTotal} = $${fmtM(projFY)}
+      </div>
+      <div class="dp-section">Portfolio Projections (active only)</div>
+      ${projRows.map(r => `<div class="dp-row">
+        <div style="flex:1;min-width:0">
+          <div class="dp-row-title">${r.name}</div>
+          <div class="dp-row-sub">Budget $${fmtM(r.forecast)} · Projected $${fmtM(r.projected)}</div>
+        </div>
+        <div style="text-align:right;padding-left:12px;flex-shrink:0">
+          <div style="font-size:12px;font-weight:700;color:${r.overburn?'var(--red600)':'var(--green600)'}">${r.pct}%</div>
+          <div style="font-size:10px;color:var(--g400)">${r.overburn?'⚠ overburn risk':'on track'}</div>
+        </div>
+      </div>`).join('')}`;
+
   } else if (type === 'sp') {
     const s = data;
     const burn = burnPct(s.actual, s.forecast);
@@ -1152,8 +1185,6 @@ function buildOverview() {
   ];
 
   // ── Run Rate KPIs ─────────────────────────────────────────
-  const PERIODS_ELAPSED = 4;
-  const TOTAL_PERIODS = 12;
   const runRatePerPeriod = TOTAL_ACTUAL / PERIODS_ELAPSED;
   const projectedFY = runRatePerPeriod * TOTAL_PERIODS;
   const projPct = (projectedFY / TOTAL_FORECAST * 100).toFixed(1);
@@ -1543,64 +1574,6 @@ function buildOverview() {
     }]
   });
 
-  // ── Chart 8: Run Rate Projection (replaces treemap) ───────
-  const projRaw = PORTFOLIOS
-    .filter(p => p.actual > 0)
-    .map(p => ({
-      name: p.name,
-      forecast: p.forecast / 1e6,
-      projected: (p.actual / PERIODS_ELAPSED * TOTAL_PERIODS) / 1e6,
-      overburn: (p.actual / PERIODS_ELAPSED * TOTAL_PERIODS) > p.forecast,
-    }))
-    .sort((a, b) => (b.projected / b.forecast) - (a.projected / a.forecast));
-  const projCtx = document.getElementById('ch-projection').getContext('2d');
-  new Chart(projCtx, {
-    type: 'bar',
-    data: {
-      labels: projRaw.map(d => d.name.length > 26 ? d.name.slice(0, 24) + '…' : d.name),
-      datasets: [
-        {
-          label: 'FY26 Budget',
-          data: projRaw.map(d => d.forecast),
-          backgroundColor: '#EAECF0',
-          borderRadius: 3,
-          barPercentage: 0.7,
-        },
-        {
-          label: 'Projected FY Spend',
-          data: projRaw.map(d => d.projected),
-          backgroundColor: projRaw.map(d => d.overburn ? 'rgba(217,45,32,0.8)' : 'rgba(18,183,106,0.75)'),
-          borderRadius: 3,
-          barPercentage: 0.7,
-        }
-      ]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, position: 'top', labels: { font: { size: 10 }, boxWidth: 10, padding: 10 } },
-        tooltip: {
-          callbacks: {
-            label: c => {
-              const d = projRaw[c.dataIndex];
-              if (c.datasetIndex === 1) {
-                const pct = (d.projected / d.forecast * 100).toFixed(0);
-                return ` Projected: $${c.raw.toFixed(0)}M (${pct}% of budget)${d.overburn ? ' ⚠ OVERBURN' : ''}`;
-              }
-              return ` Budget: $${c.raw.toFixed(0)}M`;
-            }
-          }
-        }
-      },
-      onClick: (evt, elements) => { if (elements.length) { const p = PORTFOLIOS.find(x => x.name === projRaw[elements[0].index].name); if (p) openDp('portfolio', p); } },
-      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
-        y: { grid: { display: false }, ticks: { font: { size: 9.5 } } }
-      }
-    }
-  });
 }
 
 // ── PORTFOLIOS ────────────────────────────────────────────
