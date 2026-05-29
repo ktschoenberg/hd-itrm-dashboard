@@ -167,6 +167,59 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .pill.active-vp{background:var(--g800);border-color:var(--g800);color:#fff;font-weight:600}
 .pill.dim{opacity:.45}
 .pill-group{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+
+/* ── OVERVIEW v2 ─────────────────────────────── */
+.ov-row{display:grid;gap:16px;margin-bottom:16px}
+.ov-row-1{grid-template-columns:300px 1fr}
+.ov-row-2{grid-template-columns:1fr}
+.ov-row-3{grid-template-columns:1fr 1fr}
+.ov-row-4{grid-template-columns:1fr 2fr}
+.ov-row-5{grid-template-columns:1fr}
+
+/* Gauge */
+.gauge-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.gauge-canvas-wrap{position:relative;width:220px;height:150px;flex-shrink:0}
+.gauge-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;padding-top:20px}
+.gauge-big{font-size:28px;font-weight:800;color:var(--g900);letter-spacing:-.04em;line-height:1}
+.gauge-sub{font-size:10.5px;color:var(--g500);margin-top:3px;font-weight:500}
+.gauge-delta{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:var(--rfull);margin-top:6px;background:var(--red50);color:var(--red700);border:1px solid var(--red100)}
+.gauge-stats{display:flex;gap:20px;margin-top:10px;justify-content:center}
+.gauge-stat{text-align:center}
+.gauge-stat-val{font-size:11.5px;font-weight:700;color:var(--g900)}
+.gauge-stat-label{font-size:10px;color:var(--g500);margin-top:1px}
+
+/* Heat Map */
+.hm-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:2px}
+.hm-cell{border-radius:6px;padding:10px 10px 8px;cursor:default;transition:opacity .1s}
+.hm-cell:hover{opacity:.85}
+.hm-name{font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;text-transform:uppercase;letter-spacing:.03em;opacity:.8}
+.hm-pct{font-size:18px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.hm-flag{font-size:9px;font-weight:600;margin-top:2px;opacity:.75}
+
+/* Spend Breakdown (Chart 7) */
+.sb-wrap{display:flex;flex-direction:column;gap:14px;justify-content:center;height:100%}
+.sb-row{display:flex;flex-direction:column;gap:4px}
+.sb-label-row{display:flex;align-items:baseline;justify-content:space-between}
+.sb-label{font-size:11.5px;font-weight:600;color:var(--g700)}
+.sb-amount{font-size:13px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
+.sb-track{height:14px;background:var(--g150);border-radius:7px;overflow:hidden;position:relative}
+.sb-fill-orange{height:100%;background:var(--hd);border-radius:7px 0 0 7px;transition:width .3s}
+.sb-fill-grey{height:100%;background:var(--g300);border-radius:7px;transition:width .3s}
+.sb-fill-fy25{height:100%;background:var(--g300);border-radius:7px}
+.sb-callout{display:flex;align-items:center;gap:10px;background:var(--hd-50);border:1px solid rgba(249,99,2,.18);border-radius:var(--r8);padding:10px 14px;margin-top:4px}
+.sb-callout-big{font-size:22px;font-weight:800;color:var(--hd);letter-spacing:-.03em}
+.sb-callout-sub{font-size:11px;color:var(--g600);line-height:1.4}
+.sb-legend{display:flex;gap:14px;margin-top:6px}
+.sb-legend-item{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--g500)}
+.sb-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Treemap */
+.treemap-wrap{position:relative;overflow:hidden;border-radius:var(--r8)}
+.treemap-cell{position:absolute;box-sizing:border-box;border:1.5px solid rgba(255,255,255,.5);border-radius:4px;overflow:hidden;cursor:default;transition:opacity .1s;display:flex;flex-direction:column;justify-content:flex-end;padding:6px 7px 5px}
+.treemap-cell:hover{opacity:.88;z-index:2}
+.treemap-name{font-size:9.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.treemap-amt{font-size:10.5px;font-weight:800;line-height:1;margin-top:2px}
+.treemap-pct{font-size:9px;opacity:.8;margin-top:1px}
 </style>
 </head>
 <body>
@@ -225,72 +278,134 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 
       <div id="alert-zone"></div>
 
-      <div class="kpi-grid">
-        <div class="kpi">
-          <div class="kpi-label">FY26 Forecast</div>
-          <div class="kpi-val hd">$1.549B</div>
-          <div class="kpi-sub">Full IT organization</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">YTD Actual Spend</div>
-          <div class="kpi-val">$385.4M</div>
-          <div class="kpi-sub">P1–P4 (Feb–May)</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Burn Rate</div>
-          <div class="kpi-val yellow" id="kpi-burn">24.9%</div>
-          <div class="kpi-badge behind" id="kpi-burn-badge">−8.4 pts vs pace</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Portfolios</div>
-          <div class="kpi-val">31</div>
-          <div class="kpi-sub">Across 16 VPs</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Sub-Products</div>
-          <div class="kpi-val">223</div>
-          <div class="kpi-sub">Active work streams</div>
-        </div>
-      </div>
-
-      <div class="chart-row">
-        <div class="chart-card full">
-          <div class="cc-hd">
-            <div>
-              <div class="cc-title">Portfolio Spend Breakdown</div>
-              <div class="cc-sub">FY forecast vs YTD actual by portfolio · Top 15 by forecast</div>
-            </div>
-          </div>
-          <div class="cc-chart" style="height:280px">
-            <canvas id="ch-portfolio"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="chart-row">
+      <!-- Row 1: Gauge + Budget/Actual -->
+      <div class="ov-row ov-row-1">
+        <!-- Chart 1: Spend Pace Gauge -->
         <div class="chart-card">
           <div class="cc-hd">
             <div>
-              <div class="cc-title">Monthly Spend (P1–P4)</div>
-              <div class="cc-sub">Act+Fcst by period across all portfolios</div>
+              <div class="cc-title">Spend Pace Gauge</div>
+              <div class="cc-sub">Burn rate vs year elapsed</div>
             </div>
           </div>
-          <div class="cc-chart" style="height:200px">
+          <div class="gauge-wrap">
+            <div class="gauge-canvas-wrap">
+              <canvas id="ch-gauge" style="width:220px;height:150px"></canvas>
+              <div class="gauge-overlay">
+                <div class="gauge-big" id="gauge-big">24.9%</div>
+                <div class="gauge-sub">of budget spent</div>
+                <div class="gauge-delta" id="gauge-delta">−8.4 pts vs pace</div>
+              </div>
+            </div>
+            <div class="gauge-stats">
+              <div class="gauge-stat">
+                <div class="gauge-stat-val">33.3%</div>
+                <div class="gauge-stat-label">Year elapsed</div>
+              </div>
+              <div class="gauge-stat">
+                <div class="gauge-stat-val">$385M / $1.55B</div>
+                <div class="gauge-stat-label">Actual / Forecast</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 7: Budget vs Forecast vs Actual -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">Forecast vs Actuals · Year-over-Year</div>
+              <div class="cc-sub">FY26 budget, YTD spend, and FY25 comparison</div>
+            </div>
+          </div>
+          <div id="ch-spend-breakdown" class="sb-wrap" style="padding-top:4px"></div>
+        </div>
+      </div>
+
+      <!-- Row 2: Heat Map -->
+      <div class="ov-row ov-row-2">
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">Portfolio Heat Map · All 31 Portfolios</div>
+              <div class="cc-sub">Burn rate vs pace target · Pace target: 33.3%</div>
+            </div>
+          </div>
+          <div class="hm-grid" id="ch-heatmap"></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Monthly Trend + YoY Comparison -->
+      <div class="ov-row ov-row-3">
+        <!-- Chart 3: Monthly Burn Trend -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">Monthly Act+Fcst</div>
+              <div class="cc-sub">Monthly Act+Fcst · green dashed = even pace ($129M)</div>
+            </div>
+          </div>
+          <div class="cc-chart" style="height:220px;position:relative">
             <canvas id="ch-monthly"></canvas>
           </div>
         </div>
+
+        <!-- Chart 4: YoY Portfolio Comparison -->
         <div class="chart-card">
           <div class="cc-hd">
             <div>
-              <div class="cc-title">Burn Rate by VP</div>
-              <div class="cc-sub">YTD actual / FY forecast · Year is 33.3% elapsed</div>
+              <div class="cc-title">FY25 vs FY26 · Top 8 Portfolios</div>
+              <div class="cc-sub">Prior year actuals vs FY26 forecast</div>
             </div>
           </div>
-          <div class="cc-chart" style="height:200px">
+          <div class="cc-chart" style="height:220px">
+            <canvas id="ch-yoy"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Bubble + VP Scorecard -->
+      <div class="ov-row ov-row-4">
+        <!-- Chart 6: At-Risk Bubble -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">Portfolio Risk</div>
+              <div class="cc-sub">Size = Forecast · Color = Burn rate</div>
+            </div>
+          </div>
+          <div class="cc-chart" style="height:260px">
+            <canvas id="ch-bubble"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 5: VP Burn Scorecard -->
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">VP Burn Accountability · Pace = 33.3%</div>
+              <div class="cc-sub">All 16 VPs sorted by burn rate · dashed line = year elapsed</div>
+            </div>
+          </div>
+          <div class="cc-chart" style="height:260px;position:relative">
             <canvas id="ch-vp-burn"></canvas>
           </div>
         </div>
       </div>
+
+      <!-- Row 5: Treemap -->
+      <div class="ov-row ov-row-5">
+        <div class="chart-card">
+          <div class="cc-hd">
+            <div>
+              <div class="cc-title">Spend Allocation · $1.55B FY26 Portfolio</div>
+              <div class="cc-sub">All portfolios · area proportional to forecast</div>
+            </div>
+          </div>
+          <div class="treemap-wrap" id="ch-treemap" style="height:240px"></div>
+        </div>
+      </div>
+
     </section>
 
     <!-- PORTFOLIOS -->
@@ -742,6 +857,17 @@ function buildOverview() {
   if (overviewBuilt) return;
   overviewBuilt = true;
 
+  const FY25_DATA = [
+    {name:'Infrastructure & Operations', fy25:163916814},
+    {name:'Supply Chain',                fy25:127918752},
+    {name:'Online',                      fy25:123043293},
+    {name:'Cybersecurity',               fy25:113851545},
+    {name:'Finance',                     fy25:89095770},
+    {name:'Store Systems',               fy25:84112845},
+    {name:'Merchandising',               fy25:67346849},
+    {name:'Executive and Admin',         fy25:46677685},
+  ];
+
   // Alerts
   const az = document.getElementById('alert-zone');
   const burnRate = burnPct(TOTAL_ACTUAL, TOTAL_FORECAST);
@@ -754,79 +880,446 @@ function buildOverview() {
     </div>`;
   }
 
-  // Portfolio bar chart (top 15)
-  const top15 = PORTFOLIOS.slice(0, 15);
-  const portCtx = document.getElementById('ch-portfolio').getContext('2d');
-  new Chart(portCtx, {
-    type: 'bar',
+  // ── Chart 1: Spend Pace Gauge ──────────────────────────
+  const gaugeCtx = document.getElementById('ch-gauge').getContext('2d');
+  document.getElementById('gauge-big').textContent = burnRate.toFixed(1) + '%';
+  const ptsDelta = (burnRate - YR_ELAPSED).toFixed(1);
+  document.getElementById('gauge-delta').textContent = (ptsDelta >= 0 ? '+' : '') + ptsDelta + ' pts vs pace';
+  new Chart(gaugeCtx, {
+    type: 'doughnut',
     data: {
-      labels: top15.map(p => p.name.length > 24 ? p.name.slice(0, 22) + '…' : p.name),
       datasets: [
-        {label:'FY Forecast', data: top15.map(p => p.forecast/1e6), backgroundColor:'rgba(249,99,2,.15)', borderColor:'#F96302', borderWidth:1.5, borderRadius:3},
-        {label:'YTD Actual', data: top15.map(p => p.actual/1e6), backgroundColor:'rgba(249,99,2,.7)', borderColor:'#D95A00', borderWidth:0, borderRadius:3},
+        {
+          data: [burnRate, 100 - burnRate],
+          backgroundColor: ['#F96302', '#EAECF0'],
+          borderWidth: 0,
+          cutout: '72%',
+          weight: 2,
+        },
+        {
+          data: [YR_ELAPSED, 100 - YR_ELAPSED],
+          backgroundColor: ['rgba(52,64,84,0.22)', 'rgba(52,64,84,0.06)'],
+          borderWidth: 0,
+          cutout: '82%',
+          weight: 1,
+        }
       ]
     },
     options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:10,padding:12}}, tooltip:{callbacks:{label:c=>' $'+c.raw.toFixed(1)+'M'}}},
-      scales:{
-        x:{grid:{display:false}, ticks:{font:{size:10},maxRotation:35,minRotation:25}},
-        y:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10},callback:v=>'$'+v.toFixed(0)+'M'}}
-      }
+      responsive: false,
+      maintainAspectRatio: false,
+      rotation: -135,
+      circumference: 270,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      animation: { animateRotate: true, duration: 800 }
     }
   });
 
-  // Monthly chart
+  // ── Chart 7: Spend Breakdown (HTML/CSS) ───────────────
+  const FY25_TOTAL = 1302219353; // sum of FY25_DATA
+  const spendEl = document.getElementById('ch-spend-breakdown');
+  const actPct = (TOTAL_ACTUAL / TOTAL_FORECAST * 100).toFixed(1);
+  const fy25PctOfFy26 = (FY25_TOTAL / TOTAL_FORECAST * 100).toFixed(1);
+  const yoyChg = ((TOTAL_FORECAST / FY25_TOTAL - 1) * 100).toFixed(0);
+  spendEl.innerHTML = `
+    <div class="sb-callout">
+      <div class="sb-callout-big">+${yoyChg}%</div>
+      <div class="sb-callout-sub">vs prior year forecast<br><span style="font-size:10px;color:var(--g400)">FY26 $1.55B vs FY25 $1.30B</span></div>
+    </div>
+    <div class="sb-row">
+      <div class="sb-label-row">
+        <span class="sb-label">FY26 Forecast</span>
+        <span class="sb-amount">$1.55B</span>
+      </div>
+      <div class="sb-track" style="height:16px">
+        <div style="display:flex;height:100%;width:100%">
+          <div style="width:${actPct}%;background:var(--hd);border-radius:7px 0 0 7px;flex-shrink:0"></div>
+          <div style="flex:1;background:var(--g200)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sb-row">
+      <div class="sb-label-row">
+        <span class="sb-label">YTD Actual (P1–P4)</span>
+        <span class="sb-amount" style="color:var(--hd)">$385M <span style="font-size:11px;font-weight:600;color:var(--g500)">(${actPct}%)</span></span>
+      </div>
+      <div class="sb-track" style="height:10px">
+        <div style="width:${actPct}%;background:var(--hd);border-radius:5px;height:100%"></div>
+      </div>
+    </div>
+    <div class="sb-row">
+      <div class="sb-label-row">
+        <span class="sb-label">FY25 Full Year</span>
+        <span class="sb-amount" style="color:var(--g500)">$1.30B</span>
+      </div>
+      <div class="sb-track" style="height:10px">
+        <div style="width:${fy25PctOfFy26}%;background:var(--g300);border-radius:5px;height:100%"></div>
+      </div>
+    </div>
+    <div class="sb-legend">
+      <div class="sb-legend-item"><div class="sb-legend-dot" style="background:var(--hd)"></div>Actual spent</div>
+      <div class="sb-legend-item"><div class="sb-legend-dot" style="background:var(--g200)"></div>Remaining budget</div>
+      <div class="sb-legend-item"><div class="sb-legend-dot" style="background:var(--g300)"></div>FY25 scale</div>
+    </div>
+  `;
+
+  // ── Chart 2: Portfolio Heat Map ────────────────────────
+  const hmEl = document.getElementById('ch-heatmap');
+  function hmStyle(pct, actual) {
+    if (!actual || actual <= 0) return {bg:'#F2F4F7', text:'#98A2B3', border:''};
+    if (pct < 20)               return {bg:'#ECFDF3', text:'#027A48', border:''};
+    if (pct < 30)               return {bg:'#D1FADF', text:'#027A48', border:''};
+    if (pct < 36)               return {bg:'#F9FAFB', text:'#344054', border:'border-left:3px solid #12B76A'};
+    if (pct < 43)               return {bg:'#FEE4E2', text:'#B42318', border:''};
+    return                              {bg:'#D92D20', text:'#FFFFFF', border:''};
+  }
+  hmEl.innerHTML = PORTFOLIOS.map(p => {
+    const pct = burnPct(p.actual, p.forecast);
+    const s = hmStyle(pct, p.actual);
+    const shortName = p.name.length > 16 ? p.name.slice(0,15) + '…' : p.name;
+    const overFlag = pct >= 43 ? `<div class="hm-flag">OVER PACE</div>` : '';
+    return `<div class="hm-cell" title="${p.name} · ${pct.toFixed(1)}% burn · $${fmtM(p.actual)} actual" style="background:${s.bg};${s.border}">
+      <div class="hm-name" style="color:${s.text}">${shortName}</div>
+      <div class="hm-pct" style="color:${s.text}">${p.actual > 0 ? pct.toFixed(1) + '%' : '—'}</div>
+      ${overFlag}
+    </div>`;
+  }).join('');
+
+  // ── Chart 3: Monthly Burn Trend ────────────────────────
   const mCtx = document.getElementById('ch-monthly').getContext('2d');
+  const evenPace = TOTAL_FORECAST / 12 / 1e6;
   new Chart(mCtx, {
     type: 'bar',
     data: {
       labels: MONTHLY.map(m => m.period + ' ' + m.month),
-      datasets: [{
-        label:'Spend ($M)',
-        data: MONTHLY.map(m => m.af/1e6),
-        backgroundColor: MONTHLY.map(m => m.fcst ? 'rgba(152,162,179,.25)' : m.current ? 'rgba(249,99,2,.55)' : 'rgba(249,99,2,.8)'),
-        borderColor: MONTHLY.map(m => m.fcst ? 'rgba(152,162,179,.5)' : '#F96302'),
-        borderWidth: 1, borderRadius: 4,
-      }]
+      datasets: [
+        {
+          label: 'Spend ($M)',
+          data: MONTHLY.map(m => m.af / 1e6),
+          backgroundColor: MONTHLY.map(m =>
+            m.fcst ? 'rgba(152,162,179,0.2)' :
+            m.current ? 'rgba(249,99,2,0.5)' :
+            '#F96302'
+          ),
+          borderColor: MONTHLY.map(m =>
+            m.fcst ? 'rgba(152,162,179,0.5)' :
+            m.current ? '#F96302' :
+            '#F96302'
+          ),
+          borderWidth: MONTHLY.map(m => m.fcst ? 1 : 0),
+          borderDash: MONTHLY.map(m => m.fcst ? [4,2] : []),
+          borderRadius: 4,
+          order: 2,
+        },
+        {
+          label: 'Even Pace',
+          data: MONTHLY.map(() => evenPace),
+          type: 'line',
+          borderColor: '#039855',
+          borderWidth: 1.5,
+          borderDash: [5, 3],
+          pointRadius: 0,
+          fill: false,
+          order: 1,
+        }
+      ]
     },
     options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' $'+c.raw.toFixed(0)+'M'}}},
-      scales:{
-        x:{grid:{display:false}, ticks:{font:{size:10}}},
-        y:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10},callback:v=>'$'+v+'M'}}
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { size: 10 }, boxWidth: 10, padding: 10, filter: i => i.datasetIndex === 1 } },
+        tooltip: { callbacks: { label: c => ' $' + c.raw.toFixed(0) + 'M' } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: { max: 175, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } }
+      }
+    },
+    plugins: [{
+      id: 'aprLabel',
+      afterDatasetsDraw(chart) {
+        const { ctx, scales: { x, y } } = chart;
+        const p3idx = 2; // April = index 2
+        const meta = chart.getDatasetMeta(0);
+        if (!meta.data[p3idx]) return;
+        const bar = meta.data[p3idx];
+        ctx.save();
+        ctx.font = '600 9px Inter, sans-serif';
+        ctx.fillStyle = '#B54708';
+        ctx.textAlign = 'center';
+        ctx.fillText('Apr spike', bar.x, bar.y - 8);
+        ctx.restore();
+      }
+    }]
+  });
+
+  // ── Chart 4: YoY Portfolio Comparison ─────────────────
+  const yoyCtx = document.getElementById('ch-yoy').getContext('2d');
+  // Match FY25 data to PORTFOLIOS, take top 8 by FY26 forecast
+  const yoyData = FY25_DATA.map(d => {
+    const port = PORTFOLIOS.find(p => p.name === d.name) || { forecast: 0 };
+    return { name: d.name, fy25: d.fy25, fy26: port.forecast };
+  }).sort((a, b) => b.fy26 - a.fy26);
+  new Chart(yoyCtx, {
+    type: 'bar',
+    data: {
+      labels: yoyData.map(d => d.name.length > 20 ? d.name.slice(0, 18) + '…' : d.name),
+      datasets: [
+        {
+          label: 'FY25 Actual',
+          data: yoyData.map(d => d.fy25 / 1e6),
+          backgroundColor: '#D0D5DD',
+          borderRadius: 3,
+        },
+        {
+          label: 'FY26 Forecast',
+          data: yoyData.map(d => d.fy26 / 1e6),
+          backgroundColor: '#F96302',
+          borderRadius: 3,
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 10 }, boxWidth: 10, padding: 10 } },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const d = yoyData[c.dataIndex];
+              const pct = d.fy25 > 0 ? ((d.fy26 / d.fy25 - 1) * 100).toFixed(0) : '—';
+              return ` $${c.raw.toFixed(0)}M${c.datasetIndex === 1 ? '  (Δ ' + (pct >= 0 ? '+' : '') + pct + '%)' : ''}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
+        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
       }
     }
   });
 
-  // VP burn chart
+  // ── Chart 5: VP Burn Scorecard ─────────────────────────
+  const vpSorted = [...VPS].sort((a, b) => burnPct(b.actual, b.forecast) - burnPct(a.actual, a.forecast));
+  const vpBurns = vpSorted.map(v => burnPct(v.actual, v.forecast));
   const vpBurnCtx = document.getElementById('ch-vp-burn').getContext('2d');
-  const vpTop10 = VPS.filter(v => v.actual > 0).slice(0, 10);
-  const vpBurns = vpTop10.map(v => burnPct(v.actual, v.forecast));
-  new Chart(vpBurnCtx, {
+  const vpChart = new Chart(vpBurnCtx, {
     type: 'bar',
     data: {
-      labels: vpTop10.map(v => {
+      labels: vpSorted.map(v => {
         const parts = v.name.split(',');
-        return parts.length > 1 ? parts[0].trim() : v.name.split(' ')[0];
+        return parts[0].trim();
       }),
       datasets: [{
-        label:'Burn %',
+        label: 'Burn %',
         data: vpBurns,
-        backgroundColor: vpBurns.map(b => b > YR_ELAPSED+5 ? 'rgba(180,35,24,.65)' : b > YR_ELAPSED-3 ? 'rgba(181,71,8,.55)' : 'rgba(18,183,106,.6)'),
-        borderRadius: 4,
+        backgroundColor: vpBurns.map(b =>
+          b > YR_ELAPSED + 5 ? '#D92D20' :
+          b < YR_ELAPSED - 3 ? '#12B76A' :
+          '#98A2B3'
+        ),
+        borderRadius: 3,
+        barPercentage: 0.7,
       }]
     },
     options: {
-      indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' '+c.raw.toFixed(1)+'%'}}},
-      scales:{
-        x:{grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10},callback:v=>v+'%'}, max:40},
-        y:{grid:{display:false}, ticks:{font:{size:10}}}
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ' ' + c.raw.toFixed(1) + '%' } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => Math.round(v) + '%' }, max: Math.ceil(Math.max(...vpBurns) * 1.15 / 10) * 10 },
+        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    },
+    plugins: [{
+      id: 'paceLine',
+      afterDraw(chart) {
+        const { ctx, scales: { x, y }, chartArea } = chart;
+        const xPos = x.getPixelForValue(YR_ELAPSED);
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([5, 3]);
+        ctx.strokeStyle = '#039855';
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(xPos, chartArea.top);
+        ctx.lineTo(xPos, chartArea.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '600 9px Inter, sans-serif';
+        ctx.fillStyle = '#039855';
+        ctx.textAlign = 'center';
+        ctx.fillText('Pace', xPos, chartArea.top - 2);
+        ctx.restore();
+      }
+    }]
+  });
+
+  // ── Chart 6: At-Risk Sub-Products Bubble ──────────────
+  const bigSPs = SP.filter(s => s.forecast > 2e6);
+  const bubbleData = bigSPs.map(s => {
+    const b = burnPct(s.actual, s.forecast);
+    const r = Math.min(Math.sqrt(s.forecast / 1e6) * 3.5, 20);
+    const color = !s.actual || s.actual <= 0 ? 'rgba(152,162,179,0.6)' :
+      b > 38 ? 'rgba(217,45,32,0.7)' :
+      b > 30 ? 'rgba(249,99,2,0.65)' :
+      'rgba(18,183,106,0.6)';
+    return { x: s.forecast / 1e6, y: b, r, color, name: s.name, burn: b, forecast: s.forecast };
+  });
+  const bubbleCtx = document.getElementById('ch-bubble').getContext('2d');
+  new Chart(bubbleCtx, {
+    type: 'bubble',
+    data: {
+      datasets: [{
+        label: 'Sub-Products',
+        data: bubbleData.map(d => ({ x: d.x, y: d.y, r: d.r })),
+        backgroundColor: bubbleData.map(d => d.color),
+        borderColor: bubbleData.map(d => d.color.replace(/[\d.]+\)$/, '1)')),
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const d = bubbleData[c.dataIndex];
+              return ` ${d.name.slice(0,28)} · $${fmtM(d.forecast)} · ${d.burn.toFixed(1)}% burn`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'Forecast ($M)', font: { size: 10 }, color: '#667085' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'Burn %', font: { size: 10 }, color: '#667085' }, ticks: { font: { size: 10 }, callback: v => v + '%' } }
+      }
+    },
+    plugins: [{
+      id: 'bubbleLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        const meta = chart.getDatasetMeta(0);
+        ctx.save();
+        meta.data.forEach((pt, i) => {
+          const d = bubbleData[i];
+          if (d.burn > 38 || d.forecast > 15e6) {
+            const shortName = d.name.length > 14 ? d.name.slice(0, 13) + '…' : d.name;
+            ctx.font = '600 8px Inter, sans-serif';
+            ctx.fillStyle = '#344054';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(shortName, pt.x, pt.y - d.r - 2);
+          }
+        });
+        ctx.restore();
+      }
+    }]
+  });
+
+  // ── Chart 8: Treemap ───────────────────────────────────
+  const tmEl = document.getElementById('ch-treemap');
+  const tmW = tmEl.offsetWidth || 900;
+  const tmH = 240;
+  tmEl.style.height = tmH + 'px';
+
+  function hmBgColor(pct, actual) {
+    if (!actual || actual <= 0) return { bg: '#F2F4F7', text: '#98A2B3' };
+    if (pct < 20)  return { bg: '#ECFDF3', text: '#027A48' };
+    if (pct < 30)  return { bg: '#D1FADF', text: '#027A48' };
+    if (pct < 36)  return { bg: '#F0FDF4', text: '#344054' };
+    if (pct < 43)  return { bg: '#FEE4E2', text: '#B42318' };
+    return              { bg: '#D92D20', text: '#FFFFFF' };
+  }
+
+  // Simple strip treemap algorithm
+  const total = PORTFOLIOS.reduce((s, p) => s + Math.max(p.forecast, 0), 0);
+  const items = PORTFOLIOS.map(p => ({ ...p, val: Math.max(p.forecast, 0) })).filter(p => p.val > 0);
+
+  function layoutStrip(items, x, y, w, h) {
+    const rects = [];
+    const total = items.reduce((s, i) => s + i.val, 0);
+    let cx = x;
+    items.forEach(item => {
+      const iw = (item.val / total) * w;
+      rects.push({ item, x: cx, y, w: iw, h });
+      cx += iw;
+    });
+    return rects;
+  }
+
+  function squarify(items, x, y, w, h) {
+    if (!items.length) return [];
+    const total = items.reduce((s, i) => s + i.val, 0);
+    const area = w * h;
+    const rects = [];
+
+    let remaining = [...items].sort((a, b) => b.val - a.val);
+    let cx = x, cy = y, cw = w, ch = h;
+
+    while (remaining.length > 0) {
+      // Try to find how many items fit best in a row/column
+      const isWide = cw >= ch;
+      const stripLen = isWide ? cw : ch;
+      const stripOther = isWide ? ch : cw;
+      const stripTotal = remaining.reduce((s, i) => s + i.val, 0);
+
+      let best = 1;
+      let bestRatio = Infinity;
+      let runTotal = 0;
+      for (let n = 1; n <= remaining.length; n++) {
+        runTotal += remaining[n - 1].val;
+        const stripH = (runTotal / stripTotal) * stripOther;
+        let worstR = 0;
+        let rt = 0;
+        for (let j = 0; j < n; j++) {
+          rt += remaining[j].val;
+          const bw = (remaining[j].val / runTotal) * stripLen;
+          const bh = stripH;
+          const r = Math.max(bw / bh, bh / bw);
+          if (r > worstR) worstR = r;
+        }
+        if (worstR < bestRatio) { bestRatio = worstR; best = n; }
+        else break;
+      }
+
+      const strip = remaining.splice(0, best);
+      const stripSum = strip.reduce((s, i) => s + i.val, 0);
+      const stripFrac = stripSum / stripTotal;
+
+      if (isWide) {
+        const sw = cw * stripFrac;
+        rects.push(...layoutStrip(strip, cx, cy, sw, ch));
+        cx += sw; cw -= sw;
+      } else {
+        const sh = ch * stripFrac;
+        rects.push(...layoutStrip(strip, cx, cy, cw, sh));
+        cy += sh; ch -= sh;
       }
     }
-  });
+    return rects;
+  }
+
+  const rects = squarify(items, 0, 0, tmW, tmH);
+  tmEl.innerHTML = rects.map(({ item, x, y, w, h }) => {
+    const pct = burnPct(item.actual, item.forecast);
+    const s = hmBgColor(pct, item.actual);
+    const showLabel = w > 60;
+    const shortName = item.name.length > 16 ? item.name.slice(0, 14) + '…' : item.name;
+    return `<div class="treemap-cell" title="${item.name} · $${fmtM(item.forecast)} · ${pct.toFixed(1)}% burn"
+      style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;background:${s.bg};color:${s.text}">
+      ${showLabel ? `
+        <div class="treemap-name">${shortName}</div>
+        <div class="treemap-amt">$${fmtM(item.forecast)}</div>
+        ${h > 55 ? `<div class="treemap-pct">${item.actual > 0 ? pct.toFixed(1) + '%' : 'No actuals'}</div>` : ''}
+      ` : ''}
+    </div>`;
+  }).join('');
 }
 
 // ── PORTFOLIOS ────────────────────────────────────────────
