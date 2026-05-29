@@ -543,7 +543,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Initiative vs KTLO Split</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Breaks FY26 spend into new initiative investment vs keeping-the-lights-on operational spend vs hard cap hardware/software. Leadership uses this ratio to defend budget requests and assess how much capacity is available for strategic work vs mandatory operations.</span></button>
             </div>
-            <div class="cc-sub">Sub-product classification by spend type · <span class="ct">KTLO<span class="ct-tip">Keep-The-Lights-On (KTLO) spend covers mandatory operational work: running existing systems, compliance, support desks, and sustaining infrastructure. Not discretionary — cutting it risks system failures.</span></span> vs net-new investment</div>
+            <div class="cc-sub">Labor only · excludes Hard Cap · <span class="ct">KTLO<span class="ct-tip">Keep-The-Lights-On (KTLO) spend covers mandatory operational work: running existing systems, compliance, support desks, and sustaining infrastructure. Not discretionary — cutting it risks system failures.</span></span> vs net-new investment</div>
           </div>
           <div style="display:flex;align-items:center;gap:20px;flex:1">
             <div class="cc-chart" style="height:180px;width:180px;flex-shrink:0;position:relative">
@@ -1907,13 +1907,14 @@ function buildOverview() {
     }]
   });
 
-  // ── Chart: Initiative vs KTLO Split ───────────────────────
+  // ── Chart: Initiative vs KTLO Split (labor only — excludes Hard Cap) ───────
   const isHC   = s => s.name.includes('Hard Cap');
   const isKTLO = s => !isHC(s) && (s.name.includes('KTLO') || s.name.includes('Operations') || s.name.includes('Support Center') || s.name.includes('Unallocated') || s.name.includes('Variance') || s.name.includes('Portfolio Services'));
-  const ktloColors = ['#F96302','#667085','#D0D5DD'];
-  const ktloTypes = ['Initiative', 'KTLO / Run Ops', 'Hard Cap (HW/SW)'];
-  const ktloFcst  = [SP.filter(s=>!isKTLO(s)&&!isHC(s)).reduce((t,s)=>t+s.forecast,0), SP.filter(isKTLO).reduce((t,s)=>t+s.forecast,0), SP.filter(isHC).reduce((t,s)=>t+s.forecast,0)];
-  const ktloAct   = [SP.filter(s=>!isKTLO(s)&&!isHC(s)).reduce((t,s)=>t+s.actual,0), SP.filter(isKTLO).reduce((t,s)=>t+s.actual,0), SP.filter(isHC).reduce((t,s)=>t+s.actual,0)];
+  const ktloColors = ['#F96302','#667085'];
+  const ktloTypes = ['Initiative', 'KTLO / Run Ops'];
+  const laborSP = SP.filter(s => !isHC(s));
+  const ktloFcst  = [laborSP.filter(s=>!isKTLO(s)).reduce((t,s)=>t+s.forecast,0), laborSP.filter(isKTLO).reduce((t,s)=>t+s.forecast,0)];
+  const ktloAct   = [laborSP.filter(s=>!isKTLO(s)).reduce((t,s)=>t+s.actual,0), laborSP.filter(isKTLO).reduce((t,s)=>t+s.actual,0)];
   const ktloTotal = ktloFcst.reduce((a,b)=>a+b,0);
   const ktloCtx   = document.getElementById('ch-ktlo').getContext('2d');
   new Chart(ktloCtx, {
