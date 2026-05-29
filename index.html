@@ -454,7 +454,7 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
               <div class="cc-title">Portfolio Heat Map · All 31 Portfolios</div>
               <button class="cc-info">ⓘ<span class="cc-tip">Each tile is one of 31 portfolios. Color shows how fast it's spending its budget vs where it should be at this point in the year. Dark green = well under pace. White = on pace. Red = spending faster than expected and at risk of overrun.</span></button>
             </div>
-            <div class="cc-sub"><span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span><sup class="fn">3</sup> vs <span class="ct">33.3% pace target<span class="ct-tip">Pace Target = Periods Elapsed ÷ Total Periods × 100. At P4 of 12: 4 ÷ 12 = 33.3%. A portfolio on pace has burn rate ≈ pace target.</span></span><sup class="fn">4</sup></div>
+            <div class="cc-sub">Labor only · excludes Hard Cap · <span class="ct">Burn rate<span class="ct-tip">Burn Rate = YTD Actual ÷ FY Forecast × 100. Measures how much of the annual budget has been consumed to date.</span></span><sup class="fn">3</sup> vs <span class="ct">33.3% pace target<span class="ct-tip">Pace Target = Periods Elapsed ÷ Total Periods × 100. At P4 of 12: 4 ÷ 12 = 33.3%. A portfolio on pace has burn rate ≈ pace target.</span></span><sup class="fn">4</sup></div>
           </div>
           <div class="hm-grid" id="ch-heatmap"></div>
           <div class="hm-legend">
@@ -1480,7 +1480,7 @@ function buildOverview() {
     </div>
   `;
 
-  // ── Chart 2: Portfolio Heat Map ────────────────────────
+  // ── Chart 2: Portfolio Heat Map (labor only — excludes Hard Cap) ──
   const hmEl = document.getElementById('ch-heatmap');
   function hmStyle(pct, actual) {
     if (!actual || actual <= 0) return {bg:'#D0D5DD', text:'#344054', border:''};
@@ -1490,12 +1490,24 @@ function buildOverview() {
     if (pct < 43)               return {bg:'#FEE4E2', text:'#101828', border:''};
     return                              {bg:'#D92D20', text:'#FFFFFF', border:''};
   }
-  hmEl.innerHTML = PORTFOLIOS.map(p => {
+  // Build labor-only totals per portfolio from SP
+  const laborSPMap = {};
+  SP.filter(s => !s.name.includes('Hard Cap')).forEach(s => {
+    if (!laborSPMap[s.portfolio]) laborSPMap[s.portfolio] = {forecast:0, actual:0};
+    laborSPMap[s.portfolio].forecast += s.forecast;
+    laborSPMap[s.portfolio].actual   += s.actual;
+  });
+  const hmPortfolios = PORTFOLIOS.map(p => ({
+    ...p,
+    forecast: (laborSPMap[p.name] || {forecast:p.forecast}).forecast,
+    actual:   (laborSPMap[p.name] || {actual:p.actual}).actual,
+  }));
+  hmEl.innerHTML = hmPortfolios.map(p => {
     const pct = burnPct(p.actual, p.forecast);
     const s = hmStyle(pct, p.actual);
     const shortName = p.name.length > 16 ? p.name.slice(0,15) + '…' : p.name;
     const overFlag = pct >= 43 ? `<div class="hm-flag">OVER PACE</div>` : '';
-    return `<div class="hm-cell" title="${p.name} · ${pct.toFixed(1)}% burn · $${fmtM(p.actual)} actual" onclick="openDpPortfolio('${p.name.replace(/'/g,"\\'")}')" style="background:${s.bg};${s.border};cursor:pointer">
+    return `<div class="hm-cell" title="${p.name} · ${pct.toFixed(1)}% labor burn · $${fmtM(p.actual)} actual" onclick="openDpPortfolio('${p.name.replace(/'/g,"\\'")}')" style="background:${s.bg};${s.border};cursor:pointer">
       <div class="hm-name" style="color:${s.text}">${shortName}</div>
       <div class="hm-pct" style="color:${s.text}">${p.actual > 0 ? pct.toFixed(1) + '%' : '—'}</div>
       ${overFlag}
