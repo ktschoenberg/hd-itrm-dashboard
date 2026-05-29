@@ -221,6 +221,34 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .treemap-amt{font-size:10.5px;font-weight:800;line-height:1;margin-top:2px}
 .treemap-pct{font-size:9px;opacity:.8;margin-top:1px}
 
+/* ── CHART INFO LIGHTBULB ────────────────────────────────── */
+.cc-info{border:none;background:none;cursor:pointer;color:var(--g300);font-size:13px;padding:3px 6px;
+  border-radius:var(--r4);position:relative;flex-shrink:0;transition:color .1s;margin-left:6px;line-height:1}
+.cc-info:hover{color:var(--g600);background:var(--g150)}
+.cc-tip{display:none;position:absolute;right:0;top:calc(100% + 8px);width:260px;
+  background:var(--g900);color:var(--white);font-size:11.5px;line-height:1.6;
+  padding:10px 14px;border-radius:var(--r8);z-index:100;box-shadow:0 4px 20px rgba(16,24,40,.18);
+  text-align:left;font-weight:400;white-space:normal;pointer-events:none}
+.cc-info:hover .cc-tip{display:block}
+.cc-tip::before{content:'';position:absolute;right:9px;top:-5px;
+  border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid var(--g900)}
+
+/* Heat map legend */
+.hm-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;padding-top:9px;border-top:1px solid var(--g200)}
+.hm-li{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--g500)}
+.hm-sw{width:12px;height:12px;border-radius:2px;flex-shrink:0;border:1px solid rgba(0,0,0,.07)}
+
+/* Run rate row */
+.rr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.rr-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);
+  padding:14px 18px;box-shadow:var(--sh-xs);display:flex;flex-direction:column}
+.rr-eyebrow{font-size:10px;font-weight:700;color:var(--g500);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:5px}
+.rr-val{font-size:22px;font-weight:800;color:var(--g900);letter-spacing:-.03em;line-height:1}
+.rr-sub{font-size:11px;color:var(--g400);margin-top:4px}
+.rr-badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;
+  padding:2px 7px;border-radius:var(--rfull);margin-top:6px;align-self:flex-start}
+
 /* ── DETAIL PANE ─────────────────────────────────────────── */
 .dp-overlay{position:fixed;inset:0;background:rgba(16,24,40,.28);z-index:200;
   opacity:0;pointer-events:none;transition:opacity .2s}
@@ -319,6 +347,34 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 
       <div id="alert-zone"></div>
 
+      <!-- Run Rate KPIs -->
+      <div class="rr-grid" id="rr-grid">
+        <div class="rr-card">
+          <div class="rr-eyebrow">Projected FY Spend</div>
+          <div class="rr-val" id="rr-projected">—</div>
+          <div class="rr-sub" id="rr-proj-sub">At current run rate</div>
+          <span class="rr-badge" id="rr-proj-badge"></span>
+        </div>
+        <div class="rr-card">
+          <div class="rr-eyebrow">Monthly Run Rate</div>
+          <div class="rr-val" id="rr-runrate">—</div>
+          <div class="rr-sub">Avg spend per period · P1–P4</div>
+          <span class="rr-badge" id="rr-rr-badge"></span>
+        </div>
+        <div class="rr-card">
+          <div class="rr-eyebrow">Portfolios Over Pace</div>
+          <div class="rr-val" id="rr-overpace">—</div>
+          <div class="rr-sub">Burn rate &gt; pace target + 5 pts</div>
+          <span class="rr-badge" id="rr-op-badge"></span>
+        </div>
+        <div class="rr-card">
+          <div class="rr-eyebrow">Overburn Risk</div>
+          <div class="rr-val" id="rr-overburn">—</div>
+          <div class="rr-sub">Portfolios projected to exceed budget</div>
+          <span class="rr-badge" id="rr-ob-badge"></span>
+        </div>
+      </div>
+
       <!-- Row 1: Gauge + Budget/Actual -->
       <div class="ov-row ov-row-1">
         <!-- Chart 1: Spend Pace Gauge -->
@@ -328,6 +384,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Spend Pace Gauge</div>
               <div class="cc-sub">Burn rate vs year elapsed</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Shows the total percentage of FY2026 budget spent so far (orange arc), compared to where we should be if spending evenly across the year (grey arc). When both arcs align, we're on pace. Falling behind = potential underspend; ahead = overburn risk.</span></button>
           </div>
           <div class="gauge-wrap">
             <div class="gauge-canvas-wrap">
@@ -358,6 +415,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">Forecast vs Actuals · Year-over-Year</div>
               <div class="cc-sub">FY26 budget, YTD spend, and FY25 comparison</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Compares this year's $1.55B budget and what's been spent so far, against last year's full-year actual ($1.30B). The +19% shows how much bigger the FY26 budget is year-over-year.</span></button>
           </div>
           <div id="ch-spend-breakdown" class="sb-wrap" style="padding-top:4px"></div>
         </div>
@@ -367,10 +425,18 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
           <div class="cc-hd">
             <div>
               <div class="cc-title">Portfolio Heat Map · All 31 Portfolios</div>
-              <div class="cc-sub">Burn rate vs pace · Target: 33.3%</div>
+              <div class="cc-sub">Burn rate vs 33.3% pace target</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Each tile is one of 31 portfolios. Color shows how fast it's spending its budget vs where it should be at this point in the year. Dark green = well under pace. White = on pace. Red = spending faster than expected and at risk of overrun.</span></button>
           </div>
           <div class="hm-grid" id="ch-heatmap"></div>
+          <div class="hm-legend">
+            <div class="hm-li"><div class="hm-sw" style="background:#ECFDF3"></div>Well under pace (&lt;20%)</div>
+            <div class="hm-li"><div class="hm-sw" style="background:#D1FADF"></div>Under pace (20–30%)</div>
+            <div class="hm-li"><div class="hm-sw" style="background:#F9FAFB;border-color:var(--g300)"></div>On pace (30–36%)</div>
+            <div class="hm-li"><div class="hm-sw" style="background:#FEE4E2"></div>Over pace (36–43%)</div>
+            <div class="hm-li"><div class="hm-sw" style="background:#D92D20"></div>Significantly over (43%+)</div>
+          </div>
         </div>
       </div>
 
@@ -380,9 +446,10 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         <div class="chart-card">
           <div class="cc-hd">
             <div>
-              <div class="cc-title">Monthly Act+Fcst</div>
-              <div class="cc-sub">Monthly Act+Fcst · green dashed = even pace ($129M)</div>
+              <div class="cc-title">Monthly Spend · Act + Fcst</div>
+              <div class="cc-sub">Solid = actual · Outlined = forecast · Green dashed = even pace</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one fiscal period's spend. Solid orange = recorded actuals. Outlined bars = remaining period forecasts. The green dashed line is "even pace" — what we'd spend per month if the annual budget were spread perfectly across 12 periods. Click any bar for period details.</span></button>
           </div>
           <div class="cc-chart" style="height:220px;position:relative">
             <canvas id="ch-monthly"></canvas>
@@ -396,6 +463,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
               <div class="cc-title">FY25 vs FY26 · Top 8 Portfolios</div>
               <div class="cc-sub">Prior year actuals vs FY26 forecast</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Compares each major portfolio's prior year actual spend (grey) vs this year's forecast (orange). Longer orange bar = bigger budget this year. Helps identify where leadership has significantly increased or decreased investment year-over-year. Click a bar for portfolio details.</span></button>
           </div>
           <div class="cc-chart" style="height:220px">
             <canvas id="ch-yoy"></canvas>
@@ -403,18 +471,19 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
         </div>
       </div>
 
-      <!-- Row 4: Bubble + VP Scorecard -->
+      <!-- Row 4: Deviation + VP Scorecard -->
       <div class="ov-row ov-row-4">
-        <!-- Chart 6: At-Risk Bubble -->
+        <!-- Chart 6: Burn Deviation (replaces bubble) -->
         <div class="chart-card">
           <div class="cc-hd">
             <div>
-              <div class="cc-title">Portfolio Risk</div>
-              <div class="cc-sub">Size = Forecast · Color = Burn rate</div>
+              <div class="cc-title">Portfolio Pace Deviation</div>
+              <div class="cc-sub">Burn rate vs 33.3% pace · pts above/below target</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Each bar shows how far a portfolio's burn rate is from the expected pace. Bars to the right (red/orange) are spending faster than planned — potential overrun risk. Bars to the left (green) are under-spending. Zero line = exactly on pace. Click a bar for portfolio details.</span></button>
           </div>
-          <div class="cc-chart" style="height:260px">
-            <canvas id="ch-bubble"></canvas>
+          <div class="cc-chart" style="height:280px;position:relative">
+            <canvas id="ch-deviation"></canvas>
           </div>
         </div>
 
@@ -423,25 +492,29 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
           <div class="cc-hd">
             <div>
               <div class="cc-title">VP Burn Accountability · Pace = 33.3%</div>
-              <div class="cc-sub">All 16 VPs sorted by burn rate · dashed line = year elapsed</div>
+              <div class="cc-sub">All 16 VPs sorted by burn rate · dashed = year elapsed</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Each bar is one VP's current burn rate — the percentage of their total budget spent so far. The green dashed line marks where they should be at this point in the year (33.3%). Red bars are over pace; green bars are under. Click a bar for VP details including their portfolios and top sub-products.</span></button>
           </div>
-          <div class="cc-chart" style="height:260px;position:relative">
+          <div class="cc-chart" style="height:280px;position:relative">
             <canvas id="ch-vp-burn"></canvas>
           </div>
         </div>
       </div>
 
-      <!-- Row 5: Treemap -->
+      <!-- Row 5: Projected vs Budget (replaces treemap) -->
       <div class="ov-row ov-row-5">
         <div class="chart-card">
           <div class="cc-hd">
             <div>
-              <div class="cc-title">Spend Allocation · $1.55B FY26 Portfolio</div>
-              <div class="cc-sub">All portfolios · area proportional to forecast</div>
+              <div class="cc-title">Run Rate Projection · Forecast vs Projected FY Spend</div>
+              <div class="cc-sub">Projected full-year spend at current run rate vs approved budget · red = overburn risk</div>
             </div>
+            <button class="cc-info">ⓘ<span class="cc-tip">Grey bars = approved FY26 budget. Colored bars = projected full-year spend if the current spending rate continues for all 12 periods. Red = on track to exceed budget (overburn risk). Green = on track to stay within budget. Only portfolios with recorded actuals are shown. Click a bar for portfolio details.</span></button>
           </div>
-          <div class="treemap-wrap" id="ch-treemap" style="height:240px"></div>
+          <div class="cc-chart" style="height:340px;position:relative">
+            <canvas id="ch-projection"></canvas>
+          </div>
         </div>
       </div>
 
@@ -1077,17 +1150,54 @@ function buildOverview() {
     {name:'Executive and Admin',         fy25:46677685},
   ];
 
+  // ── Run Rate KPIs ─────────────────────────────────────────
+  const PERIODS_ELAPSED = 4;
+  const TOTAL_PERIODS = 12;
+  const runRatePerPeriod = TOTAL_ACTUAL / PERIODS_ELAPSED;
+  const projectedFY = runRatePerPeriod * TOTAL_PERIODS;
+  const projPct = (projectedFY / TOTAL_FORECAST * 100).toFixed(1);
+  const overburns = PORTFOLIOS.filter(p => p.actual > 0 && (p.actual / PERIODS_ELAPSED * TOTAL_PERIODS) > p.forecast);
+  const overpaceCount = PORTFOLIOS.filter(p => p.actual > 0 && burnPct(p.actual, p.forecast) > YR_ELAPSED + 5).length;
+
+  document.getElementById('rr-projected').textContent = '$' + fmtM(projectedFY);
+  document.getElementById('rr-proj-sub').textContent = `${projPct}% of $${fmtM(TOTAL_FORECAST)} budget`;
+  const projBadgeEl = document.getElementById('rr-proj-badge');
+  const projSavings = TOTAL_FORECAST - projectedFY;
+  projBadgeEl.textContent = projSavings > 0 ? `$${fmtM(projSavings)} projected under` : `$${fmtM(-projSavings)} projected over`;
+  projBadgeEl.style.cssText = projSavings > 0 ? 'background:var(--green50);color:var(--green700);border:1px solid var(--green100)' : 'background:var(--red50);color:var(--red700);border:1px solid var(--red100)';
+
+  document.getElementById('rr-runrate').textContent = '$' + fmtM(runRatePerPeriod);
+  const rrBadge = document.getElementById('rr-rr-badge');
+  const paceTarget = TOTAL_FORECAST / TOTAL_PERIODS;
+  const rrDelta = runRatePerPeriod - paceTarget;
+  rrBadge.textContent = (rrDelta >= 0 ? '+' : '') + '$' + fmtM(Math.abs(rrDelta)) + ' vs $' + fmtM(paceTarget) + ' pace';
+  rrBadge.style.cssText = rrDelta < 0 ? 'background:var(--green50);color:var(--green700);border:1px solid var(--green100)' : 'background:var(--red50);color:var(--red700);border:1px solid var(--red100)';
+
+  document.getElementById('rr-overpace').textContent = overpaceCount;
+  const opBadge = document.getElementById('rr-op-badge');
+  opBadge.textContent = overpaceCount > 0 ? `of 31 portfolios` : 'All portfolios on pace';
+  opBadge.style.cssText = overpaceCount > 0 ? 'background:var(--yellow50);color:var(--yellow700);border:1px solid var(--yellow100)' : 'background:var(--green50);color:var(--green700);border:1px solid var(--green100)';
+
+  document.getElementById('rr-overburn').textContent = overburns.length;
+  const obBadge = document.getElementById('rr-ob-badge');
+  obBadge.textContent = overburns.length > 0 ? overburns.slice(0,2).map(p=>p.name.split(' ')[0]).join(', ')+(overburns.length>2?` +${overburns.length-2} more`:'') : 'No overburn risk detected';
+  obBadge.style.cssText = overburns.length > 0 ? 'background:var(--red50);color:var(--red700);border:1px solid var(--red100)' : 'background:var(--green50);color:var(--green700);border:1px solid var(--green100)';
+
   // Alerts
   const az = document.getElementById('alert-zone');
   const burnRate = burnPct(TOTAL_ACTUAL, TOTAL_FORECAST);
   const delta = burnRate - YR_ELAPSED;
-  if (delta < -5) {
-    az.innerHTML = `<div class="alert alert-warn">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-      <span><strong>Spend Pacing Behind:</strong> Overall burn rate is ${burnRate.toFixed(1)}% with ${YR_ELAPSED}% of year elapsed — ${Math.abs(delta).toFixed(1)} pts behind pace. Review Q3/Q4 commitments.</span>
-      <span class="alert-note">${fmtM(TOTAL_FORECAST - TOTAL_ACTUAL)} remaining</span>
-    </div>`;
-  }
+  const alerts = [];
+  if (delta < -5) alerts.push(`<div class="alert alert-warn">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+    <span><strong>Spend Pacing Behind:</strong> Overall burn rate is ${burnRate.toFixed(1)}% with ${YR_ELAPSED}% of year elapsed — ${Math.abs(delta).toFixed(1)} pts behind pace. Review Q3/Q4 commitments.</span>
+    <span class="alert-note">$${fmtM(TOTAL_FORECAST - TOTAL_ACTUAL)} remaining</span>
+  </div>`);
+  if (overburns.length > 0) alerts.push(`<div class="alert alert-red" style="background:var(--red50);border:1px solid var(--red100);border-left:3px solid var(--red600);border-radius:var(--r8);padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--red700);margin-bottom:12px">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:15px;height:15px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+    <span><strong>Overburn Risk Detected:</strong> ${overburns.length} portfolio${overburns.length>1?'s':''} projected to exceed FY budget at current run rate — ${overburns.map(p=>`<strong>${p.name}</strong> (${((p.actual/PERIODS_ELAPSED*TOTAL_PERIODS/p.forecast)*100).toFixed(0)}% projected)`).join(', ')}.</span>
+  </div>`);
+  az.innerHTML = alerts.join('');
 
   // ── Chart 1: Spend Pace Gauge ──────────────────────────
   const gaugeCtx = document.getElementById('ch-gauge').getContext('2d');
@@ -1376,171 +1486,120 @@ function buildOverview() {
     }]
   });
 
-  // ── Chart 6: At-Risk Sub-Products Bubble ──────────────
-  const bigSPs = SP.filter(s => s.forecast > 2e6);
-  const bubbleData = bigSPs.map(s => {
-    const b = burnPct(s.actual, s.forecast);
-    const r = Math.min(Math.sqrt(s.forecast / 1e6) * 3.5, 20);
-    const color = !s.actual || s.actual <= 0 ? 'rgba(152,162,179,0.6)' :
-      b > 38 ? 'rgba(217,45,32,0.7)' :
-      b > 30 ? 'rgba(249,99,2,0.65)' :
-      'rgba(18,183,106,0.6)';
-    return { x: s.forecast / 1e6, y: b, r, color, name: s.name, burn: b, forecast: s.forecast };
-  });
-  _bubbleData = bubbleData;
-  const bubbleCtx = document.getElementById('ch-bubble').getContext('2d');
-  new Chart(bubbleCtx, {
-    type: 'bubble',
+  // ── Chart 6: Burn Rate Deviation (replaces bubble) ────────
+  const devRaw = PORTFOLIOS.filter(p => p.actual > 0)
+    .map(p => ({ name: p.name, dev: +(burnPct(p.actual, p.forecast) - YR_ELAPSED).toFixed(2) }))
+    .sort((a, b) => b.dev - a.dev);
+  const devCtx = document.getElementById('ch-deviation').getContext('2d');
+  new Chart(devCtx, {
+    type: 'bar',
     data: {
+      labels: devRaw.map(d => d.name.length > 24 ? d.name.slice(0, 22) + '…' : d.name),
       datasets: [{
-        label: 'Sub-Products',
-        data: bubbleData.map(d => ({ x: d.x, y: d.y, r: d.r })),
-        backgroundColor: bubbleData.map(d => d.color),
-        borderColor: bubbleData.map(d => d.color.replace(/[\d.]+\)$/, '1)')),
-        borderWidth: 1,
+        data: devRaw.map(d => d.dev),
+        backgroundColor: devRaw.map(d => d.dev > 9.7 ? '#D92D20' : d.dev > 0 ? '#F96302' : '#12B76A'),
+        borderRadius: 3,
+        barPercentage: 0.75,
       }]
     },
     options: {
+      indexAxis: 'y',
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: c => {
-              const d = bubbleData[c.dataIndex];
-              return ` ${d.name.slice(0,28)} · $${fmtM(d.forecast)} · ${d.burn.toFixed(1)}% burn`;
-            }
-          }
-        }
+        tooltip: { callbacks: { label: c => ` ${c.raw >= 0 ? '+' : ''}${c.raw.toFixed(1)} pts vs pace (${(+YR_ELAPSED + c.raw).toFixed(1)}% burn)` } }
       },
-      onClick: (evt, elements) => { if (elements.length) { const d = _bubbleData[elements[0].index]; const s = SP.find(x => x.name === d.name); if (s) openDp('sp', s); } },
+      onClick: (evt, elements) => { if (elements.length) { const p = PORTFOLIOS.find(x => x.name === devRaw[elements[0].index].name); if (p) openDp('portfolio', p); } },
       onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
       scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'Forecast ($M)', font: { size: 10 }, color: '#667085' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
-        y: { grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'Burn %', font: { size: 10 }, color: '#667085' }, ticks: { font: { size: 10 }, callback: v => v + '%' } }
+        x: {
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { font: { size: 10 }, callback: v => (v >= 0 ? '+' : '') + v + '%' },
+        },
+        y: { grid: { display: false }, ticks: { font: { size: 9.5 } } }
       }
     },
     plugins: [{
-      id: 'bubbleLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        const meta = chart.getDatasetMeta(0);
+      id: 'zeroline',
+      afterDraw(chart) {
+        const { ctx, scales: { x, y }, chartArea } = chart;
+        const xPos = x.getPixelForValue(0);
         ctx.save();
-        meta.data.forEach((pt, i) => {
-          const d = bubbleData[i];
-          if (d.burn > 38 || d.forecast > 15e6) {
-            const shortName = d.name.length > 14 ? d.name.slice(0, 13) + '…' : d.name;
-            ctx.font = '600 8px Inter, sans-serif';
-            ctx.fillStyle = '#344054';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(shortName, pt.x, pt.y - d.r - 2);
-          }
-        });
+        ctx.beginPath();
+        ctx.strokeStyle = '#667085';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 3]);
+        ctx.moveTo(xPos, chartArea.top);
+        ctx.lineTo(xPos, chartArea.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '600 9px Inter, sans-serif';
+        ctx.fillStyle = '#667085';
+        ctx.textAlign = 'center';
+        ctx.fillText('Pace', xPos, chartArea.top - 4);
         ctx.restore();
       }
     }]
   });
 
-  // ── Chart 8: Treemap ───────────────────────────────────
-  const tmEl = document.getElementById('ch-treemap');
-  const tmW = tmEl.offsetWidth || 900;
-  const tmH = 240;
-  tmEl.style.height = tmH + 'px';
-
-  function hmBgColor(pct, actual) {
-    if (!actual || actual <= 0) return { bg: '#F2F4F7', text: '#98A2B3' };
-    if (pct < 20)  return { bg: '#ECFDF3', text: '#027A48' };
-    if (pct < 30)  return { bg: '#D1FADF', text: '#027A48' };
-    if (pct < 36)  return { bg: '#F0FDF4', text: '#344054' };
-    if (pct < 43)  return { bg: '#FEE4E2', text: '#B42318' };
-    return              { bg: '#D92D20', text: '#FFFFFF' };
-  }
-
-  // Simple strip treemap algorithm
-  const total = PORTFOLIOS.reduce((s, p) => s + Math.max(p.forecast, 0), 0);
-  const items = PORTFOLIOS.map(p => ({ ...p, val: Math.max(p.forecast, 0) })).filter(p => p.val > 0);
-
-  function layoutStrip(items, x, y, w, h) {
-    const rects = [];
-    const total = items.reduce((s, i) => s + i.val, 0);
-    let cx = x;
-    items.forEach(item => {
-      const iw = (item.val / total) * w;
-      rects.push({ item, x: cx, y, w: iw, h });
-      cx += iw;
-    });
-    return rects;
-  }
-
-  function squarify(items, x, y, w, h) {
-    if (!items.length) return [];
-    const total = items.reduce((s, i) => s + i.val, 0);
-    const area = w * h;
-    const rects = [];
-
-    let remaining = [...items].sort((a, b) => b.val - a.val);
-    let cx = x, cy = y, cw = w, ch = h;
-
-    while (remaining.length > 0) {
-      // Try to find how many items fit best in a row/column
-      const isWide = cw >= ch;
-      const stripLen = isWide ? cw : ch;
-      const stripOther = isWide ? ch : cw;
-      const stripTotal = remaining.reduce((s, i) => s + i.val, 0);
-
-      let best = 1;
-      let bestRatio = Infinity;
-      let runTotal = 0;
-      for (let n = 1; n <= remaining.length; n++) {
-        runTotal += remaining[n - 1].val;
-        const stripH = (runTotal / stripTotal) * stripOther;
-        let worstR = 0;
-        let rt = 0;
-        for (let j = 0; j < n; j++) {
-          rt += remaining[j].val;
-          const bw = (remaining[j].val / runTotal) * stripLen;
-          const bh = stripH;
-          const r = Math.max(bw / bh, bh / bw);
-          if (r > worstR) worstR = r;
+  // ── Chart 8: Run Rate Projection (replaces treemap) ───────
+  const projRaw = PORTFOLIOS
+    .filter(p => p.actual > 0)
+    .map(p => ({
+      name: p.name,
+      forecast: p.forecast / 1e6,
+      projected: (p.actual / PERIODS_ELAPSED * TOTAL_PERIODS) / 1e6,
+      overburn: (p.actual / PERIODS_ELAPSED * TOTAL_PERIODS) > p.forecast,
+    }))
+    .sort((a, b) => (b.projected / b.forecast) - (a.projected / a.forecast));
+  const projCtx = document.getElementById('ch-projection').getContext('2d');
+  new Chart(projCtx, {
+    type: 'bar',
+    data: {
+      labels: projRaw.map(d => d.name.length > 26 ? d.name.slice(0, 24) + '…' : d.name),
+      datasets: [
+        {
+          label: 'FY26 Budget',
+          data: projRaw.map(d => d.forecast),
+          backgroundColor: '#EAECF0',
+          borderRadius: 3,
+          barPercentage: 0.7,
+        },
+        {
+          label: 'Projected FY Spend',
+          data: projRaw.map(d => d.projected),
+          backgroundColor: projRaw.map(d => d.overburn ? 'rgba(217,45,32,0.8)' : 'rgba(18,183,106,0.75)'),
+          borderRadius: 3,
+          barPercentage: 0.7,
         }
-        if (worstR < bestRatio) { bestRatio = worstR; best = n; }
-        else break;
-      }
-
-      const strip = remaining.splice(0, best);
-      const stripSum = strip.reduce((s, i) => s + i.val, 0);
-      const stripFrac = stripSum / stripTotal;
-
-      if (isWide) {
-        const sw = cw * stripFrac;
-        rects.push(...layoutStrip(strip, cx, cy, sw, ch));
-        cx += sw; cw -= sw;
-      } else {
-        const sh = ch * stripFrac;
-        rects.push(...layoutStrip(strip, cx, cy, cw, sh));
-        cy += sh; ch -= sh;
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { size: 10 }, boxWidth: 10, padding: 10 } },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const d = projRaw[c.dataIndex];
+              if (c.datasetIndex === 1) {
+                const pct = (d.projected / d.forecast * 100).toFixed(0);
+                return ` Projected: $${c.raw.toFixed(0)}M (${pct}% of budget)${d.overburn ? ' ⚠ OVERBURN' : ''}`;
+              }
+              return ` Budget: $${c.raw.toFixed(0)}M`;
+            }
+          }
+        }
+      },
+      onClick: (evt, elements) => { if (elements.length) { const p = PORTFOLIOS.find(x => x.name === projRaw[elements[0].index].name); if (p) openDp('portfolio', p); } },
+      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
+        y: { grid: { display: false }, ticks: { font: { size: 9.5 } } }
       }
     }
-    return rects;
-  }
-
-  const rects = squarify(items, 0, 0, tmW, tmH);
-  tmEl.innerHTML = rects.map(({ item, x, y, w, h }) => {
-    const pct = burnPct(item.actual, item.forecast);
-    const s = hmBgColor(pct, item.actual);
-    const showLabel = w > 60;
-    const shortName = item.name.length > 16 ? item.name.slice(0, 14) + '…' : item.name;
-    return `<div class="treemap-cell" title="${item.name} · $${fmtM(item.forecast)} · ${pct.toFixed(1)}% burn"
-      onclick="openDpPortfolio('${item.name.replace(/'/g,"\\'")}')"
-      style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;background:${s.bg};color:${s.text}">
-      ${showLabel ? `
-        <div class="treemap-name">${shortName}</div>
-        <div class="treemap-amt">$${fmtM(item.forecast)}</div>
-        ${h > 55 ? `<div class="treemap-pct">${item.actual > 0 ? pct.toFixed(1) + '%' : 'No actuals'}</div>` : ''}
-      ` : ''}
-    </div>`;
-  }).join('');
+  });
 }
 
 // ── PORTFOLIOS ────────────────────────────────────────────
