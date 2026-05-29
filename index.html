@@ -468,9 +468,8 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
         </div>
       </div>
 
-      <!-- Row 3: Monthly Trend + YoY Comparison -->
-      <div class="ov-row ov-row-3">
-        <!-- Chart 3: Monthly Burn Trend -->
+      <!-- Row 3: Monthly Burn Trend (full width) -->
+      <div class="ov-row ov-row-5">
         <div class="chart-card">
           <div class="cc-hd">
             <div class="cc-title-row">
@@ -482,20 +481,6 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
           </div>
           <div class="cc-chart" style="height:220px;position:relative">
             <canvas id="ch-monthly"></canvas>
-          </div>
-        </div>
-
-        <!-- Chart 4: YoY Portfolio Comparison -->
-        <div class="chart-card">
-          <div class="cc-hd">
-            <div class="cc-title-row">
-              <div class="cc-title">FY25 vs FY26 · Top 8 Portfolios</div>
-              <button class="cc-info">ⓘ<span class="cc-tip">Compares each major portfolio's prior year actual spend (grey) vs this year's forecast (orange). Longer orange bar = bigger budget this year. Helps identify where leadership has significantly increased or decreased investment year-over-year. Click a bar for portfolio details.</span></button>
-            </div>
-            <div class="cc-sub">Prior year actuals vs FY26 forecast</div>
-          </div>
-          <div class="cc-chart" style="height:220px">
-            <canvas id="ch-yoy"></canvas>
           </div>
         </div>
       </div>
@@ -1099,7 +1084,7 @@ function toTitleCase(s) {
 }
 
 // ── DETAIL PANE ───────────────────────────────────────────
-let _vpSorted = [], _yoyData = [], _bubbleData = [];
+let _vpSorted = [], _bubbleData = [];
 
 function _dpColor(c) {
   return c === 'green' ? 'var(--green600)' : c === 'yellow' ? 'var(--yellow700)' : 'var(--red600)';
@@ -1585,57 +1570,6 @@ function buildOverview() {
         ctx.restore();
       }
     }]
-  });
-
-  // ── Chart 4: YoY Portfolio Comparison ─────────────────
-  const yoyCtx = document.getElementById('ch-yoy').getContext('2d');
-  // Match FY25 data to PORTFOLIOS, take top 8 by FY26 forecast
-  const yoyData = FY25_DATA.map(d => {
-    const port = PORTFOLIOS.find(p => p.name === d.name) || { forecast: 0 };
-    return { name: d.name, fy25: d.fy25, fy26: port.forecast };
-  }).sort((a, b) => b.fy26 - a.fy26);
-  _yoyData = yoyData;
-  new Chart(yoyCtx, {
-    type: 'bar',
-    data: {
-      labels: yoyData.map(d => d.name.length > 20 ? d.name.slice(0, 18) + '…' : d.name),
-      datasets: [
-        {
-          label: 'FY25 Actual',
-          data: yoyData.map(d => d.fy25 / 1e6),
-          backgroundColor: '#D0D5DD',
-          borderRadius: 3,
-        },
-        {
-          label: 'FY26 Forecast',
-          data: yoyData.map(d => d.fy26 / 1e6),
-          backgroundColor: '#F96302',
-          borderRadius: 3,
-        }
-      ]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', labels: { font: { size: 10 }, boxWidth: 10, padding: 10 } },
-        tooltip: {
-          callbacks: {
-            label: c => {
-              const d = yoyData[c.dataIndex];
-              const pct = d.fy25 > 0 ? ((d.fy26 / d.fy25 - 1) * 100).toFixed(0) : '—';
-              return ` $${c.raw.toFixed(0)}M${c.datasetIndex === 1 ? '  (Δ ' + (pct >= 0 ? '+' : '') + pct + '%)' : ''}`;
-            }
-          }
-        }
-      },
-      onClick: (evt, elements) => { if (elements.length) { const d = _yoyData[elements[0].index]; const p = PORTFOLIOS.find(x => x.name === d.name); if (p) openDp('portfolio', p); } },
-      onHover: (evt, el) => { evt.native.target.style.cursor = el.length ? 'pointer' : 'default'; },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$' + v + 'M' } },
-        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
-      }
-    }
   });
 
   // ── Chart 5: VP Burn Scorecard ─────────────────────────
