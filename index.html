@@ -175,6 +175,7 @@ td.mono{font-size:11px;color:var(--g500);font-family:monospace}
 .ov-row-3{grid-template-columns:1fr 1fr}
 .ov-row-4{grid-template-columns:1fr 2fr}
 .ov-row-5{grid-template-columns:1fr}
+.ov-row-6{grid-template-columns:repeat(3,1fr)}
 
 /* Gauge */
 .gauge-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
@@ -530,22 +531,8 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
         </div>
       </div>
 
-      <!-- Row 5a: Forecast Restatement + KTLO Split -->
-      <div class="ov-row ov-row-3">
-
-        <!-- Forecast Restatement Tracker -->
-        <div class="chart-card">
-          <div class="cc-hd">
-            <div class="cc-title-row">
-              <div class="cc-title">Forecast Restatement Tracker</div>
-              <button class="cc-info">ⓘ<span class="cc-tip">Compares the original SPP-approved annual forecast to the current P4 forecast for portfolios that have changed. Increases (red) mean scope or cost expanded. Decreases (green) mean deferrals or efficiency gains. Large swings mid-year warrant leadership review.</span></button>
-            </div>
-            <div class="cc-sub">Original SPP plan vs current P4 forecast · sorted by % change</div>
-          </div>
-          <div class="cc-chart" style="height:220px;position:relative">
-            <canvas id="ch-restate"></canvas>
-          </div>
-        </div>
+      <!-- Row 5: Initiative vs KTLO + Labor Mix + Resource Type Mix -->
+      <div class="ov-row ov-row-6">
 
         <!-- Initiative vs KTLO Split -->
         <div class="chart-card">
@@ -563,11 +550,6 @@ sup.fn{font-size:9px;color:var(--g400);vertical-align:super;line-height:0;font-w
             <div id="ch-ktlo-legend" style="flex:1;display:flex;flex-direction:column;gap:10px"></div>
           </div>
         </div>
-
-      </div>
-
-      <!-- Row 5: Labor Mix + Resource Type Mix -->
-      <div class="ov-row ov-row-3">
 
         <!-- Transaction Class Mix -->
         <div class="chart-card">
@@ -1078,15 +1060,6 @@ const RESOURCE_MIX = [
   { type: 'Offshore',      forecast: 512000000, actual: 126900000 },
 ];
 
-// Forecast restatements vs original SPP plan
-const RESTATEMENTS = [
-  { portfolio:'Infrastructure & Operations', original:432000000, current:409900000 },
-  { portfolio:'Cybersecurity',               original: 95000000, current:103800000 },
-  { portfolio:'Online',                      original:107000000, current:102700000 },
-  { portfolio:'Core AI',                     original: 10000000, current: 12900000 },
-  { portfolio:'Canada',                      original: 15000000, current: 19600000 },
-  { portfolio:'Store Systems',              original: 88000000, current: 84600000 },
-];
 
 function fmtM(v, dp=1) {
   if (v === null || v === undefined) return '—';
@@ -1876,60 +1849,6 @@ function buildOverview() {
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 11 } } },
         y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '$'+v+'M' } }
-      }
-    }
-  });
-
-  // ── Chart: Forecast Restatement ───────────────────────────
-  const restSorted = [...RESTATEMENTS].sort((a,b) => {
-    const pctA = (a.current - a.original) / a.original;
-    const pctB = (b.current - b.original) / b.original;
-    return pctA - pctB;
-  });
-  const restCtx = document.getElementById('ch-restate').getContext('2d');
-  new Chart(restCtx, {
-    type: 'bar',
-    data: {
-      labels: restSorted.map(r => r.portfolio.length > 22 ? r.portfolio.slice(0,20)+'…' : r.portfolio),
-      datasets: [
-        {
-          label: 'Original SPP',
-          data: restSorted.map(r => +(r.original/1e6).toFixed(0)),
-          backgroundColor: 'rgba(102,112,133,0.2)',
-          borderColor: '#667085',
-          borderWidth: 1.5,
-          borderRadius: 3,
-          barPercentage: 0.65,
-        },
-        {
-          label: 'Current P4 Forecast',
-          data: restSorted.map(r => +(r.current/1e6).toFixed(0)),
-          backgroundColor: restSorted.map(r => r.current > r.original ? 'rgba(217,45,32,0.75)' : 'rgba(18,183,106,0.75)'),
-          borderRadius: 3,
-          barPercentage: 0.65,
-        }
-      ]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 }, padding: 12 } },
-        tooltip: {
-          callbacks: {
-            label: c => {
-              const r = restSorted[c.dataIndex];
-              const delta = ((r.current - r.original)/1e6).toFixed(0);
-              const pct = ((r.current - r.original)/r.original*100).toFixed(1);
-              if (c.datasetIndex === 0) return ` $${c.raw}M original SPP plan`;
-              return ` $${c.raw}M current forecast (${delta > 0 ? '+' : ''}$${delta}M · ${pct > 0 ? '+' : ''}${pct}%)`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font:{size:10}, callback: v => '$'+v+'M' } },
-        y: { grid: { display: false }, ticks: { font:{size:10} } }
       }
     }
   });
