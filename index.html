@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HD Network Ops · ITRM Financial Dashboard FY2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ─── Tokens ─── */
+:root {
+  --g950:#0C111D; --g900:#101828; --g800:#1D2939; --g700:#344054;
+  --g600:#475467; --g500:#667085; --g400:#98A2B3; --g300:#D0D5DD;
+  --g200:#EAECF0; --g150:#F2F4F7; --g100:#F9FAFB; --white:#FFFFFF;
+  --green700:#027A48; --green600:#039855; --green500:#12B76A;
+  --green100:#D1FADF; --green50:#ECFDF3;
+  --yellow700:#B54708; --yellow50:#FFFAEB; --yellow100:#FEF0C7;
+  --red700:#B42318; --red600:#D92D20; --red100:#FEE4E2; --red50:#FEF3F2;
+  --hd:#F96302; --hd-dark:#D95A00; --hd-50:#FFF4EE;
+  --sh-xs:0 1px 2px rgba(16,24,40,.05);
+  --sh-sm:0 1px 3px rgba(16,24,40,.10),0 1px 2px rgba(16,24,40,.06);
+  --sh-md:0 4px 8px -2px rgba(16,24,40,.10),0 2px 4px -2px rgba(16,24,40,.06);
+  --r4:4px; --r6:6px; --r8:8px; --r12:12px; --rfull:9999px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--g100);color:var(--g900);
+  display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--white);border-bottom:1px solid var(--g200);height:56px;
+  display:flex;align-items:center;padding:0 24px;flex-shrink:0;box-shadow:var(--sh-xs);z-index:10}
+.tb-mark{width:30px;height:30px;background:var(--hd);border-radius:var(--r6);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+  color:white;flex-shrink:0;margin-right:12px;letter-spacing:-.02em}
+.tb-name{font-size:14px;font-weight:700;color:var(--g900)}
+.tb-sep{color:var(--g300);margin:0 10px}
+.tb-sub{font-size:13px;color:var(--g500)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tb-pill{background:var(--g100);border:1px solid var(--g200);color:var(--g700);
+  font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:var(--rfull)}
+.live-pill{display:flex;align-items:center;gap:5px;background:var(--g100);
+  border:1px solid var(--g200);color:var(--g500);font-size:11.5px;padding:3px 10px;border-radius:var(--rfull)}
+.live-dot{width:6px;height:6px;background:var(--green500);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;flex:1;overflow:hidden}
+.sidebar{width:220px;flex-shrink:0;background:var(--g900);display:flex;flex-direction:column}
+.s-nav{padding:10px 8px;flex:1}
+.s-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r6);cursor:pointer;
+  font-size:13.5px;font-weight:500;color:#fff;transition:all .12s;margin-bottom:2px;
+  border:none;background:none;width:100%;text-align:left;font-family:var(--font);border-left:2px solid transparent}
+.s-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.s-item.active{background:rgba(255,255,255,.12);color:#fff;font-weight:600;border-left-color:var(--hd)}
+.s-item svg{width:16px;height:16px;flex-shrink:0;color:rgba(255,255,255,.7);transition:color .12s}
+.s-item:hover svg,.s-item.active svg{color:#fff}
+.s-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.7);line-height:1.7}
+.s-footer strong{color:#fff;display:block;font-size:11.5px;margin-bottom:1px}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:22px 28px 56px}
+.section{display:none}.section.active{display:block}
+.page-hd{margin-bottom:18px;display:flex;align-items:flex-end;justify-content:space-between}
+.page-title{font-size:18px;font-weight:700;color:var(--g900)}
+.page-sub{font-size:12.5px;color:var(--g500);margin-top:2px}
+.page-meta{font-size:11.5px;color:var(--g400)}
+
+/* ── ALERT ── */
+.alert{display:flex;align-items:center;gap:10px;background:var(--red50);border:1px solid var(--red100);
+  border-left:3px solid var(--red600);border-radius:var(--r8);padding:10px 16px;
+  font-size:12.5px;color:var(--red700);margin-bottom:16px}
+.alert svg{flex-shrink:0;width:15px;height:15px}
+.alert strong{font-weight:700}
+.alert-note{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--red600);white-space:nowrap}
+.alert-warn{background:var(--yellow50);border-color:var(--yellow100);border-left-color:var(--yellow700);color:var(--yellow700)}
+.alert-ok{background:var(--green50);border-color:var(--green100);border-left-color:var(--green500);color:var(--green700)}
+.alert-ok .alert-note{color:var(--green700)}
+
+/* ── KPI ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.kpi-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.kpi{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);padding:16px 18px;box-shadow:var(--sh-xs)}
+.kpi.accent{border-left:3px solid var(--hd)}
+.kpi.alert-red{border-left:3px solid var(--red600)}
+.kpi.alert-green{border-left:3px solid var(--green500)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:800;color:var(--g900);letter-spacing:-.04em;line-height:1;margin-bottom:4px}
+.kpi.accent .kpi-val{color:var(--hd)}
+.kpi-sub{font-size:11.5px;color:var(--g400)}
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;
+  padding:1.5px 7px;border-radius:var(--rfull);margin-top:5px}
+.delta-up{background:var(--red50);color:var(--red700)}
+.delta-dn{background:var(--green50);color:var(--green700)}
+.delta-neu{background:var(--g150);color:var(--g600)}
+.delta-warn{background:var(--yellow50);color:var(--yellow700)}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);box-shadow:var(--sh-xs)}
+.card-body{padding:18px 20px}
+.card-title{font-size:13.5px;font-weight:700;color:var(--g900)}
+.card-sub{font-size:12px;color:var(--g500);margin-top:1px}
+.mb14{margin-bottom:14px}.mb16{margin-bottom:16px}
+
+/* ── GRIDS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.grid-5-3{display:grid;grid-template-columns:5fr 3fr;gap:14px;margin-bottom:16px}
+.grid-3-2{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:16px}
+canvas{display:block;width:100%!important}
+
+/* ── PROGRESS BAR ── */
+.pbar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pbar-row:last-child{margin-bottom:0}
+.pbar-label{font-size:12px;color:var(--g600);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbar-track{flex:1;background:var(--g150);border-radius:var(--rfull);height:6px;position:relative}
+.pbar-fill{border-radius:var(--rfull);height:6px;transition:width .3s}
+.pbar-val{font-size:11.5px;font-weight:600;color:var(--g700);width:60px;text-align:right;flex-shrink:0;font-family:monospace}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);overflow:hidden;box-shadow:var(--sh-xs)}
+.table-header{padding:14px 18px;border-bottom:1px solid var(--g200);background:var(--white);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+table{width:100%;border-collapse:collapse}
+thead th{text-align:left;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;
+  letter-spacing:.05em;padding:9px 14px;background:var(--g100);border-bottom:1px solid var(--g200);white-space:nowrap}
+thead th.r{text-align:right}
+tbody td{padding:10px 14px;font-size:13px;color:var(--g700);border-bottom:1px solid var(--g150);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--g100)}
+td.r{text-align:right}
+td.mono{font-family:'SF Mono','Fira Code',monospace;font-size:12px}
+td.r.mono{text-align:right;font-family:'SF Mono','Fira Code',monospace;font-size:12px}
+.td-name{font-weight:600;color:var(--g900);font-size:13px}
+.td-muted{color:var(--g500);font-size:12px}
+tfoot td{padding:10px 14px;background:var(--g100);border-top:2px solid var(--g200);
+  font-family:'SF Mono','Fira Code',monospace;font-weight:700;color:var(--g700);font-size:12.5px}
+tfoot td:first-child{font-family:var(--font);color:var(--g500);font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+tfoot td.r{text-align:right}
+tfoot td.grand{color:var(--hd);font-size:14px}
+.burn-bar{height:4px;border-radius:2px;margin-top:4px}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--rfull);font-size:11px;font-weight:600;white-space:nowrap}
+.b-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.b-red{background:var(--red50);color:var(--red700)}.b-red .b-dot{background:var(--red600)}
+.b-green{background:var(--green50);color:var(--green700)}.b-green .b-dot{background:var(--green500)}
+.b-neu{background:var(--g150);color:var(--g700)}.b-neu .b-dot{background:var(--g400)}
+.b-hd{background:var(--hd-50);color:var(--hd-dark)}.b-hd .b-dot{background:var(--hd)}
+.b-warn{background:var(--yellow50);color:var(--yellow700)}.b-warn .b-dot{background:var(--yellow700)}
+.type-labor{background:#EFF8FF;color:#026AA2}
+.type-hc{background:var(--g150);color:var(--g700)}
+
+/* ── SEGMENT ── */
+.seg-ctrl{display:flex;gap:3px;background:var(--g150);border-radius:8px;padding:3px}
+.seg-btn{padding:4px 11px;border:none;border-radius:6px;font-size:11.5px;font-weight:500;cursor:pointer;background:transparent;color:var(--g500);transition:all .15s;white-space:nowrap;font-family:var(--font)}
+.seg-btn.active{background:var(--white);color:var(--g800);box-shadow:var(--sh-xs);font-weight:600}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--white);border:1px solid var(--g200);border-radius:var(--r12);
+  padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;box-shadow:var(--sh-xs)}
+.filter-label{font-size:12px;font-weight:500;color:var(--g500)}
+.filter-select{font-size:12px;font-family:var(--font);color:var(--g700);border:1px solid var(--g200);
+  border-radius:var(--r6);padding:5px 10px;background:var(--g100);cursor:pointer;outline:none}
+.filter-select:focus{border-color:var(--hd)}
+
+/* ── INSIGHT CHIP ── */
+.insight-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.insight{background:var(--white);border:1px solid var(--g200);border-radius:var(--r8);
+  padding:10px 14px;flex:1;min-width:200px;box-shadow:var(--sh-xs)}
+.insight-label{font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.insight-val{font-size:18px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.insight-sub{font-size:11.5px;color:var(--g500);margin-top:2px}
+
+/* ── MISC ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+.divider{height:1px;background:var(--g200);margin:14px 0}
+.em-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:6px}
+.period-label{font-size:10px;color:var(--g400);font-weight:500}
+.current-period{font-size:10px;color:var(--hd);font-weight:700}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="tb-mark">HD</div>
+  <span class="tb-name">Network &amp; Unified Comms</span>
+  <span class="tb-sep">|</span>
+  <span class="tb-sub">ITRM Financial Dashboard · FY2026</span>
+  <div class="tb-right">
+    <span class="tb-pill">P4 May · Period 4 of 13</span>
+    <span class="tb-pill">FY 2026</span>
+    <span class="live-pill"><span class="live-dot"></span>Live</span>
+  </div>
+</header>
+
+<div class="body-wrap">
+  <aside class="sidebar">
+    <nav class="s-nav">
+      <button class="s-item active" data-section="overview" onclick="switchTab('overview')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Overview
+      </button>
+      <button class="s-item" data-section="labor" onclick="switchTab('labor')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Labor
+      </button>
+      <button class="s-item" data-section="hardcap" onclick="switchTab('hardcap')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        Hard Cap
+      </button>
+      <button class="s-item" data-section="projects" onclick="switchTab('projects')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        All Projects
+      </button>
+    </nav>
+    <div class="s-footer">
+      <strong>Source: ITRM Reports</strong>
+      Project Financials · Allocation<br>
+      Monthly Financials · Resource Data
+      <div style="margin-top:6px;color:rgba(255,255,255,.5);font-size:10.5px">18 projects · 4 Eng. Managers</div>
+      <div style="margin-top:2px;color:rgba(255,255,255,.5);font-size:10.5px">Data as of P4 May 2026</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ═══════════════════ OVERVIEW ═══════════════════ -->
+    <div id="sec-overview" class="section">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Executive Overview</div>
+          <div class="page-sub">FY2026 ITRM Portfolio · Network &amp; Unified Communications</div>
+        </div>
+        <div class="page-meta">P4 May 2026 · 30.8% of fiscal year elapsed</div>
+      </div>
+
+      <div class="alert">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <span><strong>Budget Risk — Action Required:</strong> UC Refresh Store Hard Cap (PR000938) forecast of <strong>$40.9M</strong> exceeds approved budget of <strong>$38.0M</strong> by <strong>$2.89M (7.6%).</strong> GIBNER portfolio is the only EM over budget. All other EMs are favorable.</span>
+        <span class="alert-note">−$2.89M over budget</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi accent">
+          <div class="kpi-label">Total Forecast Cost</div>
+          <div class="kpi-val">$99.2M</div>
+          <div class="kpi-sub">18 projects · Labor + Hard Cap</div>
+          <div class="kpi-delta delta-neu">vs Budget $101.6M</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">YTD Actual Spend</div>
+          <div class="kpi-val">$30.0M</div>
+          <div class="kpi-sub">Through P4 May (30.2% burn rate)</div>
+          <div class="kpi-delta delta-neu">Year 30.8% elapsed · On track</div>
+        </div>
+        <div class="kpi alert-green">
+          <div class="kpi-label">Portfolio Budget Variance</div>
+          <div class="kpi-val" style="color:var(--green600)">+$2.43M</div>
+          <div class="kpi-sub">Budget exceeds forecast — favorable overall</div>
+          <div class="kpi-delta delta-dn">↓ Favorable · Under budget</div>
+        </div>
+        <div class="kpi alert-red">
+          <div class="kpi-label">At-Risk Budget Items</div>
+          <div class="kpi-val" style="color:var(--red600)">1</div>
+          <div class="kpi-sub">PR000938 UC Refresh Store over budget</div>
+          <div class="kpi-delta delta-up">↑ −$2.89M unfavorable</div>
+        </div>
+      </div>
+
+      <div class="grid-5-3">
+        <div class="card">
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div>
+                <div class="card-title">Forecast vs Budget by Engineering Manager</div>
+                <div class="card-sub">Orange = Forecast · Light = Budget · Sorted by forecast total</div>
+              </div>
+            </div>
+            <div style="position:relative;height:210px"><canvas id="emChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="card-title">Portfolio Composition</div>
+            <div style="position:relative;height:150px;margin-top:12px"><canvas id="compChart"></canvas></div>
+            <div id="compLegend" style="margin-top:14px;display:flex;flex-direction:column;gap:7px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly Burn Chart -->
+      <div class="card mb16">
+        <div class="card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div class="card-title">Monthly Spend — Forecast vs Actual</div>
+              <div class="card-sub">P1 Feb – P12 Jan · Combined Labor + Hard Cap · P4 May in progress</div>
+            </div>
+            <div style="display:flex;gap:14px;font-size:11.5px;color:var(--g500)">
+              <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--hd);border-radius:2px;display:inline-block"></span>Actual</span>
+              <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:3px;background:var(--g400);display:inline-block"></span>Forecast</span>
+            </div>
+          </div>
+          <div style="position:relative;height:210px"><canvas id="monthlyChart"></canvas></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--g400);padding:0 2px">
+            <span>← FY26 Start</span>
+            <span style="color:var(--hd);font-weight:600">▲ Current: P4 May</span>
+            <span>FY26 End →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EM Summary Cards -->
+      <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.05em">Engineering Manager Portfolios</div>
+      <div class="grid-2" id="emSummaryCards"></div>
+    </div>
+
+    <!-- ═══════════════════ LABOR ═══════════════════ -->
+    <div id="sec-labor" class="section">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Labor Budget Analysis</div>
+          <div class="page-sub">THD, T&amp;M, SOW, and Ranch Labor across 11 projects</div>
+        </div>
+        <div class="page-meta">FY2026 · Labor Forecast $23.9M · Budget $23.6M</div>
+      </div>
+
+      <div class="alert alert-warn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Labor burn rate is <strong>24.5%</strong> vs 30.8% of year elapsed — labor is running slightly behind planned pace. Monitor resource fill rate and project velocity to ensure full-year forecast is achievable.</span>
+        <span class="alert-note">−6.3 pts vs year pace</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi accent">
+          <div class="kpi-label">Labor Forecast</div>
+          <div class="kpi-val">$23.9M</div>
+          <div class="kpi-sub">11 labor projects across 4 EMs</div>
+          <div class="kpi-delta delta-up">↑ +$317K over labor budget</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">YTD Labor Actual</div>
+          <div class="kpi-val">$5.85M</div>
+          <div class="kpi-sub">24.5% of forecast spent</div>
+          <div class="kpi-delta delta-warn">⚠ Behind 30.8% year pace</div>
+        </div>
+        <div class="kpi alert-red">
+          <div class="kpi-label">Labor Budget Variance</div>
+          <div class="kpi-val" style="color:var(--red600)">−$318K</div>
+          <div class="kpi-sub">Forecast slightly exceeds labor budget</div>
+          <div class="kpi-delta delta-up">↑ Unfavorable · 3 projects over</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Remaining to Spend</div>
+          <div class="kpi-val">$18.0M</div>
+          <div class="kpi-sub">Through P12 Jan 2027</div>
+          <div class="kpi-delta delta-neu">9 periods remaining</div>
+        </div>
+      </div>
+
+      <div class="grid-5-3">
+        <div class="table-wrap">
+          <div class="table-header">
+            <div>
+              <div class="card-title">Labor Projects — Full Detail</div>
+              <div class="card-sub">Forecast vs Actual vs Budget · variance column: green = favorable, red = over budget</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Project ID</th>
+                <th>Sub-Product</th>
+                <th>Eng. Manager</th>
+                <th class="r">Forecast</th>
+                <th class="r">Actual YTD</th>
+                <th class="r">Burn %</th>
+                <th class="r">Budget</th>
+                <th class="r">Variance</th>
+              </tr>
+            </thead>
+            <tbody id="laborTableBody"></tbody>
+            <tfoot id="laborTableFoot"></tfoot>
+          </table>
+        </div>
+        <div>
+          <div class="card mb14">
+            <div class="card-body">
+              <div class="card-title" style="margin-bottom:14px">Labor by Engineering Manager</div>
+              <div id="laborEmBars"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="card-title" style="margin-bottom:4px">Burn Rate Context</div>
+              <div class="card-sub" style="margin-bottom:14px">Actual vs Forecast per project</div>
+              <div id="laborBurnBars"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ HARDCAP ═══════════════════ -->
+    <div id="sec-hardcap" class="section">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Hard Cap Budget Analysis</div>
+          <div class="page-sub">Equipment, infrastructure, and technology hardware purchases across 7 projects</div>
+        </div>
+        <div class="page-meta">FY2026 · Hard Cap Forecast $75.3M · Budget $78.1M</div>
+      </div>
+
+      <div class="alert">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <span><strong>PR000938 — UC Refresh Store (GIBNER):</strong> Forecast of <strong>$40.89M</strong> exceeds approved budget of <strong>$38.0M</strong>. The $2.89M overage requires a budget amendment or scope reduction before year-end. All other HC projects are at or under budget.</span>
+        <span class="alert-note">−$2.89M / −7.6%</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi accent">
+          <div class="kpi-label">Hard Cap Forecast</div>
+          <div class="kpi-val">$75.3M</div>
+          <div class="kpi-sub">7 projects · Equipment &amp; licenses</div>
+          <div class="kpi-delta delta-dn">↓ $2.75M under HC budget</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">YTD HC Actual</div>
+          <div class="kpi-val">$24.1M</div>
+          <div class="kpi-sub">32.0% of HC forecast spent</div>
+          <div class="kpi-delta delta-dn">↓ Slightly ahead of year pace</div>
+        </div>
+        <div class="kpi alert-green">
+          <div class="kpi-label">HC Budget Variance</div>
+          <div class="kpi-val" style="color:var(--green600)">+$2.74M</div>
+          <div class="kpi-sub">Exc. PR000938 overage — net favorable</div>
+          <div class="kpi-delta delta-dn">↓ $5.63M favorable ex-UC Refresh</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Remaining HC Spend</div>
+          <div class="kpi-val">$51.2M</div>
+          <div class="kpi-sub">Per forecast through Jan 2027</div>
+          <div class="kpi-delta delta-neu">68.0% of HC forecast remaining</div>
+        </div>
+      </div>
+
+      <div class="grid-5-3">
+        <div class="table-wrap">
+          <div class="table-header">
+            <div>
+              <div class="card-title">Hard Cap Projects — Full Detail</div>
+              <div class="card-sub">Negative variance = forecast exceeds budget (action required)</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Project ID</th>
+                <th>Sub-Product / Description</th>
+                <th>Eng. Manager</th>
+                <th class="r">Forecast</th>
+                <th class="r">Actual YTD</th>
+                <th class="r">Burn %</th>
+                <th class="r">Budget</th>
+                <th class="r">Variance</th>
+              </tr>
+            </thead>
+            <tbody id="hcTableBody"></tbody>
+            <tfoot id="hcTableFoot"></tfoot>
+          </table>
+        </div>
+        <div>
+          <div class="card mb14">
+            <div class="card-body">
+              <div class="card-title" style="margin-bottom:14px">HC Forecast by Project</div>
+              <div style="position:relative;height:180px"><canvas id="hcPieChart"></canvas></div>
+              <div id="hcPieLegend" style="margin-top:10px;display:flex;flex-direction:column;gap:5px"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="card-title" style="margin-bottom:4px">Spend Velocity</div>
+              <div class="card-sub" style="margin-bottom:14px">Actual as % of forecast · 30.8% = on pace</div>
+              <div id="hcVelocityBars"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ ALL PROJECTS ═══════════════════ -->
+    <div id="sec-projects" class="section">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">All Projects</div>
+          <div class="page-sub">18 projects · Full financial detail · Filter by type or engineering manager</div>
+        </div>
+        <div class="page-meta">FY2026 Portfolio Total: $99.2M forecast</div>
+      </div>
+
+      <div class="filter-bar">
+        <span class="filter-label">Type:</span>
+        <div class="seg-ctrl">
+          <button class="seg-btn active" id="filt-all" onclick="filterProjects('all')">All (18)</button>
+          <button class="seg-btn" id="filt-labor" onclick="filterProjects('labor')">Labor (11)</button>
+          <button class="seg-btn" id="filt-hc" onclick="filterProjects('hc')">Hard Cap (7)</button>
+        </div>
+        <span class="filter-label" style="margin-left:8px">EM:</span>
+        <select class="filter-select" id="emFilter" onchange="filterProjects(document.getElementById('filt-all').classList.contains('active')?'all':document.getElementById('filt-labor').classList.contains('active')?'labor':'hc')">
+          <option value="all">All Managers</option>
+          <option value="gibner">GIBNER, Jason</option>
+          <option value="glenn">GLENN, Matt</option>
+          <option value="janus">JANUS, Alexander</option>
+          <option value="higginbotham">Higginbotham, Matt</option>
+        </select>
+        <div style="margin-left:auto;font-size:12px;color:var(--g400)">
+          Variance: <span style="color:var(--green600);font-weight:600">Green = Under budget</span> · <span style="color:var(--red600);font-weight:600">Red = Over budget</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <div>
+            <div class="card-title" id="allProjectsTitle">All 18 Projects — FY2026</div>
+            <div class="card-sub">Sorted by forecast cost descending · Budget-to-Forecast variance shown</div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Project ID</th>
+              <th>Sub-Product</th>
+              <th>Type</th>
+              <th>Eng. Manager</th>
+              <th class="r">Forecast Cost</th>
+              <th class="r">Actual YTD</th>
+              <th class="r">Burn %</th>
+              <th class="r">Planned Cost</th>
+              <th class="r">Budget Cost</th>
+              <th class="r">Variance (Bdgt−Fcst)</th>
+              <th class="r">Status</th>
+            </tr>
+          </thead>
+          <tbody id="allProjectsBody"></tbody>
+          <tfoot id="allProjectsFoot"></tfoot>
+        </table>
+      </div>
+
+      <!-- Sub-product rollup -->
+      <div class="table-wrap" style="margin-top:14px">
+        <div class="table-header">
+          <div>
+            <div class="card-title">Sub-Product Rollup</div>
+            <div class="card-sub">Aggregated by program area · includes all project types</div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Sub-Product</th>
+              <th>Eng. Manager</th>
+              <th class="r">Forecast</th>
+              <th class="r">Actual YTD</th>
+              <th class="r">Burn %</th>
+              <th class="r">Budget</th>
+              <th class="r">Variance</th>
+              <th class="r">Projects</th>
+            </tr>
+          </thead>
+          <tbody id="subprodBody"></tbody>
+          <tfoot id="subprodFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  DATA — sourced from ITRM Report exports (FY2026)
+// ════════════════════════════════════════════════════════
+
+const PROJECTS = [
+  // ── Higginbotham, Matt ─────────────────────────────
+  { id:'PR001509', type:'Labor',    em:'Higginbotham, Matt', em_id:'higginbotham',
+    subProduct:'DC Network Services Enhancement',
+    name:'FY26 - Data Center Network Services Enhancements (Labor) (IT-09365)',
+    forecast:1161574.80, actual:267728.00,  planned:1161574.80, budget:1227750.20,  variance:66175.40 },
+  { id:'PR000406', type:'Hard Cap', em:'Higginbotham, Matt', em_id:'higginbotham',
+    subProduct:'DC Network Services Enhancement',
+    name:'Data Center Network Services Enhancements (Hard Cap) (IT-09365)',
+    forecast:1200000.00, actual:1163161.64, planned:1200000.00, budget:1200000.00,  variance:0.00 },
+  { id:'PR001510', type:'Labor',    em:'Higginbotham, Matt', em_id:'higginbotham',
+    subProduct:'DC Network Services Operations',
+    name:'FY26 - Data Center Network Services Operations (IT-09376)',
+    forecast:1550610.40, actual:390953.60,  planned:1550610.40, budget:1547009.36,  variance:-3601.04 },
+  { id:'PR001511', type:'Labor',    em:'Higginbotham, Matt', em_id:'higginbotham',
+    subProduct:'DC Network Services Refresh',
+    name:'FY26 - Data Center Network Services Refresh (Labor) (IT-09366)',
+    forecast:1217664.50, actual:299613.60,  planned:1217664.50, budget:1267431.88,  variance:49767.38 },
+  { id:'PR000407', type:'Hard Cap', em:'Higginbotham, Matt', em_id:'higginbotham',
+    subProduct:'DC Network Services Refresh',
+    name:'Data Center Network Services Refresh (Hard Cap) (IT-09366)',
+    forecast:4660000.34, actual:3350847.11, planned:4660000.00, budget:4660000.00,  variance:-0.34 },
+  // ── GLENN, Matt ────────────────────────────────────
+  { id:'PR000413', type:'Hard Cap', em:'GLENN, Matt', em_id:'glenn',
+    subProduct:'Distributed Network Enhancements',
+    name:'Distributed Network Enhancements (Hard Cap) (IT-09562)',
+    forecast:5259265.36, actual:-66733.11,  planned:5328124.75, budget:5476239.75,  variance:216974.39 },
+  { id:'PR001513', type:'Labor',    em:'GLENN, Matt', em_id:'glenn',
+    subProduct:'Distributed Network Enhancements',
+    name:'FY26 - Distributed Network Enhancements (Labor) (IT-09562)',
+    forecast:3235026.75, actual:801456.50,  planned:3227613.25, budget:3157505.19,  variance:-77521.56 },
+  { id:'PR000414', type:'Hard Cap', em:'GLENN, Matt', em_id:'glenn',
+    subProduct:'Distributed Network Non-Store',
+    name:'Distributed Network Refresh: Non-Store (Hard Cap) (IT-08369)',
+    forecast:22200000.00, actual:9372902.29, planned:22200000.00, budget:24348000.00, variance:2148000.00 },
+  { id:'PR001514', type:'Labor',    em:'GLENN, Matt', em_id:'glenn',
+    subProduct:'Distributed Network Operations',
+    name:'FY26 - Distributed Network Operations (IT-09377)',
+    forecast:2295639.08, actual:572155.97,  planned:2295639.08, budget:2254867.13,  variance:-40771.95 },
+  { id:'PR001515', type:'Labor',    em:'GLENN, Matt', em_id:'glenn',
+    subProduct:'Distributed Network Refresh',
+    name:'FY26 - Distributed Network Refresh (Labor) (IT-79368)',
+    forecast:837893.47,  actual:209976.00,  planned:835461.74,  budget:826484.27,   variance:-11409.20 },
+  // ── JANUS, Alexander ──────────────────────────────
+  { id:'PR001536', type:'Labor',    em:'JANUS, Alexander', em_id:'janus',
+    subProduct:'Network Automation &amp; Traffic Mgmt',
+    name:'FY26 - Network Automation and Traffic Management - TLM (Labor)',
+    forecast:928280.62,  actual:231450.21,  planned:927448.73,  budget:964690.92,   variance:36410.30 },
+  { id:'PR001507', type:'Labor',    em:'JANUS, Alexander', em_id:'janus',
+    subProduct:'Network Automation &amp; Traffic Mgmt',
+    name:'FY26 - Network Automation and Traffic Management (Labor)',
+    forecast:8523388.11, actual:2069554.25, planned:8526388.91, budget:8294705.65,  variance:-228682.46 },
+  { id:'PR001205', type:'Hard Cap', em:'JANUS, Alexander', em_id:'janus',
+    subProduct:'Network Automation &amp; Traffic Mgmt',
+    name:'Network Automation and Traffic Management (Hard Cap) (IT-09590)',
+    forecast:725791.88,  actual:692205.38,  planned:756925.37,  budget:1700000.00,  variance:974208.12 },
+  // ── GIBNER, Jason ──────────────────────────────────
+  { id:'PR001526', type:'Labor',    em:'GIBNER, Jason', em_id:'gibner',
+    subProduct:'Unified Communications Enhancements',
+    name:'FY26 - Unified Communications Enhancements (Labor) (IT-09370)',
+    forecast:1072272.40, actual:269200.00,  planned:1072272.40, budget:1059595.28,  variance:-12677.12 },
+  { id:'PR001527', type:'Labor',    em:'GIBNER, Jason', em_id:'gibner',
+    subProduct:'Unified Communications Operations',
+    name:'FY26 - Unified Communications Operations (IT-09390)',
+    forecast:2066573.13, actual:473790.44,  planned:2068936.69, budget:1976296.35,  variance:-90276.78 },
+  { id:'PR001528', type:'Labor',    em:'GIBNER, Jason', em_id:'gibner',
+    subProduct:'Unified Communications Refresh',
+    name:'FY26 - Unified Communications Refresh (Labor) (IT-09371)',
+    forecast:985091.19,  actual:261498.72,  planned:985756.47,  budget:980123.32,   variance:-4967.87 },
+  { id:'PR000938', type:'Hard Cap', em:'GIBNER, Jason', em_id:'gibner',
+    subProduct:'Unified Communications Refresh',
+    name:'Unified Communications Refresh - Store (Hard Cap)',
+    forecast:40894798.25, actual:9539212.25, planned:40894799.25, budget:38000000.00, variance:-2894798.25 },
+  { id:'PR001705', type:'Hard Cap', em:'GIBNER, Jason', em_id:'gibner',
+    subProduct:'Unified Communications Refresh Non-Store',
+    name:'Unified Communications Refresh - Non-Store (Hard Cap)',
+    forecast:400000.00,  actual:69038.17,   planned:400000.00,  budget:2700000.00,  variance:2300000.00 },
+];
+
+const EM_COLORS = {
+  gibner:       '#344054',
+  glenn:        '#667085',
+  janus:        '#F96302',
+  higginbotham: '#98A2B3',
+};
+
+const EM_NAMES = {
+  gibner:'GIBNER, Jason', glenn:'GLENN, Matt',
+  janus:'JANUS, Alexander', higginbotham:'Higginbotham, Matt'
+};
+
+// Monthly totals P1-P12 (all types) from ITRM Investment Allocation report totals row
+const MONTHLY = [
+  { period:'P1', month:'Feb', forecast:1880091.18,  actual:1880091.18,  complete:true  },
+  { period:'P2', month:'Mar', forecast:13073903.95, actual:13073903.95, complete:true  },
+  { period:'P3', month:'Apr', forecast:11256549.52, actual:11256549.52, complete:true  },
+  { period:'P4', month:'May', forecast:4496559.26,  actual:3757466.37,  complete:false, current:true },
+  { period:'P5', month:'Jun', forecast:9219165.09,  actual:null,        complete:false },
+  { period:'P6', month:'Jul', forecast:7172794.05,  actual:null,        complete:false },
+  { period:'P7', month:'Aug', forecast:9283055.68,  actual:null,        complete:false },
+  { period:'P8', month:'Sep', forecast:6841816.68,  actual:null,        complete:false },
+  { period:'P9', month:'Oct', forecast:7454567.02,  actual:null,        complete:false },
+  { period:'P10', month:'Nov', forecast:7282721.59,  actual:null,        complete:false },
+  { period:'P11', month:'Dec', forecast:6557531.68,  actual:null,        complete:false },
+  { period:'P12', month:'Jan', forecast:14695114.59, actual:null,        complete:false },
+];
+
+// ════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════
+
+function fmtM(v, dp=1) {
+  if (v === null || v === undefined) return '—';
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  if (abs >= 1e6) return sign + '$' + (abs/1e6).toFixed(dp) + 'M';
+  if (abs >= 1e3) return sign + '$' + (abs/1e3).toFixed(dp) + 'K';
+  return sign + '$' + abs.toFixed(0);
+}
+function fmtPct(a, b) { return b === 0 ? '—' : (a/b*100).toFixed(1) + '%'; }
+function burnPct(actual, forecast) { return forecast > 0 ? (actual/forecast*100).toFixed(1) : 0; }
+
+function varBadge(v) {
+  if (v > 500) return `<span class="badge b-green"><span class="b-dot"></span>${fmtM(v)} fav</span>`;
+  if (v < -500) return `<span class="badge b-red"><span class="b-dot"></span>${fmtM(Math.abs(v))} over</span>`;
+  return `<span class="badge b-neu"><span class="b-dot"></span>${fmtM(v)}</span>`;
+}
+
+function varCellStyle(v) {
+  if (v > 500)  return 'style="color:var(--green600);font-weight:700"';
+  if (v < -500) return 'style="color:var(--red600);font-weight:700"';
+  return 'style="color:var(--g500)"';
+}
+
+function burnBadge(pct) {
+  const n = parseFloat(pct);
+  if (n > 50)  return `<span class="badge b-warn">${pct}%</span>`;
+  if (n > 35)  return `<span class="badge b-hd">${pct}%</span>`;
+  return `<span class="badge b-neu">${pct}%</span>`;
+}
+
+function statusBadge(p) {
+  if (p.type === 'Hard Cap' && p.id === 'PR000406' && p.actual/p.forecast > 0.9) return '<span class="badge b-green">Fully Spent</span>';
+  if (p.id === 'PR001205' && p.actual/p.forecast > 0.9) return '<span class="badge b-green">Fully Spent</span>';
+  if (p.variance < -500000) return '<span class="badge b-red"><span class="b-dot"></span>Over Budget</span>';
+  if (p.variance < 0) return '<span class="badge b-warn">Watch</span>';
+  return '<span class="badge b-neu">On Track</span>';
+}
+
+// ════════════════════════════════════════════════════════
+//  OVERVIEW
+// ════════════════════════════════════════════════════════
+
+function buildOverview() {
+  // EM aggregations
+  const emIds = ['gibner','glenn','janus','higginbotham'];
+  const emData = {};
+  emIds.forEach(id => {
+    const ps = PROJECTS.filter(p => p.em_id === id);
+    emData[id] = {
+      forecast: ps.reduce((s,p) => s + p.forecast, 0),
+      actual:   ps.reduce((s,p) => s + p.actual, 0),
+      budget:   ps.reduce((s,p) => s + p.budget, 0),
+      variance: ps.reduce((s,p) => s + p.variance, 0),
+    };
+  });
+
+  const sorted = [...emIds].sort((a,b) => emData[b].forecast - emData[a].forecast);
+
+  // EM bar chart
+  new Chart(document.getElementById('emChart'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(id => EM_NAMES[id].replace(', ','<br>')),
+      datasets: [
+        {
+          label: 'Forecast', data: sorted.map(id => emData[id].forecast/1e6),
+          backgroundColor: sorted.map(id => EM_COLORS[id]),
+          borderRadius: 4, stack:'a',
+        },
+        {
+          label: 'Budget', data: sorted.map(id => emData[id].budget/1e6),
+          backgroundColor: sorted.map(id => EM_COLORS[id]+'33'),
+          borderRadius: 4, stack:'b',
+          borderColor: sorted.map(id => EM_COLORS[id]),
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {position:'top', labels:{font:{size:11},color:'#667085',boxWidth:10,padding:10}},
+        tooltip: {callbacks:{label: ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw*1e6)}`}},
+      },
+      scales: {
+        x: {ticks:{font:{size:11},color:'#667085'},grid:{display:false},border:{display:false}},
+        y: {ticks:{callback:v=>`$${v.toFixed(0)}M`,font:{size:10},color:'#98A2B3'},grid:{color:'#F2F4F7'},border:{display:false}},
+      },
+    },
+  });
+
+  // Composition donut
+  const totalForecast = PROJECTS.reduce((s,p)=>s+p.forecast,0);
+  const laborForecast = PROJECTS.filter(p=>p.type==='Labor').reduce((s,p)=>s+p.forecast,0);
+  const hcForecast    = PROJECTS.filter(p=>p.type==='Hard Cap').reduce((s,p)=>s+p.forecast,0);
+
+  new Chart(document.getElementById('compChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Hard Cap','Labor'],
+      datasets: [{
+        data: [hcForecast, laborForecast],
+        backgroundColor: ['#344054','#F96302'],
+        borderWidth: 2, borderColor: '#fff',
+      }],
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false, cutout:'66%',
+      plugins: {
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)}`}},
+      },
+    },
+  });
+
+  const cl = document.getElementById('compLegend');
+  [
+    {label:'Hard Cap', val:hcForecast, color:'#344054'},
+    {label:'Labor',    val:laborForecast, color:'#F96302'},
+  ].forEach(item => {
+    const pct = (item.val/totalForecast*100).toFixed(1);
+    cl.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:12px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${item.color}"></div>
+        <span style="color:var(--g600)">${item.label}</span>
+      </div>
+      <span style="font-weight:600;color:var(--g700)">${fmtM(item.val)} <span style="color:var(--g400);font-weight:400">(${pct}%)</span></span>
+    </div>`;
+  });
+
+  // Monthly chart
+  const months = MONTHLY.map(m => m.month);
+  const forecastData = MONTHLY.map(m => m.forecast/1e6);
+  const actualData   = MONTHLY.map(m => m.actual !== null ? m.actual/1e6 : null);
+
+  new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'Actual',
+          data: actualData,
+          backgroundColor: ctx => {
+            const m = MONTHLY[ctx.dataIndex];
+            if (!m) return '#F96302';
+            return m.current ? 'rgba(249,99,2,0.6)' : '#F96302';
+          },
+          borderRadius: 3, order: 1,
+        },
+        {
+          label: 'Forecast',
+          data: forecastData,
+          type: 'line',
+          borderColor: '#98A2B3', backgroundColor:'transparent',
+          borderWidth: 1.5, pointRadius: 3, pointBackgroundColor: '#98A2B3',
+          borderDash: [4,3], tension: 0, order: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {display:false},
+        tooltip: {callbacks:{label: ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw*1e6)}`}},
+      },
+      scales: {
+        x: {ticks:{font:{size:10},color:'#667085'},grid:{display:false},border:{display:false}},
+        y: {ticks:{callback:v=>`$${v.toFixed(0)}M`,font:{size:10},color:'#98A2B3'},grid:{color:'#F2F4F7'},border:{display:false}},
+      },
+    },
+  });
+
+  // EM summary cards
+  const cardsEl = document.getElementById('emSummaryCards');
+  const emColorList = ['#344054','#667085','#F96302','#98A2B3'];
+  sorted.forEach((id, i) => {
+    const d = emData[id];
+    const burnPctVal = (d.actual/d.forecast*100).toFixed(1);
+    const varFav = d.variance >= 0;
+    const projects = PROJECTS.filter(p=>p.em_id===id);
+    const laborPs  = projects.filter(p=>p.type==='Labor');
+    const hcPs     = projects.filter(p=>p.type==='Hard Cap');
+
+    cardsEl.innerHTML += `<div class="card">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${emColorList[i]};flex-shrink:0"></div>
+          <div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--g900)">${EM_NAMES[id]}</div>
+            <div style="font-size:11.5px;color:var(--g500)">${projects.length} projects · ${laborPs.length} Labor · ${hcPs.length} Hard Cap</div>
+          </div>
+          <div style="margin-left:auto">${varFav
+            ? `<span class="badge b-green"><span class="b-dot"></span>+${fmtM(d.variance)} fav</span>`
+            : `<span class="badge b-red"><span class="b-dot"></span>${fmtM(Math.abs(d.variance))} over</span>`}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Forecast</div>
+            <div style="font-size:18px;font-weight:800;color:var(--g900);letter-spacing:-.03em">${fmtM(d.forecast)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Actual YTD</div>
+            <div style="font-size:18px;font-weight:800;color:var(--g700);letter-spacing:-.03em">${fmtM(d.actual)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">Budget</div>
+            <div style="font-size:18px;font-weight:800;color:var(--g700);letter-spacing:-.03em">${fmtM(d.budget)}</div>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g500);margin-bottom:4px">
+            <span>Burn rate</span><span style="font-weight:600;color:var(--g700)">${burnPctVal}% of forecast</span>
+          </div>
+          <div style="background:var(--g150);border-radius:99px;height:5px">
+            <div style="width:${Math.min(parseFloat(burnPctVal),100)}%;height:5px;border-radius:99px;background:${emColorList[i]}"></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  LABOR
+// ════════════════════════════════════════════════════════
+
+function buildLabor() {
+  const laborPs = PROJECTS.filter(p => p.type === 'Labor');
+  const totForecast = laborPs.reduce((s,p)=>s+p.forecast,0);
+  const totActual   = laborPs.reduce((s,p)=>s+p.actual,0);
+  const totBudget   = laborPs.reduce((s,p)=>s+p.budget,0);
+  const totVariance = laborPs.reduce((s,p)=>s+p.variance,0);
+
+  const body = document.getElementById('laborTableBody');
+  const sorted = [...laborPs].sort((a,b)=>b.forecast-a.forecast);
+  sorted.forEach(p => {
+    const burn = burnPct(p.actual, p.forecast);
+    body.innerHTML += `<tr>
+      <td class="mono" style="color:var(--g500);font-size:11.5px">${p.id}</td>
+      <td class="td-name" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.subProduct}</td>
+      <td class="td-muted">${p.em.split(',')[0]}</td>
+      <td class="r mono">${fmtM(p.forecast)}</td>
+      <td class="r mono">${fmtM(p.actual)}</td>
+      <td class="r">${burnBadge(burn)}</td>
+      <td class="r mono" style="color:var(--g500)">${fmtM(p.budget)}</td>
+      <td class="r mono" ${varCellStyle(p.variance)}>${p.variance >= 0 ? '+' : ''}${fmtM(p.variance)}</td>
+    </tr>`;
+  });
+
+  document.getElementById('laborTableFoot').innerHTML = `<tr>
+    <td colspan="3">Total · ${laborPs.length} Labor Projects</td>
+    <td class="r grand">${fmtM(totForecast)}</td>
+    <td class="r">${fmtM(totActual)}</td>
+    <td class="r">${burnPct(totActual,totForecast)}%</td>
+    <td class="r" style="color:var(--g500)">${fmtM(totBudget)}</td>
+    <td class="r" ${varCellStyle(totVariance)}>${totVariance >= 0 ? '+' : ''}${fmtM(totVariance)}</td>
+  </tr>`;
+
+  // Labor by EM bars
+  const emBarsEl = document.getElementById('laborEmBars');
+  const emIds = ['gibner','glenn','janus','higginbotham'];
+  const emColorList = ['#344054','#667085','#F96302','#98A2B3'];
+  const maxFc = Math.max(...emIds.map(id => laborPs.filter(p=>p.em_id===id).reduce((s,p)=>s+p.forecast,0)));
+
+  emIds.forEach((id, i) => {
+    const ps = laborPs.filter(p=>p.em_id===id);
+    if (!ps.length) return;
+    const fc = ps.reduce((s,p)=>s+p.forecast,0);
+    const act = ps.reduce((s,p)=>s+p.actual,0);
+    const pct = (fc/maxFc*100).toFixed(0);
+    emBarsEl.innerHTML += `<div class="pbar-row">
+      <div class="pbar-label" title="${EM_NAMES[id]}">${EM_NAMES[id].split(',')[0]}</div>
+      <div class="pbar-track">
+        <div class="pbar-fill" style="width:${pct}%;background:${emColorList[i]}"></div>
+      </div>
+      <div class="pbar-val">${fmtM(fc)}</div>
+    </div>`;
+  });
+
+  // Burn rate bars
+  const burnBarsEl = document.getElementById('laborBurnBars');
+  sorted.slice(0,6).forEach(p => {
+    const burn = parseFloat(burnPct(p.actual, p.forecast));
+    const color = burn > 40 ? 'var(--yellow700)' : 'var(--g400)';
+    burnBarsEl.innerHTML += `<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g500);margin-bottom:3px">
+        <span style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.id}</span>
+        <span style="font-weight:600;color:var(--g700)">${burn.toFixed(1)}%</span>
+      </div>
+      <div style="background:var(--g150);border-radius:99px;height:5px">
+        <div style="width:${Math.min(burn,100)}%;height:5px;border-radius:99px;background:${color}"></div>
+      </div>
+    </div>`;
+  });
+  burnBarsEl.innerHTML += `<div style="font-size:11px;color:var(--g400);margin-top:4px">Target: ~30.8% at P4</div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  HARDCAP
+// ════════════════════════════════════════════════════════
+
+function buildHardcap() {
+  const hcPs = PROJECTS.filter(p => p.type === 'Hard Cap');
+  const totForecast = hcPs.reduce((s,p)=>s+p.forecast,0);
+  const totActual   = hcPs.reduce((s,p)=>s+p.actual,0);
+  const totBudget   = hcPs.reduce((s,p)=>s+p.budget,0);
+  const totVariance = hcPs.reduce((s,p)=>s+p.variance,0);
+
+  const sorted = [...hcPs].sort((a,b)=>b.forecast-a.forecast);
+
+  const body = document.getElementById('hcTableBody');
+  sorted.forEach(p => {
+    const burn = burnPct(Math.max(p.actual,0), p.forecast);
+    const overBudget = p.variance < -10000;
+    body.innerHTML += `<tr${overBudget ? ' style="background:rgba(254,226,226,.25)"' : ''}>
+      <td class="mono" style="color:var(--g500);font-size:11.5px">${p.id}</td>
+      <td class="td-name" style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.subProduct}</td>
+      <td class="td-muted">${p.em.split(',')[0]}</td>
+      <td class="r mono" style="font-weight:700;color:var(--g900)">${fmtM(p.forecast)}</td>
+      <td class="r mono">${fmtM(Math.max(p.actual,0))}</td>
+      <td class="r">${burnBadge(burn)}</td>
+      <td class="r mono" style="color:var(--g500)">${fmtM(p.budget)}</td>
+      <td class="r mono" ${varCellStyle(p.variance)}>${p.variance >= 0 ? '+' : ''}${fmtM(p.variance)}</td>
+    </tr>`;
+  });
+
+  document.getElementById('hcTableFoot').innerHTML = `<tr>
+    <td colspan="3">Total · ${hcPs.length} Hard Cap Projects</td>
+    <td class="r grand">${fmtM(totForecast)}</td>
+    <td class="r">${fmtM(totActual)}</td>
+    <td class="r">${burnPct(totActual,totForecast)}%</td>
+    <td class="r" style="color:var(--g500)">${fmtM(totBudget)}</td>
+    <td class="r" ${varCellStyle(totVariance)}>${totVariance >= 0 ? '+' : ''}${fmtM(totVariance)}</td>
+  </tr>`;
+
+  // HC donut
+  const pieColors = ['#0C111D','#344054','#475467','#667085','#98A2B3','#D0D5DD','#F96302'];
+  new Chart(document.getElementById('hcPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(p=>p.id),
+      datasets: [{
+        data: sorted.map(p=>Math.max(p.forecast,0)),
+        backgroundColor: pieColors,
+        borderWidth: 2, borderColor:'#fff',
+      }],
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false, cutout:'60%',
+      plugins: {
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmtM(ctx.raw)}`}},
+      },
+    },
+  });
+
+  const legEl = document.getElementById('hcPieLegend');
+  sorted.forEach((p, i) => {
+    const pct = (p.forecast/totForecast*100).toFixed(1);
+    legEl.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
+      <div style="display:flex;align-items:center;gap:5px">
+        <div style="width:7px;height:7px;border-radius:50%;background:${pieColors[i]}"></div>
+        <span style="color:var(--g600)">${p.id}</span>
+      </div>
+      <span style="font-weight:600;color:var(--g700)">${pct}%</span>
+    </div>`;
+  });
+
+  // Velocity bars
+  const velEl = document.getElementById('hcVelocityBars');
+  sorted.forEach(p => {
+    const burn = parseFloat(burnPct(Math.max(p.actual,0), p.forecast));
+    const color = burn > 50 ? 'var(--hd)' : burn < 10 ? 'var(--g300)' : 'var(--g500)';
+    velEl.innerHTML += `<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g600);margin-bottom:3px">
+        <span>${p.id}</span>
+        <span style="font-weight:600">${burn.toFixed(1)}%</span>
+      </div>
+      <div style="background:var(--g150);border-radius:99px;height:5px">
+        <div style="width:${Math.min(burn,100)}%;height:5px;border-radius:99px;background:${color}"></div>
+      </div>
+    </div>`;
+  });
+  velEl.innerHTML += `<div style="font-size:11px;color:var(--g400);margin-top:2px;border-top:1px solid var(--g200);padding-top:8px">
+    <span style="color:var(--hd);font-weight:600">■</span> High burn · <span style="color:var(--g500);font-weight:600">■</span> On pace · <span style="color:var(--g300);font-weight:600">■</span> Low burn
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  ALL PROJECTS
+// ════════════════════════════════════════════════════════
+
+let currentTypeFilter = 'all';
+let currentEmFilter   = 'all';
+
+function filterProjects(type) {
+  if (type === 'all' || type === 'labor' || type === 'hc') currentTypeFilter = type;
+  currentEmFilter = document.getElementById('emFilter').value;
+
+  // Update filter buttons
+  ['all','labor','hc'].forEach(t => {
+    const btn = document.getElementById('filt-' + t);
+    if (btn) btn.classList.toggle('active', t === currentTypeFilter);
+  });
+
+  let filtered = PROJECTS;
+  if (currentTypeFilter === 'labor') filtered = filtered.filter(p=>p.type==='Labor');
+  if (currentTypeFilter === 'hc')    filtered = filtered.filter(p=>p.type==='Hard Cap');
+  if (currentEmFilter !== 'all')     filtered = filtered.filter(p=>p.em_id===currentEmFilter);
+
+  const sorted = [...filtered].sort((a,b)=>b.forecast-a.forecast);
+
+  const body = document.getElementById('allProjectsBody');
+  body.innerHTML = '';
+  sorted.forEach(p => {
+    const burn = burnPct(Math.max(p.actual,0), p.forecast);
+    body.innerHTML += `<tr>
+      <td class="mono" style="color:var(--g500);font-size:11.5px">${p.id}</td>
+      <td style="font-size:12px;color:var(--g700);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.subProduct}</td>
+      <td><span class="badge ${p.type==='Labor'?'type-labor':'type-hc'}">${p.type}</span></td>
+      <td class="td-muted">${p.em.split(',')[0]}</td>
+      <td class="r mono" style="font-weight:700;color:var(--g900)">${fmtM(p.forecast)}</td>
+      <td class="r mono">${fmtM(Math.max(p.actual,0))}</td>
+      <td class="r">${burnBadge(burn)}</td>
+      <td class="r mono" style="color:var(--g400)">${fmtM(p.planned)}</td>
+      <td class="r mono" style="color:var(--g500)">${fmtM(p.budget)}</td>
+      <td class="r mono" ${varCellStyle(p.variance)}>${p.variance >= 0 ? '+' : ''}${fmtM(p.variance)}</td>
+      <td class="r">${statusBadge(p)}</td>
+    </tr>`;
+  });
+
+  const totForecast = filtered.reduce((s,p)=>s+p.forecast,0);
+  const totActual   = filtered.reduce((s,p)=>s+p.actual,0);
+  const totBudget   = filtered.reduce((s,p)=>s+p.budget,0);
+  const totVariance = filtered.reduce((s,p)=>s+p.variance,0);
+  const totPlanned  = filtered.reduce((s,p)=>s+p.planned,0);
+
+  document.getElementById('allProjectsFoot').innerHTML = `<tr>
+    <td colspan="4">Total · ${filtered.length} projects</td>
+    <td class="r grand">${fmtM(totForecast)}</td>
+    <td class="r">${fmtM(Math.max(totActual,0))}</td>
+    <td class="r">${burnPct(Math.max(totActual,0),totForecast)}%</td>
+    <td class="r" style="color:var(--g400)">${fmtM(totPlanned)}</td>
+    <td class="r" style="color:var(--g500)">${fmtM(totBudget)}</td>
+    <td class="r" ${varCellStyle(totVariance)}>${totVariance >= 0 ? '+' : ''}${fmtM(totVariance)}</td>
+    <td></td>
+  </tr>`;
+
+  document.getElementById('allProjectsTitle').textContent =
+    `${filtered.length} Projects — FY2026${currentEmFilter !== 'all' ? ' · ' + EM_NAMES[currentEmFilter] : ''}`;
+
+  // Sub-product rollup
+  buildSubProductRollup();
+}
+
+function buildSubProductRollup() {
+  const spMap = {};
+  PROJECTS.forEach(p => {
+    const key = p.subProduct + '|' + p.em;
+    if (!spMap[key]) spMap[key] = {subProduct:p.subProduct, em:p.em, em_id:p.em_id, forecast:0, actual:0, budget:0, variance:0, count:0};
+    spMap[key].forecast += p.forecast;
+    spMap[key].actual   += p.actual;
+    spMap[key].budget   += p.budget;
+    spMap[key].variance += p.variance;
+    spMap[key].count    += 1;
+  });
+
+  const items = Object.values(spMap).sort((a,b)=>b.forecast-a.forecast);
+  const body = document.getElementById('subprodBody');
+  body.innerHTML = '';
+  items.forEach(sp => {
+    const burn = burnPct(Math.max(sp.actual,0), sp.forecast);
+    body.innerHTML += `<tr>
+      <td class="td-name" style="font-size:12.5px">${sp.subProduct}</td>
+      <td class="td-muted">${sp.em.split(',')[0]}</td>
+      <td class="r mono" style="font-weight:700;color:var(--g900)">${fmtM(sp.forecast)}</td>
+      <td class="r mono">${fmtM(Math.max(sp.actual,0))}</td>
+      <td class="r">${burnBadge(burn)}</td>
+      <td class="r mono" style="color:var(--g500)">${fmtM(sp.budget)}</td>
+      <td class="r mono" ${varCellStyle(sp.variance)}>${sp.variance >= 0 ? '+' : ''}${fmtM(sp.variance)}</td>
+      <td class="r" style="color:var(--g400);font-size:12px">${sp.count}</td>
+    </tr>`;
+  });
+
+  const totF = items.reduce((s,sp)=>s+sp.forecast,0);
+  const totA = items.reduce((s,sp)=>s+sp.actual,0);
+  const totB = items.reduce((s,sp)=>s+sp.budget,0);
+  const totV = items.reduce((s,sp)=>s+sp.variance,0);
+  document.getElementById('subprodFoot').innerHTML = `<tr>
+    <td colspan="2">Total · ${items.length} sub-products</td>
+    <td class="r grand">${fmtM(totF)}</td>
+    <td class="r">${fmtM(Math.max(totA,0))}</td>
+    <td class="r">${burnPct(Math.max(totA,0),totF)}%</td>
+    <td class="r" style="color:var(--g500)">${fmtM(totB)}</td>
+    <td class="r" ${varCellStyle(totV)}>${totV >= 0 ? '+' : ''}${fmtM(totV)}</td>
+    <td></td>
+  </tr>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  NAV
+// ════════════════════════════════════════════════════════
+
+const initialized = {overview:false, labor:false, hardcap:false, projects:false};
+
+function switchTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.s-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  document.querySelector(`[data-section="${id}"]`).classList.add('active');
+  if (!initialized[id]) {
+    initialized[id] = true;
+    if (id === 'overview') buildOverview();
+    if (id === 'labor')    buildLabor();
+    if (id === 'hardcap')  buildHardcap();
+    if (id === 'projects') { filterProjects('all'); }
+  }
+}
+
+switchTab('overview');
+</script>
+</body>
+</html>
